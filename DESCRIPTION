@@ -17,3 +17,5 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Language: es
 LazyData: true
+URL: https://github.com/Aariq/bumbl
+BugReports: https://github.com/Aariq/bumbl/issues
