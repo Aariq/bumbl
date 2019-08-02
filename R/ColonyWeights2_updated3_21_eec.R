@@ -14,42 +14,42 @@ skimr::skim(wts)
 # Colony ID, Condition, TRT, and Site should all be factors.  Maybe "Pair" too.  There is no colom called "Supp".  Maybe that's NectarWt_g? Supp is supplemented or not.
 
 #Also ends in a bunch of NAs
-tail(wts)
+unique(wts$Condition)
 
 wts <-
-  wts %>% 
-  rename(Supp = NectarWt_g) %>% 
+  wts %>%
+  rename(Supp = NectarWt_g) %>%
   filter(!is.na(Supp))
 
-sites = unique(wts$ColonyID) 
-sites 
+sites = unique(wts$ColonyID)
+sites
 
 ######## The code below loops over possible values for the break point from growth to decline in each colonly
-# a separate curve is fit to each colony because I do not think there are any commonly used methods for fitting 
+# a separate curve is fit to each colony because I do not think there are any commonly used methods for fitting
 #this kind of curve to multiple data sets at once
 
-# This version of the model estimates different growth rates during weeks in which resources 
+# This version of the model estimates different growth rates during weeks in which resources
 # were supplemented and when they were not
 
 lm(log(TrueColonyWt_g) ~ Round + Supp + post, data = dat)
 
 taos = (seq(2,8,0.1)) #possible values for breakpoint
-taoML = array() 
+taoML = array()
 for(j in 1:length(sites)){
   dat = wts[wts$ColonyID == sites[j],] #subset data by colony?
   LLs = array(NA, dim = c(length(taos),1)) #creates array with slot for each tau?
-  
+
   for(i in 1:length(taos)){
     usetao = taos[i]
     dat$post = dat$Round - usetao
     dat$post[(dat$post < 0) == T] = 0 #post is 0 if before tao, numeric if after tao
-    
+
     m0 = try(lm(log(TrueColonyWt_g) ~ Round + Supp + post, data = dat))
     if(class(m0) != "try-error") LLs[i] = logLik(m0)
     LLs
   }
   taoML[j] = taos[which(LLs == max(LLs))]
-  
+
 }
 # Warnings about replacement lenghts.
 taoML # show the list of maximum-likelihood breakpoints for each colony
@@ -68,7 +68,7 @@ for(k in 1:length(sites)){
   # plots of each colony's trajectory and fitted curve, for visual inspection
   # these lines of code can be turned off without loss of function
   # but I like to look at them to be sure nothing went wrong
-  plot(dat$Round, dat$TrueColonyWt_g, main = sites[k]) 
+  plot(dat$Round, dat$TrueColonyWt_g, main = sites[k])
   points(dat$Round[1:length(predict(m1))], exp(predict(m1)), type = "l", col = "red")
 }# this loop returns `params` and prints models and plots as side-effect
 
@@ -90,7 +90,7 @@ param.dat = param.dat[1:length(sites), ] #not sure why necessary
 param.dat
 
 ##### this set of code compares parameters among treatments
-# When I have a number of possibly-correlated variables to compare among groups, I like to start with a manova as an omnibus test for signifcant patterns, then move to univariate tests of input variables and possibly ecologically relevant derived variables 
+# When I have a number of possibly-correlated variables to compare among groups, I like to start with a manova as an omnibus test for signifcant patterns, then move to univariate tests of input variables and possibly ecologically relevant derived variables
 w0 = manova(cbind(tao,loglam,logNo, suppl) ~ TRT, data = param.dat) # omnibus test for significance across 4 variables
 # NB max colony weight not included, since it is a function of the other 4 variables
 summary(w0)
@@ -133,7 +133,7 @@ w4 = lmer(logNmax ~ TRT + (1|Site), data = param.dat)
 Anova(w4) # marginally signifciant result that ES colonies get bigger
 hist(resid(w4))
 w4b = lmer(logNmax ~ -1 + TRT + (1|Site), data = param.dat)
-fixef(w4b) # although LS colonies might grow longer, they don't catch up 
+fixef(w4b) # although LS colonies might grow longer, they don't catch up
 exp(fixef(w4b)) # difference is more than 1.5x higher when back-transformed
 confint(w4b)
 exp(confint(w4b))
