@@ -1,0 +1,21 @@
+citHeader("To cite bumbl in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Bumble bee colony dynamics: quantifying the importance of land use and floral resources for colony growth and queen production",
+  author   = c(person(c("Elizabeth", "E."), "Crone",
+                      role = "aut",
+                      email = "elizabeth.crone@tufts.edu"),
+               person(c("Neal", "M.") "Williams",
+                      role = "aut"))
+
+  journal  = "Ecology Letters",
+  year     = "2016",
+  volume   = "19",
+  number   = "4",
+  pages    = "460-468",
+  doi      = "10.1111/ele.12581",
+  textVersion = paste(
+
+  )
+)
