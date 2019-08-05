@@ -38,6 +38,7 @@ brkpt <- function(data, taus, t, formula){
   if(length(tau_win) > 1){
     tau_win <- median(tau_win)
   }
+  # I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate({{data}}, .post = ifelse({{t}} <= tau_win, 0, {{t}} - tau_win))
   m_win <- lm(f, data = data_win)
   return(tibble(tau = tau_win, model = list(m_win)))

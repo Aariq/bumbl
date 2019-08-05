@@ -19,3 +19,5 @@ Language: es
 LazyData: true
 URL: https://github.com/Aariq/bumbl
 BugReports: https://github.com/Aariq/bumbl/issues
+Suggests: 
+    testthat (>= 2.1.0)
