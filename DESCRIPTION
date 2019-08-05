@@ -1,17 +1,18 @@
 Package: bumbl
-Title: Modeling bumblebee colony growth.
+Title: Tools for modeling bumblebee colony growth.
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "Eric",
+Authors@R: c(
+    person(given = c("Eric", "R."),
            family = "Scott",
            role = c("aut", "cre"),
            email = "scottericr@gmail.com",
-           comment = c(ORCID = "0000-0002-7430-7879"))
-    person(given = "Elizabeth",
+           comment = c(ORCID = "0000-0002-7430-7879")),
+    person(given = c("Elizabeth", "E."),
            family = "Crone",
            role = c("aut"),
            email = "elizabeth.crone@tufts.edu",
            comment = c(ORCID = ""))
+           )
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -21,3 +22,6 @@ URL: https://github.com/Aariq/bumbl
 BugReports: https://github.com/Aariq/bumbl/issues
 Suggests: 
     testthat (>= 2.1.0)
+Imports: 
+    dplyr
+RoxygenNote: 6.1.1
