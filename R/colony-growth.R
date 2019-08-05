@@ -3,12 +3,14 @@
 #' Fit breakpoint model to individual colony
 #' Fits models using a range of taus and picks the best one using maximum liklihood
 #'
-#' @param data
-#' @param taus
-#' @param t
-#' @param formula
+#' @param data a dataframe or tibble
+#' @param taus a vector of taus to test
+#' @param t the unquoted variable representing time in ___units?
+#' @param formula a formula passed to `lm`
 #'
 #' @return dataframe with two columns
+#'
+#' @import dplyr
 #' @export
 #'
 #' @examples
