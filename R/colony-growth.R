@@ -72,7 +72,7 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 
 #' Fit breakpoint growth models to many colonies.
 #'
-#' Fits breakpoint growth models to each colony in a dataset and returns the estimated breakpoint (tau) and some other things...
+#' Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, $\tau$.  This allows for a different switchpoint ($\tau$) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See **Details** for more information.
 #'
 #' @param data a dataframe or tibble
 #' @param colonyID the unquoted column name of the colony ID variable
@@ -80,7 +80,17 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula passed to `lm()`
 #'
-#' @return a dataframe
+#' @details Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
+#'
+#' @return The original dataframe augmented with the following columns:
+#' \itemize{
+#' \item{`tau` is the switchpoint, in the same units as `t`, for each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
+#' \item{`logNo` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
+#' \item{`loglam` is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit `t`) during the growth period.}
+#' \item{`decay` reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit `t` is calculated as `decay` - `loglam`.}
+#' \item{`logNmax` is the maximum weight reached by each colony.  It is a function of `tau`, `logNo` and `loglam`}
+#' \item{Additional columns are coefficients for any covariates supplied in the `formula`}
+#' }
 #'
 #' @import tidyr
 #' @import rlang
@@ -93,14 +103,19 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 #' @examples
 #' data(colony_weights)
 #' mytaus <- (seq(2,8,0.1))
-#' bumbl(colony_weights, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
+#' bumbl(colony_weights,
+#'       colonyID = ColonyID,
+#'       taus = mytaus,
+#'       t = Round,
+#'       formula = log(TrueColonyWt_g) ~ Round)
 
 bumbl <- function(data, colonyID, taus, t, formula){
+  #TODO: create a sensible default for tau that's like seq(min(t), max(t), length.out = 100)
   models <-
     data %>%
     group_by({{colonyID}}) %>%
     tidyr::nest() %>%
-    mutate(model = purrr::map(data, ~brkpt(., colonyID, taus, {{t}}, as.formula(formula))))
+    mutate(model = purrr::map(data, ~brkpt(., colonyID, taus, {{t}}, {{formula}})))
 
   summary_data <-
     models %>%

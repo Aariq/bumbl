@@ -9,13 +9,13 @@ brkpt(data, colonyID = NULL, taus, t, formula)
 \arguments{
 \item{data}{a dataframe or tibble}
 
-\item{colonyID}{unquoted name of colony ID column.  Only used for generating error messages.  Can be NULL if you're trying to call this function directly and not through `bumbl()`}
+\item{colonyID}{unquoted name of colony ID column.  Only used for generating error messages.  Can be NULL if you're trying to call this function directly and not through \code{bumbl()}}
 
 \item{taus}{a vector of taus to test}
 
 \item{t}{the unquoted variable representing time in ___units?}
 
-\item{formula}{a formula passed to `lm`}
+\item{formula}{a formula passed to \code{lm}}
 }
 \value{
 dataframe with two columns

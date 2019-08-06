@@ -1,5 +1,5 @@
 Package: bumbl
-Title: Tools for modeling bumblebee colony growth.
+Title: Tools for modeling bumblebee colony growth
 Version: 0.0.0.9000
 Authors@R: c(
     person(given = c("Eric", "R."),
@@ -13,7 +13,7 @@ Authors@R: c(
            email = "elizabeth.crone@tufts.edu",
            comment = c(ORCID = ""))
            )
-Description: What the package does (one paragraph).
+Description: Implements a breakpoint model from crone and williams....
 License: CCBY-4.0
 Encoding: UTF-8
 Language: es
@@ -29,3 +29,4 @@ Imports:
     purrr,
     broom
 RoxygenNote: 6.1.1
+Roxygen: list(markdown = TRUE)
