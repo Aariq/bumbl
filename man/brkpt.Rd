@@ -23,3 +23,8 @@ dataframe with two columns
 Fit breakpoint model to individual colony
 Fits models using a range of taus and picks the best one using maximum liklihood
 }
+\examples{
+testbees <- colony_weights \%>\% filter(ColonyID == 68)
+mytaus <- (seq(2,8,0.1))
+brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
+}
