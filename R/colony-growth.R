@@ -1,7 +1,9 @@
 #' Fit breakpoint model to individual colony
+#'
 #' Fits models using a range of taus and picks the best one using maximum liklihood
 #'
 #' @param data a dataframe or tibble
+#' @param colonyID unquoted name of colony ID column.  Only used for generating error messages.  Can be NULL if you're trying to call this function directly and not through `bumbl()`
 #' @param taus a vector of taus to test
 #' @param t the unquoted variable representing time in ___units?
 #' @param formula a formula passed to `lm`
@@ -10,28 +12,33 @@
 #'
 #' @import dplyr
 #' @import rlang
+#'
 #' @export
 #'
 #' @examples
 #' testbees <- colony_weights %>% filter(ColonyID == 68)
 #' mytaus <- (seq(2,8,0.1))
 #' brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
-brkpt <- function(data, taus, t, formula){
+brkpt <- function(data, colonyID = NULL, taus, t, formula){
   #TODO: make sure none of the variables are called '.post'
   fterms <- terms(formula)
   t <- enquo(t)
+  colonyID <- enquo(colonyID)
 
   #Check that time variable is in the formula
   if(!quo_name(t) %in% attr(fterms, "term.labels")) {
-    stop("'t=' should specify the time variable in the formula")
+    stop(paste0("Error in", quo_name(colonyID), "'t=' should specify the time variable in the formula"))
     }
+
   #Check that at least some taus are in range of t
   if(all(taus > max(data[[quo_name(t)]]))) {
     stop("at least one tau must be in range of 't'")
   }
   #If some taus are out of range of t, drop them
   if(any(taus > max(data[[quo_name(t)]])) | any(taus < min(data[[quo_name(t)]]))){
-    warn("Some taus were not used because they were outside of range of t")
+    #TODO: does this need a warning message? If so, could be more specific
+    # e.g. "For colony {colonyID} taus {unused taus} were not tested because they are outside of the range of {t}"
+    # warn("Some taus were not used because they were outside of range of t")
     taus <- taus[taus <= max(data[[quo_name(t)]]) & taus >= min(data[[quo_name(t)]])]
   }
 
@@ -46,14 +53,14 @@ brkpt <- function(data, taus, t, formula){
     m0 = try(lm(f, data = data2))
     if(class(m0) != "try-error") LLs[i] = logLik(m0)
     #TODO: what if there is an error?
+    #TODO: change to inherits()
     # LLs
   }
   tau_win <- taus[which(LLs == max(LLs))]
 
-  # This should be documented in "Details":
-  # If there is more than one equivalent tau (all have same LL), then re-fit model with median of those taus
+  # if multiple equivalent taus are found, this should fail
   if(length(tau_win) > 1){
-    tau_win <- median(tau_win)
+    stop(paste0("For colony ", unique(data[[quo_name(colonyID)]]), " more than one equivalent tau found"))
   }
   #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
@@ -64,6 +71,7 @@ brkpt <- function(data, taus, t, formula){
 
 
 #' Fit breakpoint growth models to many colonies.
+#'
 #' Fits breakpoint growth models to each colony in a dataset and returns the estimated breakpoint (tau) and some other things...
 #'
 #' @param data a dataframe or tibble
@@ -73,6 +81,13 @@ brkpt <- function(data, taus, t, formula){
 #' @param formula a formula passed to `lm()`
 #'
 #' @return a dataframe
+#'
+#' @import tidyr
+#' @import rlang
+#' @import dplyr
+#' @import purrr
+#' @import broom
+#'
 #' @export
 #'
 #' @examples
@@ -81,13 +96,16 @@ brkpt <- function(data, taus, t, formula){
 #' bumbl(colony_weights, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
 
 bumbl <- function(data, colonyID, taus, t, formula){
-  summary_data <-
+  models <-
     data %>%
     group_by({{colonyID}}) %>%
-    nest() %>%
-    mutate(model = map(data, ~brkpt(., taus, {{t}}, formula))) %>%
+    tidyr::nest() %>%
+    mutate(model = purrr::map(data, ~brkpt(., colonyID, taus, {{t}}, as.formula(formula))))
+
+  summary_data <-
+    models %>%
     unnest(model) %>%
-    mutate(coefs = map(model, tidy)) %>%
+    mutate(coefs = map(model, broom::tidy)) %>%
     unnest(coefs, .preserve = "model") %>%
     select({{colonyID}}, tau, model, term, estimate) %>%
     spread(key = term, value = estimate) %>%

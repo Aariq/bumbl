@@ -2,8 +2,7 @@
 % Please edit documentation in R/colony-growth.R
 \name{brkpt}
 \alias{brkpt}
-\title{Fit breakpoint model to individual colony
-Fits models using a range of taus and picks the best one using maximum liklihood}
+\title{Fit breakpoint model to individual colony}
 \usage{
 brkpt(data, taus, t, formula)
 }
@@ -20,7 +19,6 @@ brkpt(data, taus, t, formula)
 dataframe with two columns
 }
 \description{
-Fit breakpoint model to individual colony
 Fits models using a range of taus and picks the best one using maximum liklihood
 }
 \examples{
