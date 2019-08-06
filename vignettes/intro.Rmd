@@ -1,0 +1,49 @@
+---
+title: "Modeling bumblebee colony growth with a switch point"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modeling bumblebee colony growth with a switch point}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bumbl)
+```
+
+# Find Tau for a single colony
+This function is probably not super useful to end users, but is the "inner loop" of the main function
+
+```{r}
+testbees <- colony_weights[colony_weights$ColonyID == 18,]
+
+brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round)
+```
+
+# Run model on whole dataset
+
+```{r}
+bumbl(colony_weights[colony_weights$ColonyID != 68, ],
+      colonyID = ColonyID,
+      taus = seq(2,8,0.1),
+      t = Round,
+      formula = log(TrueColonyWt_g) ~ Round)
+```
+
+# With a covariate
+
+```{r}
+bumbl(colony_weights[colony_weights$ColonyID != 68, ],
+      colonyID = ColonyID,
+      taus = seq(2,8,0.1),
+      t = Round,
+      formula = log(TrueColonyWt_g) ~ Round + Condition)
+```
+

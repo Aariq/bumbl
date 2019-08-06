@@ -3,7 +3,7 @@ testbees <- colony_weights %>% filter(ColonyID == 18)
 test_that("brkpt errors if time variable is missing from formula", {
   expect_error(
     brkpt(testbees, taus = seq(2,8,0.1), colonyID = Site, t = Round, formula = log(TrueColonyWt_g) ~ 1),
-    "'t=' should specify the time variable in the formula"
+    "'Round' is missing from the model formula"
   )
 })
 

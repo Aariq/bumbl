@@ -21,7 +21,9 @@ LazyData: true
 URL: https://github.com/Aariq/bumbl
 BugReports: https://github.com/Aariq/bumbl/issues
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    knitr,
+    rmarkdown
 Imports: 
     dplyr,
     rlang,
@@ -30,3 +32,4 @@ Imports:
     broom
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr

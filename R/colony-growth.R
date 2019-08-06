@@ -27,7 +27,7 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 
   #Check that time variable is in the formula
   if(!quo_name(t) %in% attr(fterms, "term.labels")) {
-    stop(paste0("Error in", quo_name(colonyID), "'t=' should specify the time variable in the formula"))
+    stop(paste0("'",quo_name(t),"'", " is missing from the model formula"))
     }
 
   #Check that at least some taus are in range of t
@@ -111,11 +111,14 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 
 bumbl <- function(data, colonyID, taus, t, formula){
   #TODO: create a sensible default for tau that's like seq(min(t), max(t), length.out = 100)
+
   models <-
     data %>%
     group_by({{colonyID}}) %>%
     tidyr::nest() %>%
-    mutate(model = purrr::map(data, ~brkpt(., colonyID, taus, {{t}}, {{formula}})))
+    mutate(model = purrr::map(data, {
+      ~(brkpt(., colonyID = {{colonyID}}, taus = taus, t = {{t}}, formula = formula))
+      }))
 
   summary_data <-
     models %>%
@@ -127,5 +130,5 @@ bumbl <- function(data, colonyID, taus, t, formula){
     mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>%
     select(-model) %>%
     select({{colonyID}}, tau, logNo = `(Intercept)`, loglam = {{t}}, decay = .post, everything())
-  full_join(data, summary_data)
+  full_join(data, summary_data) #add a by= to get rid of warnings
 }
