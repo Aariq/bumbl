@@ -2,8 +2,7 @@
 % Please edit documentation in R/colony-growth.R
 \name{bumbl}
 \alias{bumbl}
-\title{Fit breakpoint growth models to many colonies.
-Fits breakpoint growth models to each colony in a dataset and returns the estimated breakpoint (tau) and some other things...}
+\title{Fit breakpoint growth models to many colonies.}
 \usage{
 bumbl(data, colonyID, taus, t, formula)
 }
@@ -22,7 +21,6 @@ bumbl(data, colonyID, taus, t, formula)
 a dataframe
 }
 \description{
-Fit breakpoint growth models to many colonies.
 Fits breakpoint growth models to each colony in a dataset and returns the estimated breakpoint (tau) and some other things...
 }
 \examples{

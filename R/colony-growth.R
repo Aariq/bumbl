@@ -16,9 +16,9 @@
 #' @export
 #'
 #' @examples
-#' testbees <- colony_weights %>% filter(ColonyID == 68)
+#' testbees <- colony_weights[(colony_weights$ColonyID == 68), ]
 #' mytaus <- (seq(2,8,0.1))
-#' brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
+#' brkpt(testbees, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
 brkpt <- function(data, colonyID = NULL, taus, t, formula){
   #TODO: make sure none of the variables are called '.post'
   fterms <- terms(formula)

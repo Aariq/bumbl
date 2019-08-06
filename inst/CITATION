@@ -6,9 +6,8 @@ citEntry(
   author   = c(person(c("Elizabeth", "E."), "Crone",
                       role = "aut",
                       email = "elizabeth.crone@tufts.edu"),
-               person(c("Neal", "M.") "Williams",
-                      role = "aut"))
-
+               person(c("Neal", "M."), "Williams",
+                      role = "aut")),
   journal  = "Ecology Letters",
   year     = "2016",
   volume   = "19",
