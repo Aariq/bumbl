@@ -23,5 +23,6 @@ BugReports: https://github.com/Aariq/bumbl/issues
 Suggests: 
     testthat (>= 2.1.0)
 Imports: 
-    dplyr
+    dplyr,
+    rlang
 RoxygenNote: 6.1.1
