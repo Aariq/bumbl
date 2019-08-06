@@ -16,8 +16,12 @@
 #' @examples
 brkpt <- function(data, taus, t, formula){
   #TODO: make sure none of the variables are called '.post'
-  #TODO: check that at least one of the formula elements is the same as `t`?
   #TODO: don't bother if Tau's extend past last t.  Don't even fit those models.  Warn user maybe (verbose = TRUE??)
+  fterms <- terms(formula)
+  t <- enquo(t)
+  if(!quo_name(t) %in% attr(fterms, "term.labels")) {
+    stop("'t=' should specify the time variable in the formula")
+    }
 
   # adds `.post` to formula. Would not be difficult to modify for other interactions
   f <- update(formula, ~. + .post)
@@ -26,7 +30,7 @@ brkpt <- function(data, taus, t, formula){
 
   for(i in 1:length(taus)){
     usetau = taus[i]
-    data2 <- mutate({{data}}, .post = ifelse({{t}} <= usetau, 0, {{t}} - usetau))
+    data2 <- mutate({{data}}, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
     m0 = try(lm(f, data = data2))
     if(class(m0) != "try-error") LLs[i] = logLik(m0)
@@ -41,7 +45,7 @@ brkpt <- function(data, taus, t, formula){
     tau_win <- median(tau_win)
   }
   # I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
-  data_win <- mutate({{data}}, .post = ifelse({{t}} <= tau_win, 0, {{t}} - tau_win))
+  data_win <- mutate({{data}}, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
   m_win <- lm(f, data = data_win)
   return(tibble(tau = tau_win, model = list(m_win)))
 }
