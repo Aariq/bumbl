@@ -1,8 +1,8 @@
-testbees <- colony_weights[colony_weights$ColonyID=="18"]
+testbees <- colony_weights %>% filter(ColonyID == 18)
 
 test_that("brkpt errors if time variable is missing from formula", {
   expect_error(
-    brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ 1),
+    brkpt(testbees, taus = seq(2,8,0.1), colonyID = Site, t = Round, formula = log(TrueColonyWt_g) ~ 1),
     "'t=' should specify the time variable in the formula"
   )
 })
@@ -28,4 +28,17 @@ test_that("brkpt uses only taus in range of t", {
   )
 })
 
+test_that("brkpt works with more complicated formulas", {
+  expect_s3_class(
+    brkpt(testbees, taus = seq(2, 8, 0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round + Condition),
+    "data.frame"
+  )
+})
 
+test_that("brkpt errors when multiple equivalent taus are found", {
+  expect_error({
+    testbees <- colony_weights %>% filter(ColonyID == 68)
+    brkpt(testbees, colonyID = ColonyID, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round)},
+    "For colony 68 more than one equivalent tau found"
+  )
+})
