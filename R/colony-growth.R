@@ -3,7 +3,7 @@
 #' Fits models using a range of taus and picks the best one using maximum liklihood
 #'
 #' @param data a dataframe or tibble
-#' @param colonyID unquoted name of colony ID column.  Only used for generating error messages.  Can be NULL if you're trying to call this function directly and not through `bumbl()`
+#' @param colonyID unquoted name of colony ID column.  Only used for generating informative error messages.  Can be NULL if you're trying to call this function directly and not through `bumbl()`
 #' @param taus a vector of taus to test
 #' @param t the unquoted variable representing time in ___units?
 #' @param formula a formula passed to `lm`
@@ -16,30 +16,28 @@
 #' @export
 #'
 #' @examples
-#' testbees <- colony_weights[(colony_weights$ColonyID == 68), ]
+#' testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
 #' mytaus <- (seq(2,8,0.1))
 #' brkpt(testbees, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
-brkpt <- function(data, colonyID = NULL, taus, t, formula){
+brkpt <- function(data, taus, t, formula){
   #TODO: make sure none of the variables are called '.post'
   fterms <- terms(formula)
   t <- enquo(t)
-  colonyID <- enquo(colonyID)
+  tvar <-as_label(t) #for error handling
 
   #Check that time variable is in the formula
-  if(!quo_name(t) %in% attr(fterms, "term.labels")) {
-    stop(paste0("'",quo_name(t),"'", " is missing from the model formula"))
+  if(!as_name(t) %in% attr(fterms, "term.labels")) {
+    abort(glue::glue("'{tvar}' is missing from the model formula"))
     }
 
   #Check that at least some taus are in range of t
-  if(all(taus > max(data[[quo_name(t)]]))) {
-    stop("at least one tau must be in range of 't'")
+  if(all(taus > max(data[[as_name(t)]]))) {
+    abort(glue::glue("At least one tau must be in range of '{tvar}'"))
   }
   #If some taus are out of range of t, drop them
-  if(any(taus > max(data[[quo_name(t)]])) | any(taus < min(data[[quo_name(t)]]))){
-    #TODO: does this need a warning message? If so, could be more specific
-    # e.g. "For colony {colonyID} taus {unused taus} were not tested because they are outside of the range of {t}"
-    # warn("Some taus were not used because they were outside of range of t")
-    taus <- taus[taus <= max(data[[quo_name(t)]]) & taus >= min(data[[quo_name(t)]])]
+  if(any(taus > max(data[[as_name(t)]])) | any(taus < min(data[[as_name(t)]]))){
+    warning(glue::glue("Some taus were not used because they were outside of range of '{tvar}'"))
+    taus <- taus[taus <= max(data[[as_name(t)]]) & taus >= min(data[[as_name(t)]])]
   }
 
   # adds `.post` to formula. Would not be difficult to modify for other interactions
@@ -60,7 +58,7 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 
   # if multiple equivalent taus are found, this should fail
   if(length(tau_win) > 1){
-    stop(paste0("For colony ", unique(data[[quo_name(colonyID)]]), " more than one equivalent tau found"))
+    abort("More than one equivalent tau found")
   }
   #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
@@ -72,7 +70,7 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 
 #' Fit breakpoint growth models to many colonies.
 #'
-#' Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, $\tau$.  This allows for a different switchpoint ($\tau$) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See **Details** for more information.
+#' Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, \eqn{\tau}.  This allows for a different switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See **Details** for more information.
 #'
 #' @param data a dataframe or tibble
 #' @param colonyID the unquoted column name of the colony ID variable
@@ -97,13 +95,16 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 #' @import dplyr
 #' @import purrr
 #' @import broom
+#' @importFrom forcats fct_drop
 #'
 #' @export
 #'
 #' @examples
+#' library(dplyr)
 #' data(colony_weights)
 #' mytaus <- (seq(2,8,0.1))
-#' bumbl(colony_weights,
+#' mydata <- colony_weights %>% filter(!ColonyID %in% c("68", "97"))
+#' bumbl(mydata,
 #'       colonyID = ColonyID,
 #'       taus = mytaus,
 #'       t = Round,
@@ -111,24 +112,34 @@ brkpt <- function(data, colonyID = NULL, taus, t, formula){
 
 bumbl <- function(data, colonyID, taus, t, formula){
   #TODO: create a sensible default for tau that's like seq(min(t), max(t), length.out = 100)
+  #TODO: scoop up all the errors and warnings from brkpt() and present a summary at the end.
 
-  models <-
+  colonyID <- enquo(colonyID)
+  df <-
     data %>%
-    group_by({{colonyID}}) %>%
-    tidyr::nest() %>%
-    mutate(model = purrr::map(data, {
-      ~(brkpt(., colonyID = {{colonyID}}, taus = taus, t = {{t}}, formula = formula))
-      }))
+    # make sure colonyID is a factor, drop any unused levels
+    mutate(!!colonyID := fct_drop(!!colonyID)) %>%
+    group_by(!!colonyID)
 
-  summary_data <-
-    models %>%
-    unnest(model) %>%
+  dflist <- group_split(df)
+
+  names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
+
+  modeldf <-
+    map_dfr(dflist,
+            ~brkpt(data = .x,
+                   taus = {{taus}},
+                   t ={{t}},
+                   formula = formula),
+            .id = as_name(colonyID)) %>%
     mutate(coefs = map(model, broom::tidy)) %>%
     unnest(coefs, .preserve = "model") %>%
-    select({{colonyID}}, tau, model, term, estimate) %>%
+    select(!!colonyID, tau, model, term, estimate) %>%
     spread(key = term, value = estimate) %>%
     mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>%
     select(-model) %>%
-    select({{colonyID}}, tau, logNo = `(Intercept)`, loglam = {{t}}, decay = .post, everything())
-  full_join(data, summary_data) #add a by= to get rid of warnings
+    select(!!colonyID, tau, logNo = `(Intercept)`, loglam = Round, decay = .post, everything())
+
+  augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
+  return(augmented_df)
 }

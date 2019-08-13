@@ -18,26 +18,28 @@ bumbl(data, colonyID, taus, t, formula)
 \item{formula}{a formula passed to \code{lm()}}
 }
 \value{
-a dataframe
-}
-\description{
-Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, $\tau$.  This allows for a different switchpoint ($\tau$) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See \strong{Details} for more information.
-}
-\details{
-Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, $\tau$, may vary among colonies.  The output of this function is the original dataframe augmented with the following columns:
+The original dataframe augmented with the following columns:
 \itemize{
-\item{\code{tau} is the switchpoint, in weeks for each \code{colonyID}.  The colony grows for $\tau$ weeks, then begins to decline in week $\tau + 1$.}
+\item{\code{tau} is the switchpoint, in the same units as \code{t}, for each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
 \item{\code{logNo} is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
-\item{\code{loglam} is the average 10-day (log-scale) colony growth rate (i.e., rate of weight gain) during the growth period.}
-\item{\code{decay} reflects the rate of decline during the decline period.  In fact, the way this model is set up, the actual rate of decline per 10 days is calculated as \code{decay} - \code{loglam}.}
-\item{\code{logNmax} is the maximum weight reached by each colony.  It is a function of tao, logNo and loglam}
+\item{\code{loglam} is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit \code{t}) during the growth period.}
+\item{\code{decay} reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{loglam}.}
+\item{\code{logNmax} is the maximum weight reached by each colony.  It is a function of \code{tau}, \code{logNo} and \code{loglam}}
 \item{Additional columns are coefficients for any covariates supplied in the \code{formula}}
 }
 }
+\description{
+Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, \eqn{\tau}.  This allows for a different switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See \strong{Details} for more information.
+}
+\details{
+Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
+}
 \examples{
+library(dplyr)
 data(colony_weights)
 mytaus <- (seq(2,8,0.1))
-bumbl(colony_weights,
+mydata <- colony_weights \%>\% filter(!ColonyID \%in\% c("68", "97"))
+bumbl(mydata,
       colonyID = ColonyID,
       taus = mytaus,
       t = Round,

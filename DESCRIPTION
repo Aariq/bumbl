@@ -29,7 +29,8 @@ Imports:
     rlang,
     tidyr,
     purrr,
-    broom
+    broom,
+    forcats
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

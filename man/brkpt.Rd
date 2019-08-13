@@ -24,7 +24,7 @@ dataframe with two columns
 Fits models using a range of taus and picks the best one using maximum liklihood
 }
 \examples{
-testbees <- colony_weights[(colony_weights$ColonyID == 68), ]
+testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
 mytaus <- (seq(2,8,0.1))
 brkpt(testbees, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
 }
