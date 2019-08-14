@@ -3,22 +3,22 @@
 #' Fits models using a range of taus and picks the best one using maximum liklihood
 #'
 #' @param data a dataframe or tibble
-#' @param colonyID unquoted name of colony ID column.  Only used for generating informative error messages.  Can be NULL if you're trying to call this function directly and not through `bumbl()`
 #' @param taus a vector of taus to test
 #' @param t the unquoted variable representing time in ___units?
 #' @param formula a formula passed to `lm`
 #'
-#' @return dataframe with two columns
+#' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
 #' @import rlang
-#'
+#' @importFrom stats lm update logLik terms
 #' @export
 #'
 #' @examples
+#' data(colony_weights)
 #' testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
 #' mytaus <- (seq(2,8,0.1))
-#' brkpt(testbees, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
+#' brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
 brkpt <- function(data, taus, t, formula){
   #TODO: make sure none of the variables are called '.post'
   fterms <- terms(formula)
@@ -27,16 +27,19 @@ brkpt <- function(data, taus, t, formula){
 
   #Check that time variable is in the formula
   if(!as_name(t) %in% attr(fterms, "term.labels")) {
-    abort(glue::glue("'{tvar}' is missing from the model formula"))
+    # abort(glue::glue("'{tvar}' is missing from the model formula"))
+    abort(paste0("'",tvar,"' is missing from the model formula"))
     }
 
   #Check that at least some taus are in range of t
   if(all(taus > max(data[[as_name(t)]]))) {
-    abort(glue::glue("At least one tau must be in range of '{tvar}'"))
+    # abort(glue::glue("At least one tau must be in range of '{tvar}'"))
+    abort(paste0("At least one tau must be in range of '", tvar, "'"))
   }
   #If some taus are out of range of t, drop them
   if(any(taus > max(data[[as_name(t)]])) | any(taus < min(data[[as_name(t)]]))){
-    warning(glue::glue("Some taus were not used because they were outside of range of '{tvar}'"))
+    # warning(glue::glue("Some taus were not used because they were outside of range of '{tvar}'"))
+    warning(paste0("Some taus were not used because they were outside of range of '", tvar, "'"))
     taus <- taus[taus <= max(data[[as_name(t)]]) & taus >= min(data[[as_name(t)]])]
   }
 
@@ -93,7 +96,7 @@ brkpt <- function(data, taus, t, formula){
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
-#' @import purrr
+#' @importFrom purrr map map_dbl map_dfr
 #' @import broom
 #' @importFrom forcats fct_drop
 #'

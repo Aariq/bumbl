@@ -4,12 +4,10 @@
 \alias{brkpt}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, colonyID = NULL, taus, t, formula)
+brkpt(data, taus, t, formula)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
-
-\item{colonyID}{unquoted name of colony ID column.  Only used for generating error messages.  Can be NULL if you're trying to call this function directly and not through \code{bumbl()}}
 
 \item{taus}{a vector of taus to test}
 
@@ -18,13 +16,14 @@ brkpt(data, colonyID = NULL, taus, t, formula)
 \item{formula}{a formula passed to \code{lm}}
 }
 \value{
-dataframe with two columns
+a tibble with a column for the winning tau and a column for the winning model
 }
 \description{
 Fits models using a range of taus and picks the best one using maximum liklihood
 }
 \examples{
+data(colony_weights)
 testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
 mytaus <- (seq(2,8,0.1))
-brkpt(testbees, ColonyID, mytaus, Round, log(TrueColonyWt_g) ~ Round)
+brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
 }
