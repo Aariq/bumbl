@@ -99,7 +99,6 @@ brkpt <- function(data, taus, t, formula){
 #' @import dplyr
 #' @importFrom purrr map map_dbl map_dfr
 #' @import broom
-#' @importFrom forcats fct_drop
 #'
 #' @export
 #'
@@ -122,7 +121,7 @@ bumbl <- function(data, colonyID, taus, t, formula){
   df <-
     data %>%
     # make sure colonyID is a factor, drop any unused levels
-    mutate(!!colonyID := fct_drop(!!colonyID)) %>%
+    mutate(!!colonyID := as.factor(as.character(!!colonyID))) %>%
     group_by(!!colonyID)
 
   dflist <- group_split(df)
