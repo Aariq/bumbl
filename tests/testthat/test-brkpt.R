@@ -7,12 +7,6 @@ test_that("brkpt errors if time variable is missing from formula", {
   )
 })
 
-test_that("brkpt works", {
-  expect_s3_class(
-    brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
-    "data.frame"
-  )
-})
 
 test_that("brkpt errors if taus don't match t", {
   expect_error(
@@ -25,6 +19,13 @@ test_that("brkpt uses only taus in range of t", {
   expect_warning(
     brkpt(testbees, taus = seq(2, 10, 0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
     "Some taus were not used because they were outside of range of 'Round'"
+  )
+})
+
+test_that("brkpt works", {
+  expect_s3_class(
+    brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
+    "data.frame"
   )
 })
 

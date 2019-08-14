@@ -1,6 +1,12 @@
+library(dplyr)
 test_that("bumbl works", {
+  data <- colony_weights %>% filter(!ColonyID %in% c("68", "97"))
   expect_s3_class(
-    bumbl(colony_weights %>% filter(!ColonyID %in% c("68", "97")) , colonyID = ColonyID, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
+    bumbl(data,
+          colonyID = ColonyID,
+          taus = seq(2,8,0.1),
+          t = Round,
+          formula = log(TrueColonyWt_g) ~ Round),
     "data.frame"
   )
 })

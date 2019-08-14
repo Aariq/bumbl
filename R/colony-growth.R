@@ -23,24 +23,24 @@ brkpt <- function(data, taus, t, formula){
   #TODO: make sure none of the variables are called '.post'
   fterms <- terms(formula)
   t <- enquo(t)
-  tvar <-as_label(t) #for error handling
+  tvar <-as_name(t)
 
   #Check that time variable is in the formula
-  if(!as_name(t) %in% attr(fterms, "term.labels")) {
+  if(!tvar %in% attr(fterms, "term.labels")) {
     # abort(glue::glue("'{tvar}' is missing from the model formula"))
     abort(paste0("'",tvar,"' is missing from the model formula"))
     }
 
   #Check that at least some taus are in range of t
-  if(all(taus > max(data[[as_name(t)]]))) {
+  if(all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
     # abort(glue::glue("At least one tau must be in range of '{tvar}'"))
     abort(paste0("At least one tau must be in range of '", tvar, "'"))
   }
   #If some taus are out of range of t, drop them
-  if(any(taus > max(data[[as_name(t)]])) | any(taus < min(data[[as_name(t)]]))){
+  if(any(taus > max(data[[tvar]])) | any(taus < min(data[[tvar]]))){
     # warning(glue::glue("Some taus were not used because they were outside of range of '{tvar}'"))
     warning(paste0("Some taus were not used because they were outside of range of '", tvar, "'"))
-    taus <- taus[taus <= max(data[[as_name(t)]]) & taus >= min(data[[as_name(t)]])]
+    taus <- taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
   }
 
   # adds `.post` to formula. Would not be difficult to modify for other interactions
@@ -52,9 +52,10 @@ brkpt <- function(data, taus, t, formula){
     data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
     m0 = try(lm(f, data = data2))
-    if(class(m0) != "try-error") LLs[i] = logLik(m0)
+    if(!inherits(m0, "try-error")){
+      LLs[i] = logLik(m0)
+    } #else?
     #TODO: what if there is an error?
-    #TODO: change to inherits()
     # LLs
   }
   tau_win <- taus[which(LLs == max(LLs))]
