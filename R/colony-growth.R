@@ -10,6 +10,7 @@
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
+#' @import tibble
 #' @import rlang
 #' @importFrom stats lm update logLik terms
 #' @export
