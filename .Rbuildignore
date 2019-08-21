@@ -4,3 +4,5 @@
 ^notes$
 ^\.travis\.yml$
 ^codecov\.yml$
+^LICENSE$
+^LICENSE\.md$

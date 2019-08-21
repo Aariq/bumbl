@@ -14,7 +14,7 @@ Authors@R: c(
            comment = c(ORCID = ""))
            )
 Description: Implements a breakpoint model from crone and williams....
-License: CCBY-4.0
+License: CC BY 4.0
 Encoding: UTF-8
 Language: es
 LazyData: true
