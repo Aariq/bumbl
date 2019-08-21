@@ -1,6 +1,6 @@
 library(dplyr)
 test_that("bumbl works", {
-  data <- colony_weights %>% filter(!ColonyID %in% c("68", "97"))
+  data <- colony_weights %>% dplyr::filter(!ColonyID %in% c("68", "97"))
   expect_s3_class(
     bumbl(data,
           colonyID = ColonyID,
@@ -12,7 +12,7 @@ test_that("bumbl works", {
 })
 
 test_that("bumbl returns DF same size as data", {
-  data <- colony_weights %>% filter(!ColonyID %in% c("68", "97"))
+  data <- colony_weights %>% dplyr::filter(!ColonyID %in% c("68", "97"))
   out <- bumbl(data,
                colonyID = ColonyID,
                taus = seq(2,8,0.1),
