@@ -15,7 +15,6 @@
 #' @export
 #'
 #' @examples
-#' data(colony_weights)
 #' testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
 #' mytaus <- (seq(2,8,0.1))
 #' brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
@@ -104,9 +103,9 @@ brkpt <- function(data, taus, t, formula){
 #'
 #' @examples
 #' library(dplyr)
-#' data(colony_weights)
+#'
 #' mytaus <- (seq(2,8,0.1))
-#' mydata <- colony_weights %>% filter(!ColonyID %in% c("68", "97"))
+#' mydata <- filter(colony_weights, !ColonyID %in% c("68", "97"))
 #' bumbl(mydata,
 #'       colonyID = ColonyID,
 #'       taus = mytaus,

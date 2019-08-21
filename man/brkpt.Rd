@@ -22,7 +22,6 @@ a tibble with a column for the winning tau and a column for the winning model
 Fits models using a range of taus and picks the best one using maximum liklihood
 }
 \examples{
-data(colony_weights)
 testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
 mytaus <- (seq(2,8,0.1))
 brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)

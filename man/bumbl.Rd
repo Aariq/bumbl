@@ -36,9 +36,9 @@ Colony growth is modeled as increasing exponentialy until the colony switches to
 }
 \examples{
 library(dplyr)
-data(colony_weights)
+
 mytaus <- (seq(2,8,0.1))
-mydata <- colony_weights \%>\% filter(!ColonyID \%in\% c("68", "97"))
+mydata <- filter(colony_weights, !ColonyID \%in\% c("68", "97"))
 bumbl(mydata,
       colonyID = ColonyID,
       taus = mytaus,
