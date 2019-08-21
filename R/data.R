@@ -5,8 +5,9 @@
 #' @format A data frame with 178 rows and 10 columns
 #' \describe{
 #'   \item{Pair}{???}
-#'   \item{Site}{Which site/colony}
-#'   \item{ColonyID}{Which colony/site}
+#'   \item{Site}{Site name}
+#'   \item{Round}{Which round of measurement (in 10 day increments)}
+#'   \item{ColonyID}{Colony identifier}
 #'   \item{TRT}{Early supplemented (ES) or late supplemented (LS)}
 #'   \item{Condition}{???}
 #'   \item{TrueColonyWt_g}{True colony weight, in grams}
