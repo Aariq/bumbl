@@ -10,7 +10,6 @@
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
-#' @import tibble
 #' @import rlang
 #' @importFrom stats lm update logLik terms
 #' @export
@@ -136,7 +135,7 @@ bumbl <- function(data, colonyID, taus, t, formula){
     model_list[[i]] <-
       tryCatch(brkpt(dflist[[i]], taus = {{taus}}, t = {{t}}, formula = formula),
                error = function(c){
-                 c$message <- glue::glue("For Colony ID '{names(dflist)[i]}': {c$message}")
+                 c$message <- paste0("For Colony ID '", names(dflist)[i], "': ", c$message)
                  stop(c)
                })
     names(model_list) <- names(dflist)
@@ -146,11 +145,11 @@ bumbl <- function(data, colonyID, taus, t, formula){
     bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
     mutate(coefs = map(model, broom::tidy)) %>%
     unnest(coefs, .preserve = "model") %>%
-    select(!!colonyID, tau, model, term, estimate) %>%
-    spread(key = term, value = estimate) %>%
+    select(!!colonyID, "tau", "model", "term", "estimate") %>%
+    spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>%
-    select(-model) %>%
-    select(!!colonyID, tau, logNo = `(Intercept)`, loglam = Round, decay = .post, everything())
+    select(-"model") %>%
+    select(!!colonyID, "tau", logNo = '(Intercept)', loglam = {{t}}, decay = '.post', everything())
 
     augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
     return(augmented_df)
