@@ -98,7 +98,7 @@ brkpt <- function(data, taus, t, formula){
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
-#' @importFrom purrr map map_dbl map_dfr
+#' @importFrom purrr map map_dbl
 #' @import broom
 #'
 #' @export
@@ -129,13 +129,21 @@ bumbl <- function(data, colonyID, taus, t, formula){
 
   names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
 
+  # for loop style:
+  model_list <- vector("list", length(dflist))
+
+  for(i in 1:length(dflist)){
+    model_list[[i]] <-
+      tryCatch(brkpt(dflist[[i]], taus = {{taus}}, t = {{t}}, formula = formula),
+               error = function(c){
+                 c$message <- glue::glue("For Colony ID '{names(dflist)[i]}': {c$message}")
+                 stop(c)
+               })
+    names(model_list) <- names(dflist)
+  }
+
   modeldf <-
-    map_dfr(dflist,
-            ~brkpt(data = .x,
-                   taus = {{taus}},
-                   t ={{t}},
-                   formula = formula),
-            .id = as_name(colonyID)) %>%
+    bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
     mutate(coefs = map(model, broom::tidy)) %>%
     unnest(coefs, .preserve = "model") %>%
     select(!!colonyID, tau, model, term, estimate) %>%
@@ -144,6 +152,25 @@ bumbl <- function(data, colonyID, taus, t, formula){
     select(-model) %>%
     select(!!colonyID, tau, logNo = `(Intercept)`, loglam = Round, decay = .post, everything())
 
-  augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
-  return(augmented_df)
+    augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
+    return(augmented_df)
+
+  # Full-on {purrr} style.  This is probably faster, but I don't know how to get helpful error messages from brkpt.  Like, I don't know how to embed tryCatch into a map() function correctly.
+  # modeldf <-
+  #   map_dfr(dflist,
+  #           ~brkpt(data = .x,
+  #                  taus = {{taus}},
+  #                  t ={{t}},
+  #                  formula = formula),
+  #           .id = as_name(colonyID)) %>%
+  #   mutate(coefs = map(model, broom::tidy)) %>%
+  #   unnest(coefs, .preserve = "model") %>%
+  #   select(!!colonyID, tau, model, term, estimate) %>%
+  #   spread(key = term, value = estimate) %>%
+  #   mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>%
+  #   select(-model) %>%
+  #   select(!!colonyID, tau, logNo = `(Intercept)`, loglam = Round, decay = .post, everything())
+  #
+  # augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
+  # return(augmented_df)
 }

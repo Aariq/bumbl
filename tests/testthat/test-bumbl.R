@@ -25,6 +25,6 @@ test_that("bumbl returns DF same size as data", {
 
 test_that("error messages propgate correctly from brkpt to bumbl", {
   expect_error(bumbl(colony_weights, colonyID = ColonyID, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
-  "For colony 68 more than one equivalent tau found"
+  "For Colony ID '68': More than one equivalent tau found"
   )
 })
