@@ -3,19 +3,19 @@
 \docType{data}
 \name{colony_weights}
 \alias{colony_weights}
-\title{Bumblebee colony weight data from Crone and Williams, 2016}
+\title{Bumblebee colony weight data from Malfi et al, 2019...}
 \format{A data frame with 178 rows and 10 columns
 \describe{
-\item{Pair}{???}
-\item{Site}{Site name}
-\item{Round}{Which round of measurement (in 10 day increments)}
+\item{Pair}{A pair of colonies were placed at each site.  This should be totally redundant to 'Site', but it's not for some reason (TODO)}
+\item{Site}{Site name.  All sites are in Colusa, Solano and Yolo Counties in the northern Central Valley of California, USA}
+\item{Round}{Colonies were weighed every 9 to 11 days.  Each 9--11 day period is a 'round'}
 \item{ColonyID}{Colony identifier}
-\item{TRT}{Early supplemented (ES) or late supplemented (LS)}
-\item{Condition}{???}
+\item{TRT}{Resource supplementation tretment. Early supplemented (ES) colonies recieved supplemental nectar and pollen for the first 20 days they were in the field and late supplemented (LS) colonies recieved supplemental food for days 20 through 40.}
+\item{Condition}{All colonies started off being reared in the lab (LAB). After that, they were either recieving supplemental food (SUPP) or relying on ambient food resources (AMBIENT)}
 \item{TrueColonyWt_g}{True colony weight, in grams}
 \item{NectarWt_g}{The weight of nectar in the colonies, in grams}
 \item{A_ColonyWt_g}{???}
-\item{B_BoxWt_g}{The tare weight of the box the colony is in, in grams}
+\item{B_BoxWt_g}{The tare weight of the box the colony is in, in grams???}
 }}
 \source{
 \url{link to archived data???}
