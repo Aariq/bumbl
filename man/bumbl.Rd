@@ -4,14 +4,14 @@
 \alias{bumbl}
 \title{Fit breakpoint growth models to many colonies.}
 \usage{
-bumbl(data, colonyID, taus, t, formula)
+bumbl(data, colonyID, taus = NULL, t, formula)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
 
 \item{colonyID}{the unquoted column name of the colony ID variable}
 
-\item{taus}{vector of taus to test}
+\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 
 \item{t}{the unquoted column name of the time variable in (units???)}
 
@@ -37,11 +37,9 @@ Colony growth is modeled as increasing exponentialy until the colony switches to
 \examples{
 library(dplyr)
 
-mytaus <- (seq(2,8,0.1))
 mydata <- filter(colony_weights, !ColonyID \%in\% c("68", "97"))
 bumbl(mydata,
       colonyID = ColonyID,
-      taus = mytaus,
       t = Round,
       formula = log(TrueColonyWt_g) ~ Round)
 }

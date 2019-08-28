@@ -3,9 +3,9 @@
 #' Fits models using a range of taus and picks the best one using maximum liklihood
 #'
 #' @param data a dataframe or tibble
-#' @param taus a vector of taus to test
-#' @param t the unquoted variable representing time in ___units?
-#' @param formula a formula passed to `lm`
+#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used
+#' @param t the unquoted column name for the time variable in `data`
+#' @param formula a formula passed to `lm`.  This should include the time variable supplied to `t`
 #'
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
@@ -16,13 +16,17 @@
 #'
 #' @examples
 #' testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
-#' mytaus <- (seq(2,8,0.1))
-#' brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
-brkpt <- function(data, taus, t, formula){
+#' brkpt(testbees, t = Round, formula = log(TrueColonyWt_g) ~ Round)
+brkpt <- function(data, taus = NULL, t, formula){
   #TODO: make sure none of the variables are called '.post'
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
+
+  if(is.null(taus)){
+    tvec <- data[[tvar]]
+    taus <- seq(min(tvec), max(tvec), length.out = 50)
+  }
 
   #Check that time variable is in the formula
   if(!tvar %in% attr(fterms, "term.labels")) {
@@ -77,7 +81,7 @@ brkpt <- function(data, taus, t, formula){
 #'
 #' @param data a dataframe or tibble
 #' @param colonyID the unquoted column name of the colony ID variable
-#' @param taus vector of taus to test
+#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula passed to `lm()`
 #'
@@ -104,18 +108,15 @@ brkpt <- function(data, taus, t, formula){
 #' @examples
 #' library(dplyr)
 #'
-#' mytaus <- (seq(2,8,0.1))
 #' mydata <- filter(colony_weights, !ColonyID %in% c("68", "97"))
 #' bumbl(mydata,
 #'       colonyID = ColonyID,
-#'       taus = mytaus,
 #'       t = Round,
 #'       formula = log(TrueColonyWt_g) ~ Round)
 
-bumbl <- function(data, colonyID, taus, t, formula){
+bumbl <- function(data, colonyID, taus = NULL, t, formula){
   #TODO: create a sensible default for tau that's like seq(min(t), max(t), length.out = 100)
   #TODO: scoop up all the errors and warnings from brkpt() and present a summary at the end.
-
   colonyID <- enquo(colonyID)
   df <-
     data %>%

@@ -43,3 +43,10 @@ test_that("brkpt errors when multiple equivalent taus are found", {
     "More than one equivalent tau found"
   )
 })
+
+test_that("brkpt supplies its own taus if not given any", {
+  expect_s3_class(
+    brkpt(testbees, t = Round, formula = log(TrueColonyWt_g) ~ Round),
+    "data.frame"
+  )
+})

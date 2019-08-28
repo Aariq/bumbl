@@ -4,16 +4,16 @@
 \alias{brkpt}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, taus, t, formula)
+brkpt(data, taus = NULL, t, formula)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
 
-\item{taus}{a vector of taus to test}
+\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used}
 
-\item{t}{the unquoted variable representing time in ___units?}
+\item{t}{the unquoted column name for the time variable in \code{data}}
 
-\item{formula}{a formula passed to \code{lm}}
+\item{formula}{a formula passed to \code{lm}.  This should include the time variable supplied to \code{t}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the winning model
@@ -23,6 +23,5 @@ Fits models using a range of taus and picks the best one using maximum liklihood
 }
 \examples{
 testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
-mytaus <- (seq(2,8,0.1))
-brkpt(testbees, mytaus, Round, log(TrueColonyWt_g) ~ Round)
+brkpt(testbees, t = Round, formula = log(TrueColonyWt_g) ~ Round)
 }

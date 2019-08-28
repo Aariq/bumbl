@@ -28,3 +28,11 @@ test_that("error messages propgate correctly from brkpt to bumbl", {
   "For Colony ID '68': More than one equivalent tau found"
   )
 })
+
+test_that("bumbl works with default taus", {
+  data <- colony_weights %>% dplyr::filter(!ColonyID %in% c("68", "97"))
+  expect_s3_class(
+    bumbl(data, colonyID = ColonyID, t = Round, formula = log(TrueColonyWt_g) ~ Round),
+    "data.frame"
+  )
+})
