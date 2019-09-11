@@ -11,6 +11,8 @@ status](https://travis-ci.org/Aariq/bumbl.svg?branch=master)](https://travis-ci.
 status](https://ci.appveyor.com/api/projects/status/github/Aariq/bumbl?branch=master&svg=true)](https://ci.appveyor.com/project/Aariq/bumbl)
 [![Codecov test
 coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](https://codecov.io/gh/Aariq/bumbl?branch=master)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
