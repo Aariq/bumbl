@@ -1,20 +1,22 @@
-#' Bumblebee colony weight data from Malfi et al, 2019...
+#' *Bombus vosnesenskii* colony growth and estimated floral resrouces
 #'
-#' A dataset containing the weights of bumblebee colonies...
+#' This is a subset of the data from Crone and Williams, 2016.  *Bombus vosnesenskii* colonies were placed in sites in a mixed agricultural--natural area in California, USA and weighed weekly.
 #'
 #' @format A data frame with 178 rows and 10 columns
 #' \describe{
-#'   \item{Pair}{A pair of colonies were placed at each site.  This should be totally redundant to 'Site', but it's not for some reason (TODO)}
-#'   \item{Site}{Site name.  All sites are in Colusa, Solano and Yolo Counties in the northern Central Valley of California, USA}
-#'   \item{Round}{Colonies were weighed every 9 to 11 days.  Each 9--11 day period is a 'round'}
-#'   \item{ColonyID}{Colony identifier}
-#'   \item{TRT}{Resource supplementation tretment. Early supplemented (ES) colonies recieved supplemental nectar and pollen for the first 20 days they were in the field and late supplemented (LS) colonies recieved supplemental food for days 20 through 40.}
-#'   \item{Condition}{All colonies started off being reared in the lab (LAB). After that, they were either recieving supplemental food (SUPP) or relying on ambient food resources (AMBIENT)}
-#'   \item{TrueColonyWt_g}{True colony weight, in grams}
-#'   \item{NectarWt_g}{The weight of nectar in the colonies, in grams}
-#'   \item{A_ColonyWt_g}{???}
-#'   \item{B_BoxWt_g}{The tare weight of the box the colony is in, in grams???}
+#'   \item{site}{The site ID}
+#'   \item{colony}{The colony ID}
+#'   \item{wild}{The proportion of the habitat for that site classified as wild using GIS}
+#'   \item{habitat}{The habitat type. Either wild (W), organic agriculture (O), or conventional agriculture (C)}
+#'   \item{date}{The calendar date the measurements were taken on}
+#'   \item{week}{Number of weeks since the initial mass was taken}
+#'   \item{mass}{Colony mass, in grams}
+#'   \item{floral_resources}{Floral density in millions of flowers within a 2km radius around the colony, weighted as a function of distance from colony}
 #' }
-#' @source \url{link to archived data???}
+#' @details Floral resources (*e*) are weighted using the equation *w* = *e*^(*-D/a*) where *D* is the distance in meters between the resources and the colony and *a* is the typical flight distance for the species. This is described in further detail in Williams et al. 2012.
 #' @references
-"colony_weights"
+#' Crone, E. E., and Williams, N. M. (2016). Bumble bee colony dynamics: quantifying the importance of land use and floral resources for colony growth and queen production. Ecol. Lett. 19, 460–468. doi:10.1111/ele.12581.
+#'
+#' Williams, N. M., Regetz, J., and Kremen, C. (2012). Landscape-scale resources promote colony growth but not reproductive performance of bumble bees. Ecology 93, 1049–1058. doi:10.1890/11-1006.1.
+#'
+"bombus"
