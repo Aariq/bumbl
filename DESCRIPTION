@@ -30,7 +30,7 @@ Suggests:
 Imports: 
     dplyr,
     rlang,
-    tidyr,
+    tidyr (>= 1.0.0),
     purrr,
     broom
 RoxygenNote: 6.1.1
