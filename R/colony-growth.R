@@ -15,10 +15,13 @@
 #' @export
 #'
 #' @examples
-#' testbees <- colony_weights[(colony_weights$ColonyID == 18), ]
-#' brkpt(testbees, t = Round, formula = log(TrueColonyWt_g) ~ Round)
+#' testbees <- bombus[bombus$colony == 9, ]
+#' # Using dates
+#' brkpt(testbees, t = date, formula = log(mass) ~ date)
+#' # Using weeks
+#' brkpt(testbees, t = week, formula = log(mass) ~ week)
 brkpt <- function(data, taus = NULL, t, formula){
-  #TODO: make sure none of the variables are called '.post'
+  #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
@@ -106,17 +109,17 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @export
 #'
 #' @examples
-#' library(dplyr)
+#' # Colony 67 doesn't seem to ever switch to reproduction and results in an error
+#' \dontrun{
+#' bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
+#'}
 #'
-#' mydata <- filter(colony_weights, !ColonyID %in% c("68", "97"))
-#' bumbl(mydata,
-#'       colonyID = ColonyID,
-#'       t = Round,
-#'       formula = log(TrueColonyWt_g) ~ Round)
+#' bombus2 <- bombus[bombus$colony != 67, ]
+#' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
 
 bumbl <- function(data, colonyID, taus = NULL, t, formula){
-  #TODO: create a sensible default for tau that's like seq(min(t), max(t), length.out = 100)
-  #TODO: scoop up all the errors and warnings from brkpt() and present a summary at the end.
+  #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
+  #TODO: add augment = FALSE to by default return summary tibble and when TRUE return augmented dataset
   colonyID <- enquo(colonyID)
   df <-
     data %>%
@@ -153,23 +156,4 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula){
 
     augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
     return(augmented_df)
-
-  # Full-on {purrr} style.  This is probably faster, but I don't know how to get helpful error messages from brkpt.  Like, I don't know how to embed tryCatch into a map() function correctly.
-  # modeldf <-
-  #   map_dfr(dflist,
-  #           ~brkpt(data = .x,
-  #                  taus = {{taus}},
-  #                  t ={{t}},
-  #                  formula = formula),
-  #           .id = as_name(colonyID)) %>%
-  #   mutate(coefs = map(model, broom::tidy)) %>%
-  #   unnest(coefs, .preserve = "model") %>%
-  #   select(!!colonyID, tau, model, term, estimate) %>%
-  #   spread(key = term, value = estimate) %>%
-  #   mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>%
-  #   select(-model) %>%
-  #   select(!!colonyID, tau, logNo = `(Intercept)`, loglam = Round, decay = .post, everything())
-  #
-  # augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
-  # return(augmented_df)
 }

@@ -35,11 +35,11 @@ Fits a model that assumes bumblebee colonies will switch from growth to gyne pro
 Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
 }
 \examples{
-library(dplyr)
+# Colony 67 doesn't seem to ever switch to reproduction and results in an error
+\dontrun{
+bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
+}
 
-mydata <- filter(colony_weights, !ColonyID \%in\% c("68", "97"))
-bumbl(mydata,
-      colonyID = ColonyID,
-      t = Round,
-      formula = log(TrueColonyWt_g) ~ Round)
+bombus2 <- bombus[bombus$colony != 67, ]
+bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
 }
