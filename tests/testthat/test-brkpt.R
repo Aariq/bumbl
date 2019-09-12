@@ -1,52 +1,55 @@
-testbees <- colony_weights %>% dplyr::filter(ColonyID == 18)
+library(dplyr)
+testbees <- bombus %>% filter(colony == 9)
+noswitch <- bombus %>% filter(colony == 67)
 
 test_that("brkpt errors if time variable is missing from formula", {
   expect_error(
-    brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ 1),
-    "'Round' is missing from the model formula"
+    brkpt(testbees, t = week, formula = log(mass) ~ 1),
+    "'week' is missing from the model formula"
   )
 })
 
-
 test_that("brkpt errors if taus don't match t", {
   expect_error(
-    brkpt(testbees, taus = seq(8.1, 10, 0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
-    "At least one tau must be in range of 'Round'"
+    brkpt(testbees, taus = seq(16, 20, 0.1), t = week, formula = log(mass) ~ week),
+    "At least one tau must be in range of 'week'"
   )
 })
 
 test_that("brkpt uses only taus in range of t", {
   expect_warning(
-    brkpt(testbees, taus = seq(2, 10, 0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
-    "Some taus were not used because they were outside of range of 'Round'"
+    brkpt(testbees, taus = seq(2, 20, 0.1), t = week, formula = log(mass) ~ week),
+    "Some taus were not used because they were outside of range of 'week'"
   )
 })
 
 test_that("brkpt works", {
   expect_s3_class(
-    brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
+    brkpt(testbees, t = week, formula = log(mass) ~ week),
     "data.frame"
   )
 })
 
 test_that("brkpt works with more complicated formulas", {
   expect_s3_class(
-    brkpt(testbees, taus = seq(2, 8, 0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round + Condition),
+    brkpt(testbees, t = week, formula = log(mass) ~ week + floral_resources),
     "data.frame"
   )
 })
 
 test_that("brkpt errors when multiple equivalent taus are found", {
   expect_error({
-    testbees <- colony_weights %>% dplyr::filter(ColonyID == 68)
-    brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round)},
+    brkpt(noswitch, t = week, formula = log(mass) ~ week)},
     "More than one equivalent tau found"
   )
 })
 
-test_that("brkpt supplies its own taus if not given any", {
-  expect_s3_class(
-    brkpt(testbees, t = Round, formula = log(TrueColonyWt_g) ~ Round),
-    "data.frame"
-  )
+test_that("brkpt works with dates", {
+  date.model <- brkpt(testbees, t = date, formula = log(mass) ~ date)
+  expect_s3_class(date.model, "data.frame")
+  expect_is(date.model$tau, "Date")
+
+  testbees2 <- testbees %>% mutate(date = as.POSIXct(date))
+  date.model2 <- brkpt(testbees2, t = date, formula = log(mass) ~ date)
+  expect_is(date.model2$tau, "POSIXct")
 })

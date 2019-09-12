@@ -1,38 +1,39 @@
-library(dplyr)
+testdf <- bombus[bombus$colony != 67, ]
+
 test_that("bumbl works", {
-  data <- colony_weights %>% dplyr::filter(!ColonyID %in% c("68", "97"))
   expect_s3_class(
-    bumbl(data,
-          colonyID = ColonyID,
-          taus = seq(2,8,0.1),
-          t = Round,
-          formula = log(TrueColonyWt_g) ~ Round),
+    bumbl(testdf,
+          colonyID = colony,
+          t = week,
+          formula = log(mass) ~ week),
     "data.frame"
   )
 })
 
 test_that("bumbl returns DF same size as data", {
-  data <- colony_weights %>% dplyr::filter(!ColonyID %in% c("68", "97"))
-  out <- bumbl(data,
-               colonyID = ColonyID,
-               taus = seq(2,8,0.1),
-               t = Round,
-               formula = log(TrueColonyWt_g) ~ Round)
+  out <- bumbl(testdf,
+               colonyID = colony,
+               t = week,
+               formula = log(mass) ~ week)
   expect_equal(
-    nrow(out), nrow(data)
+    nrow(out), nrow(testdf)
   )
 })
 
 test_that("error messages propgate correctly from brkpt to bumbl", {
-  expect_error(bumbl(colony_weights, colonyID = ColonyID, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round),
-  "For Colony ID '68': More than one equivalent tau found"
+  expect_error(bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week),
+  "For Colony ID '67': More than one equivalent tau found"
   )
 })
 
-test_that("bumbl works with default taus", {
-  data <- colony_weights %>% dplyr::filter(!ColonyID %in% c("68", "97"))
+test_that("bumbl works with custom taus", {
   expect_s3_class(
-    bumbl(data, colonyID = ColonyID, t = Round, formula = log(TrueColonyWt_g) ~ Round),
+    bumbl(testdf, colonyID = colony, taus = seq(3, 18, 0.5), t = week, formula = log(mass) ~ week),
     "data.frame"
   )
+})
+
+test_that("bumbl aggregates warnings", {
+  bumbl(testdf, colonyID = colony, taus = seq(3, 18, 0.5), t = week, formula = log(mass) ~ week)
+  expect_length(warnings(), 1)
 })
