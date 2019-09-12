@@ -87,6 +87,7 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula passed to `lm()`
+#' @param augment when FALSE, `bumbl` returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.
 #'
 #' @details Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
 #'
@@ -117,7 +118,7 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
 
-bumbl <- function(data, colonyID, taus = NULL, t, formula){
+bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
   #TODO: add augment = FALSE to by default return summary tibble and when TRUE return augmented dataset
   colonyID <- enquo(colonyID)
@@ -154,6 +155,11 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula){
     select(-"model") %>%
     select(!!colonyID, "tau", logNo = '(Intercept)', loglam = {{t}}, decay = '.post', everything())
 
+  if(augment == TRUE){
     augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
     return(augmented_df)
+  } else{
+    return(modeldf)
+  }
+
 }

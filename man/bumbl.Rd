@@ -4,7 +4,7 @@
 \alias{bumbl}
 \title{Fit breakpoint growth models to many colonies.}
 \usage{
-bumbl(data, colonyID, taus = NULL, t, formula)
+bumbl(data, colonyID, taus = NULL, t, formula, augment = FALSE)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -16,6 +16,8 @@ bumbl(data, colonyID, taus = NULL, t, formula)
 \item{t}{the unquoted column name of the time variable in (units???)}
 
 \item{formula}{a formula passed to \code{lm()}}
+
+\item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.}
 }
 \value{
 The original dataframe augmented with the following columns:
