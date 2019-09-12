@@ -147,11 +147,11 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
 
   modeldf <-
     bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
-    mutate(coefs = map(model, broom::tidy)) %>%
-    unnest(coefs) %>%
+    mutate(coefs = map(.data$model, broom::tidy)) %>%
+    unnest(.data$coefs) %>%
     select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>%
+    mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
     select(-"model") %>%
     select(!!colonyID, "tau", logNo = '(Intercept)', loglam = {{t}}, decay = '.post', everything())
 
