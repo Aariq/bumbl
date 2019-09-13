@@ -117,10 +117,13 @@ brkpt <- function(data, taus = NULL, t, formula){
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
-
 bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
-  #TODO: add augment = FALSE to by default return summary tibble and when TRUE return augmented dataset
+  #TODO: find a better way to do this?
+  if(packageVersion("tidyr") >= package_version("1.0.0")) {
+    unnest <- tidyr::unnest_legacy
+  }
+
   colonyID <- enquo(colonyID)
   df <-
     data %>%
@@ -148,7 +151,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   modeldf <-
     bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
-    unnest(.data$coefs) %>%
+    unnest(.data$coefs, .preserve = model) %>%
     select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%

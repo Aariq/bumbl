@@ -25,7 +25,10 @@ test_that("bumbl works with custom taus", {
   )
 })
 
-# test_that("bumbl aggregates warnings", {
-#   bumbl(testdf, colonyID = colony, taus = seq(3, 18, 0.5), t = week, formula = log(mass) ~ week)
-#   expect_length(warnings(), 1)
-# })
+test_that("bumbl aggregates warnings", {
+  expect_message(
+    bumbl(testdf, colonyID = colony, taus = seq(3, 18, 0.5), t = week, formula = log(mass) ~ week),
+  "taus outside the range of 'week' were dropped"
+  )
+})
+
