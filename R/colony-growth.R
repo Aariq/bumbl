@@ -104,7 +104,7 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
-#' @importFrom purrr map map_dbl
+#' @importFrom purrr map map_dbl map2_df
 #' @import broom
 #' @importFrom glue glue
 #' @importFrom utils packageVersion
@@ -154,15 +154,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
            ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = {{t}}, formula = formula), .y),
            .id = as_name(colonyID))
 
-
-  # for(i in 1:length(dflist)){
-  #   model_list[[i]] <- brkpt_w_err(brkpt(dflist[[i]], t = week, formula = log(mass) ~week),
-  #                                  names(dflist)[i])
-  # }
-  # resultdf <- bind_rows(model_list, .id = rlang::as_name(colonyID))
-
   modeldf <-
-    # bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
     resultdf %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
     unnest(.data$coefs, .preserve = .data$model) %>%
@@ -170,7 +162,8 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
     select(-"model") %>%
-    select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = {{t}}, decay = '.post', logNmax, everything())
+    select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = {{t}}, decay = '.post', "logNmax",
+           everything())
 
   if(augment == TRUE){
     augmented_df <- left_join(data, modeldf, by = as_name(colonyID))
