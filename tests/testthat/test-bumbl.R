@@ -28,3 +28,7 @@ test_that("bumbl returns NAs for colonies that produce errors when augment = TRU
   expect_equal(nrow(bombus), nrow(out))
 })
 
+test_that("bumbl works with co-variates", {
+  out <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week * cum_floral)
+  expect_identical(colnames(out), c("colony", "tau", "logN0", "logLam", "decay", "logNmax", "cum_floral", "week:cum_floral"))
+})

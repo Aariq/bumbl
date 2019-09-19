@@ -12,6 +12,7 @@
 #'   \item{week}{Number of weeks since the initial mass was taken}
 #'   \item{mass}{Colony mass, in grams}
 #'   \item{floral_resources}{Floral density in millions of flowers within a 2km radius around the colony, weighted as a function of distance from colony}
+#'   \item{cum_floral}{Cumulative floral resources from the start of the study}
 #' }
 #' @details Floral resources (*e*) are weighted using the equation *w* = *e*^(*-D/a*) where *D* is the distance in meters between the resources and the colony and *a* is the typical flight distance for the species. This is described in further detail in Williams et al. 2012.
 #' @references

@@ -16,34 +16,110 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(bumbl)
+library(car)
 ```
 
-# Find Tau for a single colony
-This function is probably not super useful to end users, but is the "inner loop" of the main function
+## Introduction to the bumbl() function
+
+The `bumbl()` function fits a model that allows for different growth rates before and after a switch point, $\tau$, and an added decay rate after $\tau$. This model is fit separately for each colony in a dataset.  In this example, we'll use the built-in `bombus` dataset.  For more information on this dataset see the help file with `?bombus`.
+
+Before the switch point, growth (colony weight, $W_t$) is defined as:
+
+$$
+W_t = \lambda^tW_0
+$$
+After the switchpoint ($t > \tau$), it's defined as:
+
+$$
+W_t = \lambda^{\tau}W_{0}\delta^{t-\tau}
+$$
+
+Where $\delta$ is a rate of decline.  Therefore:
+
+$$
+W_t = 
+  \begin{cases}
+  \lambda^tW_0 & t\leq\tau \\
+  \lambda^{\tau}W_{0}\delta^{t-\tau} & t > \tau
+  \end{cases}
+$$
+
+
+After log-linearizing it it looks like this:
+
+For $t<=\tau$:
+
+$$
+\ln(W_t) = \ln(W_0) + t\ln(\lambda)
+$$
+
+
+For $t>\tau$
+
+$$
+\ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + (t-\tau)\ln(\delta)
+$$
+
+Turning that into a simple linter regression looks like:
+
+$$
+ln(W_t) = \beta_0 + \beta_1*t + \beta_2*post
+$$
+
+Where *post* is $0$ before $\tau$ and $t-\tau$ after $\tau$
+
+To clarify, in the above equation:
+
+- $\beta_0 = \ln(W_0)$
+- $\beta_1 = \ln(\lambda)$
+- $\beta_2 = \ln(\delta-\lambda) = \frac{\ln(\delta)}{\ln(\lambda)}$
+
+## Modeling Bombus colony growth
 
 ```{r}
-# testbees <- colony_weights[colony_weights$ColonyID == 18,]
-
-# brkpt(testbees, taus = seq(2,8,0.1), t = Round, formula = log(TrueColonyWt_g) ~ Round)
+head(bombus)
 ```
 
-# Run model on whole dataset
+The `bumbl()` function expects a tidy dataset with a single column for colony ID, a single column for some measure of time, and a single column for some measure of colony growth at minimum.
 
 ```{r}
-# bumbl(colony_weights[colony_weights$ColonyID != 68, ],
-#       colonyID = ColonyID,
-#       taus = seq(2,8,0.1),
-#       t = Round,
-#       formula = log(TrueColonyWt_g) ~ Round)
+out <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
+head(out)
 ```
 
-# With a covariate
+For each colony, we get the maximum likelihood estimate for $tau$ (`tau`), the estimated initial colony weight ($\ln({W_0})$, `logN0`) on a log scale, the average colony growth rate ($\ln(\lambda)$, `logLam`) on a log scale, the rate of decline after $tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
+
+You can also include co-variates [why might you want to do this?]
 
 ```{r}
-# bumbl(colony_weights[colony_weights$ColonyID != 68, ],
-#       colonyID = ColonyID,
-#       taus = seq(2,8,0.1),
-#       t = Round,
-#       formula = log(TrueColonyWt_g) ~ Round + Condition)
+out2 <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week * cum_floral)
+head(out2)
 ```
+
+
+## Plotting results
+
+Not yet implemented. To be added later
+
+
+## Using results
+
+With `augment = TRUE`, `bumbl()` returns your original data with columns added for these coefficients.  This might be useful if you were interested in how habitat type effects the switch-time, $tau$.
+
+```{r}
+out3 <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week, augment = TRUE)
+head(out3)
+```
+
+We can now use that augmented dataset in another model
+
+```{r}
+m <- lm(tau ~ habitat, data = out3)
+summary(m)
+Anova(m)
+```
+
+In this example, without accounting for any other covariates, habitat type has a highly significant effect on switch time with colonies in organic farms switching to decline about two weeks earlier than conventional agriculture and about a week earlier than wild landscapes. 
+
+
 

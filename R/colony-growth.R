@@ -94,17 +94,17 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @return The original dataframe augmented with the following columns:
 #' \itemize{
 #' \item{`tau` is the switchpoint, in the same units as `t`, for each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
-#' \item{`logNo` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
-#' \item{`loglam` is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit `t`) during the growth period.}
-#' \item{`decay` reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit `t` is calculated as `decay` - `loglam`.}
-#' \item{`logNmax` is the maximum weight reached by each colony.  It is a function of `tau`, `logNo` and `loglam`}
+#' \item{`logN0` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
+#' \item{`logLam` is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit `t`) during the growth period.}
+#' \item{`decay` reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit `t` is calculated as `decay` - `logLam`.}
+#' \item{`logNmax` is the maximum weight reached by each colony.  It is a function of `tau`, `logN0` and `logLam`}
 #' \item{Additional columns are coefficients for any covariates supplied in the `formula`}
 #' }
 #'
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
-#' @importFrom purrr map map_dbl
+#' @importFrom purrr map map_dbl map2_df
 #' @import broom
 #' @importFrom glue glue
 #' @importFrom utils packageVersion
@@ -140,23 +140,30 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
 
   model_list <- vector("list", length(dflist))
   names(model_list) <- names(dflist)
-  for(i in 1:length(dflist)){
-    model_list[[i]] <-
-      tryCatch(brkpt(dflist[[i]], taus = {{taus}}, t = {{t}}, formula = formula),
-               error = function(c){
-                 message(glue::glue("Warning: {c$message} for colonyID '{names(dflist)[i]}'. Omitting from results."))
-               })
+
+  brkpt_w_err <- function(code, colonyID) {
+    tryCatch(code,
+             error = function(c){
+               message(glue::glue("Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."))
+             })
   }
 
+  resultdf <-
+    map2_df(dflist,
+            names(dflist),
+           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = {{t}}, formula = formula), .y),
+           .id = as_name(colonyID))
+
   modeldf <-
-    bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
+    resultdf %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
     unnest(.data$coefs, .preserve = .data$model) %>%
     select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
     select(-"model") %>%
-    select(!!colonyID, "tau", logNo = '(Intercept)', loglam = {{t}}, decay = '.post', everything())
+    select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = {{t}}, decay = '.post', "logNmax",
+           everything())
 
   if(augment == TRUE){
     augmented_df <- left_join(data, modeldf, by = as_name(colonyID))

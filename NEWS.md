@@ -1,5 +1,11 @@
+# bumbl 0.0.1
+
+* `bumbl()` no longer errors when a single colony produces an error
+* added a vignette
+* updated `bombus` data to include cumulative floral resources
+* fixed major bug (issue #12) that cause bumbl() to return the incorrect colony IDs
+
 # bumbl 0.0.0.9001
 
 * Added a `NEWS.md` file to track changes to the package.
 * This is the first minimally functioning version of bumbl.  More features to come.  Feedback welcome.
-* Might not work on Windows currently due to dependency on `tidyr` 1.0.0, which apparently isn't available for the most recent version of R on windows.
