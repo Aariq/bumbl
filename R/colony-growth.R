@@ -142,8 +142,8 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
     model_list[[i]] <-
       tryCatch(brkpt(dflist[[i]], taus = {{taus}}, t = {{t}}, formula = formula),
                error = function(c){
-                 c$message <- paste0("For Colony ID '", names(dflist)[i], "': ", c$message)
-                 stop(c)
+                 message(paste0("For Colony ID '", names(dflist)[i], "': ", c$message))
+                 return(tibble(tau = NA, model = NA))
                })
     names(model_list) <- names(dflist)
   }
