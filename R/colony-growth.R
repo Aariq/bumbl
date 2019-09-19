@@ -140,16 +140,30 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
 
   model_list <- vector("list", length(dflist))
   names(model_list) <- names(dflist)
-  for(i in 1:length(dflist)){
-    model_list[[i]] <-
-      tryCatch(brkpt(dflist[[i]], taus = {{taus}}, t = {{t}}, formula = formula),
-               error = function(c){
-                 message(glue::glue("Warning: {c$message} for colonyID '{names(dflist)[i]}'. Omitting from results."))
-               })
+
+  brkpt_w_err <- function(code, colonyID) {
+    tryCatch(code,
+             error = function(c){
+               message(glue::glue("Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."))
+             })
   }
 
+  resultdf <-
+    map2_df(dflist,
+            names(dflist),
+           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = {{t}}, formula = formula), .y),
+           .id = as_name(colonyID))
+
+
+  # for(i in 1:length(dflist)){
+  #   model_list[[i]] <- brkpt_w_err(brkpt(dflist[[i]], t = week, formula = log(mass) ~week),
+  #                                  names(dflist)[i])
+  # }
+  # resultdf <- bind_rows(model_list, .id = rlang::as_name(colonyID))
+
   modeldf <-
-    bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
+    # bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
+    resultdf %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
     unnest(.data$coefs, .preserve = .data$model) %>%
     select(!!colonyID, "tau", "model", "term", "estimate") %>%
