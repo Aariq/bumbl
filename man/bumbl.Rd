@@ -23,10 +23,10 @@ bumbl(data, colonyID, taus = NULL, t, formula, augment = FALSE)
 The original dataframe augmented with the following columns:
 \itemize{
 \item{\code{tau} is the switchpoint, in the same units as \code{t}, for each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
-\item{\code{logNo} is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
-\item{\code{loglam} is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit \code{t}) during the growth period.}
-\item{\code{decay} reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{loglam}.}
-\item{\code{logNmax} is the maximum weight reached by each colony.  It is a function of \code{tau}, \code{logNo} and \code{loglam}}
+\item{\code{logN0} is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
+\item{\code{logLam} is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit \code{t}) during the growth period.}
+\item{\code{decay} reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{logLam}.}
+\item{\code{logNmax} is the maximum weight reached by each colony.  It is a function of \code{tau}, \code{logN0} and \code{logLam}}
 \item{Additional columns are coefficients for any covariates supplied in the \code{formula}}
 }
 }

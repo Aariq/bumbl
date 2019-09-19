@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(bumbl)
+library(car)
 ```
 
 ## Introduction to the bumbl() function
@@ -115,7 +116,7 @@ We can now use that augmented dataset in another model
 ```{r}
 m <- lm(tau ~ habitat, data = out3)
 summary(m)
-car::Anova(m)
+Anova(m)
 ```
 
 In this example, without accounting for any other covariates, habitat type has a highly significant effect on switch time with colonies in organic farms switching to decline about two weeks earlier than conventional agriculture and about a week earlier than wild landscapes. 

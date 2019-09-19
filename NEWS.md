@@ -3,6 +3,7 @@
 * `bumbl()` no longer errors when a single colony produces an error
 * added a vignette
 * updated `bombus` data to include cumulative floral resources
+* fixed major bug (issue #12) that cause bumbl() to return the incorrect colony IDs
 
 # bumbl 0.0.0.9001
 
