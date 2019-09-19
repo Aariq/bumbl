@@ -106,7 +106,8 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @import dplyr
 #' @importFrom purrr map map_dbl
 #' @import broom
-#'
+#' @importFrom glue glue
+#' @importFrom utils packageVersion
 #' @export
 #'
 #' @examples
@@ -150,7 +151,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   modeldf <-
     bind_rows(model_list, .id = rlang::as_name(colonyID)) %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
-    unnest(.data$coefs, .preserve = model) %>%
+    unnest(.data$coefs, .preserve = .data$model) %>%
     select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
