@@ -94,10 +94,10 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @return The original dataframe augmented with the following columns:
 #' \itemize{
 #' \item{`tau` is the switchpoint, in the same units as `t`, for each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
-#' \item{`logNo` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
-#' \item{`loglam` is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit `t`) during the growth period.}
-#' \item{`decay` reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit `t` is calculated as `decay` - `loglam`.}
-#' \item{`logNmax` is the maximum weight reached by each colony.  It is a function of `tau`, `logNo` and `loglam`}
+#' \item{`logN0` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
+#' \item{`logLam` is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit `t`) during the growth period.}
+#' \item{`decay` reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit `t` is calculated as `decay` - `logLam`.}
+#' \item{`logNmax` is the maximum weight reached by each colony.  It is a function of `tau`, `logN0` and `logLam`}
 #' \item{Additional columns are coefficients for any covariates supplied in the `formula`}
 #' }
 #'
@@ -156,7 +156,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
     select(-"model") %>%
-    select(!!colonyID, "tau", logNo = '(Intercept)', loglam = {{t}}, decay = '.post', everything())
+    select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = {{t}}, decay = '.post', logNmax, everything())
 
   if(augment == TRUE){
     augmented_df <- left_join(data, modeldf, by = as_name(colonyID))
