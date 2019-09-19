@@ -119,10 +119,12 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
 bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
-  #TODO: find a better way to do this?
+  # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
+
   if(packageVersion("tidyr") >= package_version("1.0.0")) {
     unnest <- tidyr::unnest_legacy
   }
+  #TODO: Once tidyr 1.0.0 binaries are available for windows, require tidyr 1.0.0 or greater
 
   colonyID <- enquo(colonyID)
   df <-
@@ -135,17 +137,14 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
 
   names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
 
-  # for loop style:
   model_list <- vector("list", length(dflist))
-
+  names(model_list) <- names(dflist)
   for(i in 1:length(dflist)){
     model_list[[i]] <-
       tryCatch(brkpt(dflist[[i]], taus = {{taus}}, t = {{t}}, formula = formula),
                error = function(c){
-                 message(paste0("For Colony ID '", names(dflist)[i], "': ", c$message))
-                 return(tibble(tau = NA, model = NA))
+                 message(glue::glue("Warning: {c$message} for colonyID '{names(dflist)[i]}'. Omitting from results."))
                })
-    names(model_list) <- names(dflist)
   }
 
   modeldf <-
@@ -159,7 +158,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
     select(!!colonyID, "tau", logNo = '(Intercept)', loglam = {{t}}, decay = '.post', everything())
 
   if(augment == TRUE){
-    augmented_df <- full_join(data, modeldf, by = as_name(colonyID))
+    augmented_df <- left_join(data, modeldf, by = as_name(colonyID))
     return(augmented_df)
   } else{
     return(modeldf)
