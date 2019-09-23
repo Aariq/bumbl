@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/Aariq/bumbl?branch=master&svg=true)](https://ci.appveyor.com/project/Aariq/bumbl)
 [![Codecov test coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](https://codecov.io/gh/Aariq/bumbl?branch=master)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in Crone and Williams 2019^1^. The `brkpt` function models colony growth as having a change point at some time, *tau*, where the colony switches from growth and worker production to gyne production.  The `bumbl` function applies this model to a dataframe of data from multiple colonies, allowing for each colony to have it's own *tau* and returns the original data augmented with coefficients from the changepoint model.

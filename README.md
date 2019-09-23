@@ -13,6 +13,8 @@ status](https://ci.appveyor.com/api/projects/status/github/Aariq/bumbl?branch=ma
 coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](https://codecov.io/gh/Aariq/bumbl?branch=master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
