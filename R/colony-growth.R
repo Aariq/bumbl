@@ -129,6 +129,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
+
   df <-
     data %>%
     # make sure colonyID is a factor, drop any unused levels
@@ -176,9 +177,17 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   if(augment == TRUE){
     augmented_df <- left_join(data, modeldf, by = as_name(colonyID))
     full_augmented_df <- left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
+
+    #add attributes
+    attr(full_augmented_df, "colonyID") <- as_name(colonyID)
+    attr(full_augmented_df, "t") <- as_name(t)
+    attr(full_augmented_df, "formula") <- formula
+    attributes(full_augmented_df)
+
+    class(full_augmented_df) <- c(class(full_augmented_df), "bumbldf")
     return(full_augmented_df)
 
-  } else{
+  } else {
     return(modeldf)
   }
 
