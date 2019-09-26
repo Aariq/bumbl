@@ -99,12 +99,30 @@ head(out2)
 
 ## Plotting results
 
-Not yet implemented. To be added later
+To check that these results are sensible, you should plot them.  To do this, you first need an "augmented" dataframe that you can get using the `augment = TRUE` argument in `bumbl()`.
+
+```{r}
+#using a subset of bomubs for this
+bombus2 <- bombus[bombus$colony %in% c(38, 82, 98, 35), ]
+
+aug_out <- bumbl(bombus2, colonyID = colony, t = week,
+                 formula = log(mass) ~ week, 
+                 augment = TRUE)
+head(aug_out)
+```
+
+Then you can plot this dataframe with `bumbl_plot()`.
+
+```{r}
+bumbl_plot(aug_out)
+```
+
+From this it's clear that for colony 38, the model is incorrect.
 
 
 ## Using results
 
-With `augment = TRUE`, `bumbl()` returns your original data with columns added for these coefficients.  This might be useful if you were interested in how habitat type effects the switch-time, $tau$.
+With `augment = TRUE`, `bumbl()` returns your original data with columns added for model coefficients.  This might be useful if you were interested in how habitat type effects the switch-time, $tau$.
 
 ```{r}
 out3 <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week, augment = TRUE)

@@ -118,7 +118,7 @@ brkpt <- function(data, taus = NULL, t, formula){
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
-bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
+bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
   # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
 
@@ -128,6 +128,8 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   #TODO: Once tidyr 1.0.0 binaries are available for windows, require tidyr 1.0.0 or greater
 
   colonyID <- enquo(colonyID)
+  t <- enquo(t)
+
   df <-
     data %>%
     # make sure colonyID is a factor, drop any unused levels
@@ -151,24 +153,42 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
   resultdf <-
     map2_df(dflist,
             names(dflist),
-           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = {{t}}, formula = formula), .y),
+           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = !!t, formula = formula), .y),
            .id = as_name(colonyID))
+
+  predictdf <-
+    resultdf %>%
+    dplyr::select(-"tau") %>%
+    mutate(aug = map(.data$model, broom::augment)) %>%
+    unnest(.data$aug) %>%
+    dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
   modeldf <-
     resultdf %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
     unnest(.data$coefs, .preserve = .data$model) %>%
-    select(!!colonyID, "tau", "model", "term", "estimate") %>%
+    dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
-    select(-"model") %>%
-    select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = {{t}}, decay = '.post', "logNmax",
+    dplyr::select(-"model") %>%
+    dplyr::select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = !!t, decay = '.post', "logNmax",
            everything())
 
   if(augment == TRUE){
     augmented_df <- left_join(data, modeldf, by = as_name(colonyID))
-    return(augmented_df)
-  } else{
+    full_augmented_df <- left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
+
+    #add attributes
+    attr(full_augmented_df, "colonyID") <- as_name(colonyID)
+    attr(full_augmented_df, "t") <- as_name(t)
+    attr(full_augmented_df, "formula") <- formula
+    attributes(full_augmented_df)
+
+    class(full_augmented_df) <- c(class(full_augmented_df), "bumbldf")
+
+    return(full_augmented_df)
+
+  } else {
     return(modeldf)
   }
 
