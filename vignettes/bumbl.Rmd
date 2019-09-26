@@ -87,9 +87,10 @@ out <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
 head(out)
 ```
 
-For each colony, we get the maximum likelihood estimate for $tau$ (`tau`), the estimated initial colony weight ($\ln({W_0})$, `logN0`) on a log scale, the average colony growth rate ($\ln(\lambda)$, `logLam`) on a log scale, the rate of decline after $tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
+For each colony, we get the maximum likelihood estimate for $\tau$ (`tau`), the estimated initial colony weight ($\ln({W_0})$, `logN0`) on a log scale, the average colony growth rate ($\ln(\lambda)$, `logLam`) on a log scale, the rate of decline after $\tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
 
-You can also include co-variates [why might you want to do this?]
+You can also include co-variates 
+TODO:[why might you want to do this?]
 
 ```{r}
 out2 <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week * cum_floral)
