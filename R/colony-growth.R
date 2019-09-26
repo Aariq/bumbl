@@ -118,7 +118,7 @@ brkpt <- function(data, taus = NULL, t, formula){
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
-bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
+bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
   # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
 
@@ -185,6 +185,7 @@ bumbl <- function(data, colonyID, taus = NULL, t, formula, augment = FALSE){
     attributes(full_augmented_df)
 
     class(full_augmented_df) <- c(class(full_augmented_df), "bumbldf")
+
     return(full_augmented_df)
 
   } else {

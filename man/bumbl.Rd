@@ -4,20 +4,20 @@
 \alias{bumbl}
 \title{Fit breakpoint growth models to many colonies.}
 \usage{
-bumbl(data, colonyID, taus = NULL, t, formula, augment = FALSE)
+bumbl(data, colonyID, t, formula, augment = FALSE, taus = NULL)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
 
 \item{colonyID}{the unquoted column name of the colony ID variable}
 
-\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
-
 \item{t}{the unquoted column name of the time variable in (units???)}
 
 \item{formula}{a formula passed to \code{lm()}}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.}
+
+\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 }
 \value{
 The original dataframe augmented with the following columns:
