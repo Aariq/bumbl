@@ -35,7 +35,16 @@ More bumblebee related functions to come…
 You can install this development version of `bumbl` with:
 
 ``` r
-devtools::install_github("Aariq/bumbl")
+devtools::install_github("Aariq/bumbl", build_vignettes = TRUE)
+```
+
+## Getting started
+
+View the package vignette with:
+
+``` r
+library(bumbl)
+vignette("bumbl")
 ```
 
 # References
