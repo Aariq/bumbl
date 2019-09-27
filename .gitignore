@@ -3,3 +3,4 @@
 .RData
 notes
 inst/doc
+*.pdf
