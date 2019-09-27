@@ -132,8 +132,8 @@ bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
 
   df <-
     data %>%
-    # make sure colonyID is a factor, drop any unused levels
-    mutate(!!colonyID := as.factor(as.character(!!colonyID))) %>%
+    # make sure colonyID is a character vector
+    mutate(!!colonyID := as.character(!!colonyID)) %>%
     group_by(!!colonyID)
 
   dflist <- group_split(df)
@@ -175,8 +175,11 @@ bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
            everything())
 
   if(augment == TRUE){
-    augmented_df <- left_join(data, modeldf, by = as_name(colonyID))
-    full_augmented_df <- left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
+    augmented_df <-
+      left_join(df, modeldf, by = as_name(colonyID))
+
+    full_augmented_df <-
+      left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
 
     #add attributes
     attr(full_augmented_df, "colonyID") <- as_name(colonyID)

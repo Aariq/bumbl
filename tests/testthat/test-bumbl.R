@@ -32,3 +32,9 @@ test_that("bumbl works with co-variates", {
   out <- bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week * cum_floral)
   expect_identical(colnames(out), c("colony", "tau", "logN0", "logLam", "decay", "logNmax", "cum_floral", "week:cum_floral"))
 })
+
+test_that("no unexpected warnings", {
+  expect_silent(bumbl(testdf, colonyID = colony, t = week, formula = log(mass) ~ week))
+  expect_silent(bumbl(testdf, colonyID = colony, t = week, formula = log(mass) ~ week, augment = TRUE))
+})
+
