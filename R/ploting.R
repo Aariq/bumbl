@@ -6,7 +6,7 @@
 #'
 #' @import rlang
 #' @import dplyr
-#' @importFrom purrr map2
+#' @importFrom purrr walk2
 #'
 #' @export
 #'
@@ -32,7 +32,7 @@ bumbl_plot <- function(bumbldf) {
 
   gdf %>%
     group_split() %>% #might be able to replace with base::split()
-    purrr::map2(.y = group_keys(gdf)[[1]], ~{
+    purrr::walk2(.y = group_keys(gdf)[[1]], ~{
       plot(.x[[t]], .x[[yvar]], main = .y, xlab = t, ylab = yvar)
       points(.x[[t]], exp(.x[[".fitted"]]), type = "l", col = "red")
 

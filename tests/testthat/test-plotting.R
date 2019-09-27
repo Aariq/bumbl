@@ -3,7 +3,7 @@ lildf <- bombus[bombus$colony %in% colony_subset, ]
 results <- bumbl(lildf, colonyID = colony, t = week, formula = log(mass) ~ week, augment = TRUE)
 
 test_that("plotting function displays something?", {
-  expect_visible(bumbl_plot(results))
+  expect_invisible(bumbl_plot(results))
 })
 
 test_that("plotting function errors when not a bumbl(augment = TRUE) object", {
