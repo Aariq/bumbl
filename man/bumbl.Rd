@@ -4,7 +4,8 @@
 \alias{bumbl}
 \title{Fit breakpoint growth models to many colonies.}
 \usage{
-bumbl(data, colonyID, t, formula, augment = FALSE, taus = NULL)
+bumbl(data, colonyID, t, formula, family = c("gaussian", "poisson",
+  "negbin"), augment = FALSE, taus = NULL)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -14,6 +15,8 @@ bumbl(data, colonyID, t, formula, augment = FALSE, taus = NULL)
 \item{t}{the unquoted column name of the time variable in (units???)}
 
 \item{formula}{a formula passed to \code{lm()}}
+
+\item{family}{the model family to use.  By default ("gaussian") \code{lm()} is used.  "poisson" will run \code{glm(...family = poission(link = "log"))} and "negbin" will run \code{glm.nb} from the \code{MASS} package.  For continuous measures of colony growth such as mass, use \code{family = "gaussian"} (see example).  For count data such as number of workers, use the untransformed response variable and \code{family = "poisson"}.  For overdispersed count data, use \code{family = "negbin"} (warning: this last option will be a lot slower).}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.}
 

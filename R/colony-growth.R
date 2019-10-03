@@ -11,7 +11,7 @@
 #'
 #' @import dplyr
 #' @import rlang
-#' @importFrom stats lm update logLik terms glm
+#' @importFrom stats lm update logLik terms glm poisson
 #' @importFrom MASS glm.nb
 #' @export
 #'
@@ -129,6 +129,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula passed to `lm()`
+#' @param family the model family to use.  By default ("gaussian") `lm()` is used.  "poisson" will run `glm(...family = poission(link = "log"))` and "negbin" will run `glm.nb` from the `MASS` package.  For continuous measures of colony growth such as mass, use `family = "gaussian"` (see example).  For count data such as number of workers, use the untransformed response variable and `family = "poisson"`.  For overdispersed count data, use `family = "negbin"` (warning: this last option will be a lot slower).
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.
 #'
 #' @details Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
@@ -160,7 +161,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
-bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
+bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "negbin"), augment = FALSE, taus = NULL){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
   # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
 
@@ -171,7 +172,7 @@ bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
-
+  fam <- match.arg(family)
   df <-
     data %>%
     # make sure colonyID is a character vector
@@ -195,7 +196,7 @@ bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
   resultdf <-
     map2_df(dflist,
             names(dflist),
-           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = !!t, formula = formula), .y),
+           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = !!t, formula = formula, family = fam), .y),
            .id = as_name(colonyID))
 
   predictdf <-

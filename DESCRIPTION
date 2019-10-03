@@ -10,10 +10,9 @@ Authors@R: c(
     person(given = c("Elizabeth", "E."),
            family = "Crone",
            role = c("aut"),
-           email = "elizabeth.crone@tufts.edu",
-           comment = c(ORCID = ""))
+           email = "elizabeth.crone@tufts.edu")
            )
-Description: Implements a breakpoint model from crone and williams....
+Description: Provides functions for modeling bumblebee colony growth as a growth period followed by a decline given that colonies switch from worker production to gyne production at some point.
 License: CC BY 4.0
 Encoding: UTF-8
 Language: es
@@ -34,7 +33,8 @@ Imports:
     tidyr,
     purrr,
     broom,
-    glue
+    glue,
+    MASS
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

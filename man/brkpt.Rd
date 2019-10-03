@@ -4,7 +4,8 @@
 \alias{brkpt}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, taus = NULL, t, formula)
+brkpt(data, taus = NULL, t, formula, family = c("gaussian", "poisson",
+  "negbin"))
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -14,6 +15,8 @@ brkpt(data, taus = NULL, t, formula)
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
 \item{formula}{a formula passed to \code{lm}.  This should include the time variable supplied to \code{t}}
+
+\item{family}{the model family to use.  By default ("gaussian") \code{lm()} is used.  "poisson" will run \code{glm(...family = poission(link = "log"))} and "negbin" will run \code{glm.nb} from the \code{MASS} package.  For continuous measures of colony growth such as mass, use \code{family = "gaussian"} (see example).  For count data such as number of workers, use the untransformed response variable and \code{family = "poisson"}.  For overdispersed count data, use \code{family = "negbin"}.}
 }
 \value{
 a tibble with a column for the winning tau and a column for the winning model
