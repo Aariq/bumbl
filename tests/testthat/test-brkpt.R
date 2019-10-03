@@ -1,6 +1,10 @@
 library(dplyr)
 testbees <- bombus %>% filter(colony == 9)
 noswitch <- bombus %>% filter(colony == 67)
+testcount <-
+  testbees %>%
+  #fake count data
+  mutate(count = as.integer(mass) - min(as.integer(mass)))
 
 test_that("brkpt errors if time variable is missing from formula", {
   expect_error(
@@ -52,4 +56,16 @@ test_that("brkpt works with dates", {
   testbees2 <- testbees %>% mutate(date = as.POSIXct(date))
   date.model2 <- brkpt(testbees2, t = date, formula = log(mass) ~ date)
   expect_is(date.model2$tau, "POSIXct")
+})
+
+test_that("brkpt works with poisson dist", {
+  count.model <- brkpt(testcount, t = week, formula = count ~ week, family = "poisson")
+  expect_s3_class(count.model, "data.frame")
+  expect_is(count.model$model[[1]], "glm")
+})
+
+test_that("brkpt works with negbin dist", {
+  negbin.model <- brkpt(testcount, t = week, formula = count ~ week, family = "negbin")
+  expect_s3_class(negbin.model, "data.frame")
+  expect_is(negbin.model$model[[1]], "negbin")
 })

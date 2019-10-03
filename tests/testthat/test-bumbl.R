@@ -1,5 +1,8 @@
 testdf <- bombus[bombus$colony != 67, ]
-
+testdf <-
+  testdf %>%
+  #make fake count data
+  mutate(count = as.integer(mass) - min(as.integer(mass)))
 test_that("bumbl works", {
   expect_s3_class(
     bumbl(testdf, colonyID = colony, t = week, formula = log(mass) ~ week),
@@ -38,3 +41,24 @@ test_that("no unexpected warnings", {
   expect_silent(bumbl(testdf, colonyID = colony, t = week, formula = log(mass) ~ week, augment = TRUE))
 })
 
+test_that("bumbl works with poisson count data", {
+  count.out <-
+    bumbl(testdf, colonyID = colony, t = week, formula = count ~ week,
+          family = "poisson")
+  count.out.aug <-
+    bumbl(testdf, colonyID = colony, t = week, formula = count ~ week,
+          family = "poisson", augment = TRUE)
+  expect_s3_class(count.out, "data.frame")
+  expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
+})
+
+test_that("bumbl works with overdispersed count data", {
+  count.out <-
+    bumbl(testdf, colonyID = colony, t = week, formula = count ~ week,
+          family = "negbin")
+  count.out.aug <-
+    bumbl(testdf, colonyID = colony, t = week, formula = count ~ week,
+          family = "negbin", augment = TRUE)
+  expect_s3_class(count.out, "data.frame")
+  expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
+})
