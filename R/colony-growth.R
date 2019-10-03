@@ -20,11 +20,12 @@
 #' brkpt(testbees, t = date, formula = log(mass) ~ date)
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = log(mass) ~ week)
-brkpt <- function(data, taus = NULL, t, formula){
+brkpt <- function(data, taus = NULL, t, formula, count_data = FALSE){
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
+
 
   if(is.null(taus)){
     tvec <- data[[tvar]]
@@ -52,18 +53,32 @@ brkpt <- function(data, taus = NULL, t, formula){
   # adds `.post` to formula. Would not be difficult to modify for other interactions
   f <- update(formula, ~. + .post)
   LLs <- c()
+  if(count_data == TRUE){
+    for(i in 1:length(taus)){
+      usetau = taus[i]
+      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-  for(i in 1:length(taus)){
-    usetau = taus[i]
-    data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+      m0 = try(glm(f, family = poisson(link = "log"), data = data2))
+      if(!inherits(m0, "try-error")){
+        LLs[i] = logLik(m0)
+      } #else?
+      #TODO: what if there is an error?
+      # LLs
+    }
+  } else {
+    for(i in 1:length(taus)){
+      usetau = taus[i]
+      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-    m0 = try(lm(f, data = data2))
-    if(!inherits(m0, "try-error")){
-      LLs[i] = logLik(m0)
-    } #else?
-    #TODO: what if there is an error?
-    # LLs
+      m0 = try(lm(f, data = data2))
+      if(!inherits(m0, "try-error")){
+        LLs[i] = logLik(m0)
+      } #else?
+      #TODO: what if there is an error?
+      # LLs
+    }
   }
+
   tau_win <- taus[which(LLs == max(LLs))]
 
   # if multiple equivalent taus are found, this should fail
@@ -72,7 +87,12 @@ brkpt <- function(data, taus = NULL, t, formula){
   }
   #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
-  m_win <- lm(f, data = data_win)
+
+  if(count_data == TRUE){
+    m_win <- glm(f, family = poisson(link = "log"), data = data_win)
+  } else {
+    m_win <- lm(f, data = data_win)
+  }
   return(tibble(tau = tau_win, model = list(m_win)))
 }
 
