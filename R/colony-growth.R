@@ -26,6 +26,12 @@ brkpt <- function(data, taus = NULL, t, formula, count_data = FALSE){
   t <- enquo(t)
   tvar <-as_name(t)
 
+  #reminder that you don't need to log transform when using count_data = TRUE
+  if(count_data == TRUE & any(grepl("log", all.names(update(formula, . ~ 0 ))))){
+    warning(
+      "Are you sure you meant to log-transform the response variable? If count_data = TRUE, a log-link poisson glm is used."
+    )
+  }
 
   if(is.null(taus)){
     tvec <- data[[tvar]]
