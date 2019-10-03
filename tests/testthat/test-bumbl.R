@@ -57,23 +57,23 @@ test_that("bumbl works with poisson count data", {
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
 
-test_that("bumbl works with overdispersed count data", {
-  count.out <-
-    bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "negbin")
-  count.out.aug <-
-    bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "negbin", augment = TRUE)
-  expect_s3_class(count.out, "data.frame")
-  expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
-})
+# test_that("bumbl works with overdispersed count data", {
+#   count.out <-
+#     bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
+#           family = "overdispersed")
+#   count.out.aug <-
+#     bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
+#           family = "overdispersed", augment = TRUE)
+#   expect_s3_class(count.out, "data.frame")
+#   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
+# })
 
-test_that("family = negbin doesn't produce a shit ton of warnings",{
-  expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-                      family = "negbin"))
-  expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-                      family = "negbin", augment = TRUE))
-})
+# test_that("family = overdispersed doesn't produce a shit ton of warnings",{
+#   expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
+#                       family = "overdispersed"))
+#   expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
+#                       family = "overdispersed", augment = TRUE))
+# })
 
 test_that("family = poisson doesn't produce a shit ton of warnings",{
   expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
