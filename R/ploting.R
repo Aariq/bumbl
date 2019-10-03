@@ -32,10 +32,13 @@ bumbl_plot <- function(bumbldf) {
 
   gdf %>%
     group_split() %>% #might be able to replace with base::split()
-    purrr::walk2(.y = group_keys(gdf)[[1]], ~{
-      plot(.x[[t]], .x[[yvar]], main = .y, xlab = t, ylab = yvar)
-      points(.x[[t]], exp(.x[[".fitted"]]), type = "l", col = "red")
+    purrr::walk2(.y = group_keys(gdf)[[1]],
+                 ~{
+                   ylims <- c(min(c(.x[[yvar]], exp(.x[[".fitted"]])), na.rm = TRUE),
+                              max(c(.x[[yvar]], exp(.x[[".fitted"]])), na.rm = TRUE))
+                   plot(.x[[t]], .x[[yvar]], main = .y, xlab = t, ylab = yvar, ylim = ylims)
+                   points(.x[[t]], exp(.x[[".fitted"]]), type = "l", col = "red")
 
-    })
+                 })
 
 }
