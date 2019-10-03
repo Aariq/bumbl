@@ -11,8 +11,9 @@
 #'
 #' @import dplyr
 #' @import rlang
-#' @importFrom stats lm update logLik terms glm poisson
+#' @importFrom stats lm update logLik terms glm poisson as.formula
 #' @importFrom MASS glm.nb
+#' @importFrom lme4 glmer
 #' @export
 #'
 #' @examples
@@ -132,7 +133,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
     # m_win <- glm.nb(f, data = data_win)
     rand <- as.formula(paste0("~. + (1|", as_name(t), ")"))
     f <- update(f, rand) #might work.  Unclear though
-    m_win <- flmer(f, family = "poisson", data = data_win)
+    m_win <- glmer(f, family = "poisson", data = data_win)
   }
   return(tibble(tau = tau_win, model = list(m_win)))
 }
