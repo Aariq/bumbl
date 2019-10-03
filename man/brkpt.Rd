@@ -5,7 +5,7 @@
 \title{Fit breakpoint model to individual colony}
 \usage{
 brkpt(data, taus = NULL, t, formula, family = c("gaussian", "poisson",
-  "negbin"))
+  "overdispersed"))
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -16,7 +16,7 @@ brkpt(data, taus = NULL, t, formula, family = c("gaussian", "poisson",
 
 \item{formula}{a formula passed to \code{lm}.  This should include the time variable supplied to \code{t}}
 
-\item{family}{the model family to use.  By default ("gaussian") \code{lm()} is used.  "poisson" will run \code{glm(...family = poission(link = "log"))} and "negbin" will run \code{glm.nb} from the \code{MASS} package.  For continuous measures of colony growth such as mass, use \code{family = "gaussian"} (see example).  For count data such as number of workers, use the untransformed response variable and \code{family = "poisson"}.  For overdispersed count data, use \code{family = "negbin"}.}
+\item{family}{the model family to use.  By default ("gaussian") \code{lm()} is used.  "poisson" will run \code{glm(...family = poission(link = "log"))} and "overdispersed" will run \code{glm.nb} from the \code{MASS} package.  For continuous measures of colony growth such as mass, use \code{family = "gaussian"} (see example).  For count data such as number of workers, use the untransformed response variable and \code{family = "poisson"}.  For overdispersed count data, use \code{family = "overdispersed"}.}
 }
 \value{
 a tibble with a column for the winning tau and a column for the winning model
