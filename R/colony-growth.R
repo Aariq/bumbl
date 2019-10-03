@@ -6,12 +6,13 @@
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
 #' @param formula a formula passed to `lm`.  This should include the time variable supplied to `t`
-#'
+#' @param family the model family to use.  By default ("gaussian") `lm()` is used.  "poisson" will run `glm(...family = poission(link = "log"))` and "negbin" will run `glm.nb` from the `MASS` package.  For continuous measures of colony growth such as mass, use `family = "gaussian"` (see example).  For count data such as number of workers, use the untransformed response variable and `family = "poisson"`.  For overdispersed count data, use `family = "negbin"`.
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
 #' @import rlang
-#' @importFrom stats lm update logLik terms
+#' @importFrom stats lm update logLik terms glm
+#' @importFrom MASS glm.nb
 #' @export
 #'
 #' @examples
@@ -20,18 +21,19 @@
 #' brkpt(testbees, t = date, formula = log(mass) ~ date)
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = log(mass) ~ week)
-brkpt <- function(data, taus = NULL, t, formula, count_data = FALSE){
+brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "negbin")){
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
+  fam <- match.arg(family)
 
   #reminder that you don't need to log transform when using count_data = TRUE
-  if(count_data == TRUE & any(grepl("log", all.names(update(formula, . ~ 0 ))))){
-    warning(
-      "Are you sure you meant to log-transform the response variable? If count_data = TRUE, a log-link poisson glm is used."
-    )
-  }
+  # if(count_data == TRUE & any(grepl("log", all.names(update(formula, . ~ 0 ))))){
+  #   warning(
+  #     "Are you sure you meant to log-transform the response variable? If count_data = TRUE, a log-link poisson glm is used."
+  #   )
+  # }
 
   if(is.null(taus)){
     tvec <- data[[tvar]]
@@ -59,25 +61,37 @@ brkpt <- function(data, taus = NULL, t, formula, count_data = FALSE){
   # adds `.post` to formula. Would not be difficult to modify for other interactions
   f <- update(formula, ~. + .post)
   LLs <- c()
-  if(count_data == TRUE){
-    for(i in 1:length(taus)){
+  if (fam == "gaussian") {
+    for (i in 1:length(taus)) {
       usetau = taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-      m0 = try(glm(f, family = poisson(link = "log"), data = data2))
-      if(!inherits(m0, "try-error")){
+      m0 = try(lm(f, data = data2))
+      if (!inherits(m0, "try-error")) {
         LLs[i] = logLik(m0)
       } #else?
       #TODO: what if there is an error?
       # LLs
     }
-  } else {
-    for(i in 1:length(taus)){
+  } else if (fam == "poisson") {
+    for (i in 1:length(taus)) {
       usetau = taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-      m0 = try(lm(f, data = data2))
-      if(!inherits(m0, "try-error")){
+      m0 = try(glm(f, family = "poisson", data = data2))
+      if (!inherits(m0, "try-error")) {
+        LLs[i] = logLik(m0)
+      } #else?
+      #TODO: what if there is an error?
+      # LLs
+    }
+  } else if (fam == "negbin") {
+    for (i in 1:length(taus)) {
+      usetau = taus[i]
+      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+
+      m0 = try(MASS::glm.nb(f, data = data2))
+      if (!inherits(m0, "try-error")) {
         LLs[i] = logLik(m0)
       } #else?
       #TODO: what if there is an error?
@@ -88,16 +102,18 @@ brkpt <- function(data, taus = NULL, t, formula, count_data = FALSE){
   tau_win <- taus[which(LLs == max(LLs))]
 
   # if multiple equivalent taus are found, this should fail
-  if(length(tau_win) > 1){
+  if (length(tau_win) > 1) {
     abort("More than one equivalent tau found")
   }
   #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
 
-  if(count_data == TRUE){
-    m_win <- glm(f, family = poisson(link = "log"), data = data_win)
-  } else {
+  if (fam == "gaussian") {
     m_win <- lm(f, data = data_win)
+  } else if (fam == "poisson") {
+    m_win <- glm(f, family = poisson(link = "log"), data = data_win)
+  } else if (fam == "negbin") {
+    m_win <- glm.nb(f, data = data_win)
   }
   return(tibble(tau = tau_win, model = list(m_win)))
 }
