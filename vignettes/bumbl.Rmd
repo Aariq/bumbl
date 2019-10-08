@@ -87,7 +87,7 @@ head(bombus)
 The `bumbl()` function expects a tidy dataset with a single column for colony ID, a single column for some measure of time, and a single column for some measure of colony growth at minimum.
 
 ```{r}
-out <- bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
+out <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
 head(out)
 ```
 
@@ -97,7 +97,7 @@ You can also include co-variates
 TODO:[why might you want to do this?]
 
 ```{r}
-out2 <- bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week * cum_floral)
+out2 <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week * cum_floral)
 head(out2)
 ```
 
@@ -111,7 +111,7 @@ To check that these results are sensible, you should plot them.  To do this, you
 bombus2 <- bombus[bombus$colony %in% c(38, 82, 98, 35), ]
 
 aug_out <- bumbl(bombus2, colonyID = colony, t = week,
-                 formula = mass ~ week, 
+                 formula = d.mass ~ week, 
                  augment = TRUE)
 head(aug_out)
 ```
@@ -130,7 +130,7 @@ From this it's clear that for colony 38, the model is incorrect.
 With `augment = TRUE`, `bumbl()` returns your original data with columns added for model coefficients.  This might be useful if you were interested in how habitat type effects the switch-time, $tau$.
 
 ```{r}
-out3 <- bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week, augment = TRUE)
+out3 <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)
 head(out3)
 ```
 
