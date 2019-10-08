@@ -1,5 +1,9 @@
-# bumbl 0.0.1
+# bumbl (development version)
+* changed `bumbl()` to use a log-link glm by default instead of an lm.  Use untransformed response variables.
+* added argument to `bumbl()` to allow for count data
+* added change in mass to `bombus` data
 
+# bumbl 0.0.1
 * `bumbl()` no longer errors when a single colony produces an error
 * added a vignette
 * updated `bombus` data to include cumulative floral resources
