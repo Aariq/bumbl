@@ -14,9 +14,9 @@ bumbl(data, colonyID, t, formula, family = c("gaussian", "poisson",
 
 \item{t}{the unquoted column name of the time variable in (units???)}
 
-\item{formula}{a formula passed to \code{lm()}}
+\item{formula}{a formula with the form \code{response ~ time + covariates} where response is your measure of colony growth, time is whatever measure of time you have (date, number of weeks, etc.) and covariates are any optional co-variates you want to fit at the colony level.}
 
-\item{family}{the model family to use.  By default ("gaussian") \code{lm()} is used.  "poisson" will run \code{glm(...family = poission(link = "log"))} and "overdispersed" will run \code{glm.nb} from the \code{MASS} package.  For continuous measures of colony growth such as mass, use \code{family = "gaussian"} (see example).  For count data such as number of workers, use the untransformed response variable and \code{family = "poisson"}.  For overdispersed count data, use \code{family = "overdispersed"} (warning: this last option will be a lot slower).}
+\item{family}{the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.}
 
@@ -42,9 +42,9 @@ Colony growth is modeled as increasing exponentialy until the colony switches to
 \examples{
 # Colony 67 doesn't seem to ever switch to reproduction and results in an error
 \dontrun{
-bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
+bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 }
 
 bombus2 <- bombus[bombus$colony != 67, ]
-bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
+bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
 }

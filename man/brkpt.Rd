@@ -14,9 +14,9 @@ brkpt(data, taus = NULL, t, formula, family = c("gaussian", "poisson",
 
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
-\item{formula}{a formula passed to \code{lm}.  This should include the time variable supplied to \code{t}}
+\item{formula}{a formula passed to \code{glm}.  This should include the time variable supplied to \code{t}}
 
-\item{family}{the model family to use.  By default ("gaussian") \code{lm()} is used.  "poisson" will run \code{glm(...family = poission(link = "log"))} and "overdispersed" will run \code{glm.nb} from the \code{MASS} package.  For continuous measures of colony growth such as mass, use \code{family = "gaussian"} (see example).  For count data such as number of workers, use the untransformed response variable and \code{family = "poisson"}.  For overdispersed count data, use \code{family = "overdispersed"}.}
+\item{family}{the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".}
 }
 \value{
 a tibble with a column for the winning tau and a column for the winning model
@@ -27,7 +27,7 @@ Fits models using a range of taus and picks the best one using maximum liklihood
 \examples{
 testbees <- bombus[bombus$colony == 9, ]
 # Using dates
-brkpt(testbees, t = date, formula = log(mass) ~ date)
+brkpt(testbees, t = date, formula = mass ~ date)
 # Using weeks
-brkpt(testbees, t = week, formula = log(mass) ~ week)
+brkpt(testbees, t = week, formula = mass ~ week)
 }

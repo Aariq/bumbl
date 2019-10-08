@@ -5,13 +5,13 @@
 #' @param data a dataframe or tibble
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `lm`.  This should include the time variable supplied to `t`
+#' @param formula a formula passed to `glm`.  This should include the time variable supplied to `t`
 #' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
 #' @import rlang
-#' @importFrom stats update logLik terms glm poisson as.formula
+#' @importFrom stats update logLik terms glm poisson as.formula gaussian
 #' @importFrom MASS glm.nb
 #' @importFrom lme4 glmer
 #' @export
@@ -119,7 +119,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
 
   if (fam == "gaussian") {
-    m_win <- lm(f, data = data_win)
+    m_win <- glm(f, family = gaussian(link = "log"), data = data_win)
   } else if (fam == "poisson") {
     m_win <- glm(f, family = poisson(link = "log"), data = data_win)
   } else if (fam == "overdispersed") {
@@ -141,7 +141,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #' @param colonyID the unquoted column name of the colony ID variable
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
-#' @param formula a formula passed to `lm()`
+#' @param formula a formula with the form `response ~ time + covariates` where response is your measure of colony growth, time is whatever measure of time you have (date, number of weeks, etc.) and covariates are any optional co-variates you want to fit at the colony level.
 #' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.
 #'
