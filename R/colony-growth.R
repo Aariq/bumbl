@@ -6,12 +6,12 @@
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
 #' @param formula a formula passed to `lm`.  This should include the time variable supplied to `t`
-#' @param family the model family to use.  By default ("gaussian") `lm()` is used.  "poisson" will run `glm(...family = poission(link = "log"))` and "overdispersed" will run `glm.nb` from the `MASS` package.  For continuous measures of colony growth such as mass, use `family = "gaussian"` (see example).  For count data such as number of workers, use the untransformed response variable and `family = "poisson"`.  For overdispersed count data, use `family = "overdispersed"`.
+#' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
 #' @import rlang
-#' @importFrom stats lm update logLik terms glm poisson as.formula
+#' @importFrom stats update logLik terms glm poisson as.formula
 #' @importFrom MASS glm.nb
 #' @importFrom lme4 glmer
 #' @export
@@ -19,22 +19,15 @@
 #' @examples
 #' testbees <- bombus[bombus$colony == 9, ]
 #' # Using dates
-#' brkpt(testbees, t = date, formula = log(mass) ~ date)
+#' brkpt(testbees, t = date, formula = mass ~ date)
 #' # Using weeks
-#' brkpt(testbees, t = week, formula = log(mass) ~ week)
+#' brkpt(testbees, t = week, formula = mass ~ week)
 brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "overdispersed")){
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
   fam <- match.arg(family)
-
-  #reminder that you don't need to log transform when using count_data = TRUE
-  # if(count_data == TRUE & any(grepl("log", all.names(update(formula, . ~ 0 ))))){
-  #   warning(
-  #     "Are you sure you meant to log-transform the response variable? If count_data = TRUE, a log-link poisson glm is used."
-  #   )
-  # }
 
   if(is.null(taus)){
     tvec <- data[[tvar]]
@@ -67,7 +60,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
       usetau = taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-      m0 = try(lm(f, data = data2))
+      m0 = try(glm(f, family = gaussian(link = "log"), data = data2))
       if (!inherits(m0, "try-error")) {
         LLs[i] = logLik(m0)
       } #else?
@@ -149,7 +142,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula passed to `lm()`
-#' @param family the model family to use.  By default ("gaussian") `lm()` is used.  "poisson" will run `glm(...family = poission(link = "log"))` and "overdispersed" will run `glm.nb` from the `MASS` package.  For continuous measures of colony growth such as mass, use `family = "gaussian"` (see example).  For count data such as number of workers, use the untransformed response variable and `family = "poisson"`.  For overdispersed count data, use `family = "overdispersed"` (warning: this last option will be a lot slower).
+#' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.
 #'
 #' @details Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
@@ -176,11 +169,11 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #' @examples
 #' # Colony 67 doesn't seem to ever switch to reproduction and results in an error
 #' \dontrun{
-#' bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
+#' bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 #'}
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
-#' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
+#' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
 bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "overdispersed"), augment = FALSE, taus = NULL){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
   # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
