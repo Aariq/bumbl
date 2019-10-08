@@ -13,6 +13,7 @@
 \item{date}{The calendar date the measurements were taken on}
 \item{week}{Number of weeks since the initial mass was taken}
 \item{mass}{Colony mass, in grams}
+\item{d.mass}{Difference in mass from the smallest mass for each colony, in grams}
 \item{floral_resources}{Floral density in millions of flowers within a 2km radius around the colony, weighted as a function of distance from colony}
 \item{cum_floral}{Cumulative floral resources from the start of the study}
 }}
