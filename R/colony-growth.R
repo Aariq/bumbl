@@ -21,7 +21,6 @@
 #' @import rlang
 #' @importFrom stats update logLik terms glm poisson as.formula gaussian
 #' @importFrom MASS glm.nb
-#' @importFrom lme4 glmer
 #' @export
 #'
 #' @examples
