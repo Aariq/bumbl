@@ -14,33 +14,60 @@ bumbl(data, colonyID, t, formula, family = c("gaussian", "poisson",
 
 \item{t}{the unquoted column name of the time variable in (units???)}
 
-\item{formula}{a formula with the form \code{response ~ time + covariates} where response is your measure of colony growth, time is whatever measure of time you have (date, number of weeks, etc.) and covariates are any optional co-variates you want to fit at the colony level.}
+\item{formula}{a formula with the form \code{response ~ time + covariates} where
+response is your measure of colony growth, time is whatever measure of time
+you have (date, number of weeks, etc.) and covariates are any optional
+co-variates you want to fit at the colony level.}
 
-\item{family}{the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".}
+\item{family}{the model family to use.  By default, the data are fit with a
+log-link gaussian generalized linear model. Because a log link is used, the
+response variable should not be log-transformed.  For count data (e.g.
+number of workers), use "poisson".  For overdispersed count data, use
+"overdispersed".}
 
-\item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.}
+\item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
+for each colonyID.  When TRUE, it returns the original data with additional
+columns containing model coefficients.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 }
 \value{
 The original dataframe augmented with the following columns:
 \itemize{
-\item{\code{tau} is the switchpoint, in the same units as \code{t}, for each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
-\item{\code{logN0} is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
-\item{\code{logLam} is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit \code{t}) during the growth period.}
-\item{\code{decay} reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{logLam}.}
-\item{\code{logNmax} is the maximum weight reached by each colony.  It is a function of \code{tau}, \code{logN0} and \code{logLam}}
-\item{Additional columns are coefficients for any covariates supplied in the \code{formula}}
+\item{\code{tau} is the switchpoint, in the same units as \code{t}, for
+each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to
+decline in week \eqn{\tau + 1}.}
+\item{\code{logN0} is the intercept of the
+growth function.  It reflects actual initial colony size, if the colony
+initially grows exponentially.  It would also be lower if there were a few
+weeks lag before growth started in the field.}
+\item{\code{logLam} is the
+average (log-scale) colony growth rate (i.e., rate of weight gain per unit
+\code{t}) during the growth period.}
+\item{\code{decay} reflects the rate of decline
+during the decline period. In fact, the way this model is set up, the
+actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{logLam}.}
+\item{\code{logNmax} is the maximum weight reached by each colony.  It is a
+function of \code{tau}, \code{logN0} and \code{logLam}}
+\item{Additional columns are
+coefficients for any covariates supplied in the \code{formula}}
 }
 }
 \description{
-Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, \eqn{\tau}.  This allows for a different switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See \strong{Details} for more information.
+Fits a model that assumes bumblebee colonies will switch from growth to gyne
+production at some point, \eqn{\tau}.  This allows for a different
+switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
+methods.  The function returns the original dataframe augmented with model
+statistics.  See \strong{Details} for more information.
 }
 \details{
-Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
+Colony growth is modeled as increasing exponentialy until the colony
+switches to gyne production, at which time the workers die and gynes leave
+the colony, causing the colony to decline. The switch point, \eqn{\tau},
+may vary among colonies.
 }
 \examples{
-# Colony 67 doesn't seem to ever switch to reproduction and results in an error
+# Colony 67 doesn't ever switch to reproduction and results in an error
 \dontrun{
 bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 }
