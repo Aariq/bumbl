@@ -217,17 +217,6 @@ bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", 
   #TODO: scoop up all the warnings from brkpt() and present a summary at the
   #end.
 
-  #There was a change in the vehavior of unnest with version 1.0.0 of
-  #tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries
-  #aren't available for all platforms.  So this checks for the version the user
-  #has and implements the legacy version of unnest() if appropriate.
-
-  if (packageVersion("tidyr") >= package_version("1.0.0")) {
-    unnest <- tidyr::unnest_legacy
-  }
-  #TODO: Once tidyr 1.0.0 binaries are available for windows,
-  #require tidyr 1.0.0 or greater
-
   colonyID <- enquo(colonyID)
   t <- enquo(t)
   fam <- match.arg(family)
@@ -277,7 +266,7 @@ bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", 
   modeldf <-
     resultdf %>%
     mutate(coefs = map(.data$model, broom::tidy)) %>%
-    unnest(.data$coefs, .preserve = .data$model) %>%
+    unnest(.data$coefs) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~ max(predict(.), na.rm = TRUE))) %>%
