@@ -5,7 +5,7 @@
 \title{Fit breakpoint growth models to many colonies.}
 \usage{
 bumbl(data, colonyID, t, formula, family = c("gaussian", "poisson",
-  "overdispersed"), augment = FALSE, taus = NULL)
+  "negbin"), augment = FALSE, taus = NULL)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -23,7 +23,7 @@ co-variates you want to fit at the colony level.}
 log-link gaussian generalized linear model. Because a log link is used, the
 response variable should not be log-transformed.  For count data (e.g.
 number of workers), use "poisson".  For overdispersed count data, use
-"overdispersed".}
+"negbin" to fit the model using \code{glm.nb()} from the \code{MASS} package.}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional

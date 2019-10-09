@@ -34,8 +34,7 @@ Imports:
     purrr,
     broom,
     glue,
-    MASS,
-    lme4
+    MASS
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
