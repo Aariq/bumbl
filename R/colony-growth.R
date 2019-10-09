@@ -5,26 +5,29 @@
 #' @param data a dataframe or tibble
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `lm`.  This should include the time variable supplied to `t`
-#'
+#' @param formula a formula passed to `glm`.  This should include the time variable supplied to `t`
+#' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
 #' @return a tibble with a column for the winning tau and a column for the winning model
 #'
 #' @import dplyr
 #' @import rlang
-#' @importFrom stats lm update logLik terms
+#' @importFrom stats update logLik terms glm poisson as.formula gaussian
+#' @importFrom MASS glm.nb
+#' @importFrom lme4 glmer
 #' @export
 #'
 #' @examples
 #' testbees <- bombus[bombus$colony == 9, ]
 #' # Using dates
-#' brkpt(testbees, t = date, formula = log(mass) ~ date)
+#' brkpt(testbees, t = date, formula = mass ~ date)
 #' # Using weeks
-#' brkpt(testbees, t = week, formula = log(mass) ~ week)
-brkpt <- function(data, taus = NULL, t, formula){
+#' brkpt(testbees, t = week, formula = mass ~ week)
+brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "overdispersed")){
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
+  fam <- match.arg(family)
 
   if(is.null(taus)){
     tvec <- data[[tvar]]
@@ -52,27 +55,79 @@ brkpt <- function(data, taus = NULL, t, formula){
   # adds `.post` to formula. Would not be difficult to modify for other interactions
   f <- update(formula, ~. + .post)
   LLs <- c()
+  if (fam == "gaussian") {
+    for (i in 1:length(taus)) {
+      usetau = taus[i]
+      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-  for(i in 1:length(taus)){
-    usetau = taus[i]
-    data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+      m0 = try(glm(f, family = gaussian(link = "log"), data = data2))
+      if (!inherits(m0, "try-error")) {
+        LLs[i] = logLik(m0)
+      } #else?
+      #TODO: what if there is an error?
+      # LLs
+    }
+  } else if (fam == "poisson") {
+    for (i in 1:length(taus)) {
+      usetau = taus[i]
+      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-    m0 = try(lm(f, data = data2))
-    if(!inherits(m0, "try-error")){
-      LLs[i] = logLik(m0)
-    } #else?
-    #TODO: what if there is an error?
-    # LLs
+      m0 = try(glm(f, family = "poisson", data = data2))
+      if (!inherits(m0, "try-error")) {
+        LLs[i] = logLik(m0)
+      } #else?
+      #TODO: what if there is an error?
+      # LLs
+    }
+  } else if (fam == "overdispersed") {
+    stop("the overdispersed feature doesn't work yet")
+    rand <- as.formula(paste0("~. + (1|", as_name(t), ")"))
+    f <- update(f, rand) #might work.  Unclear though
+      for (i in 1:length(taus)) {
+        usetau = taus[i]
+        data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+
+        m0 = try(lme4::glmer(f, family = "poisson", data = data2))
+        if (!inherits(m0, "try-error")) {
+          LLs[i] = logLik(m0)
+        } #else?
+        #TODO: what if there is an error?
+        # LLs
+      }
   }
+  # } else if (fam == "overdispersed") {
+  #   for (i in 1:length(taus)) {
+  #     usetau = taus[i]
+  #     data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+  #
+  #     m0 = try(MASS::glm.nb(f, data = data2))
+  #     if (!inherits(m0, "try-error")) {
+  #       LLs[i] = logLik(m0)
+  #     } #else?
+  #     #TODO: what if there is an error?
+  #     # LLs
+  #   }
+  # }
+
   tau_win <- taus[which(LLs == max(LLs))]
 
   # if multiple equivalent taus are found, this should fail
-  if(length(tau_win) > 1){
+  if (length(tau_win) > 1) {
     abort("More than one equivalent tau found")
   }
   #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
-  m_win <- lm(f, data = data_win)
+
+  if (fam == "gaussian") {
+    m_win <- glm(f, family = gaussian(link = "log"), data = data_win)
+  } else if (fam == "poisson") {
+    m_win <- glm(f, family = poisson(link = "log"), data = data_win)
+  } else if (fam == "overdispersed") {
+    # m_win <- glm.nb(f, data = data_win)
+    rand <- as.formula(paste0("~. + (1|", as_name(t), ")"))
+    f <- update(f, rand) #might work.  Unclear though
+    m_win <- glmer(f, family = "poisson", data = data_win)
+  }
   return(tibble(tau = tau_win, model = list(m_win)))
 }
 
@@ -86,7 +141,8 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @param colonyID the unquoted column name of the colony ID variable
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
-#' @param formula a formula passed to `lm()`
+#' @param formula a formula with the form `response ~ time + covariates` where response is your measure of colony growth, time is whatever measure of time you have (date, number of weeks, etc.) and covariates are any optional co-variates you want to fit at the colony level.
+#' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.
 #'
 #' @details Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
@@ -113,12 +169,12 @@ brkpt <- function(data, taus = NULL, t, formula){
 #' @examples
 #' # Colony 67 doesn't seem to ever switch to reproduction and results in an error
 #' \dontrun{
-#' bumbl(bombus, colonyID = colony, t = week, formula = log(mass) ~ week)
+#' bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 #'}
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
-#' bumbl(bombus2, colonyID = colony, t = week, formula = log(mass) ~ week)
-bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
+#' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
+bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "overdispersed"), augment = FALSE, taus = NULL){
   #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
   # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
 
@@ -129,7 +185,7 @@ bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
-
+  fam <- match.arg(family)
   df <-
     data %>%
     # make sure colonyID is a character vector
@@ -153,7 +209,7 @@ bumbl <- function(data, colonyID, t, formula, augment = FALSE, taus = NULL){
   resultdf <-
     map2_df(dflist,
             names(dflist),
-           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = !!t, formula = formula), .y),
+           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = !!t, formula = formula, family = fam), .y),
            .id = as_name(colonyID))
 
   predictdf <-
