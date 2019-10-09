@@ -5,7 +5,7 @@
 \title{Fit breakpoint model to individual colony}
 \usage{
 brkpt(data, taus = NULL, t, formula, family = c("gaussian", "poisson",
-  "overdispersed"))
+  "negbin"))
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -21,7 +21,7 @@ variable supplied to \code{t}}
 log-link gaussian generalized linear model. Because a log link is used, the
 response variable should not be log-transformed.  For count data (e.g.
 number of workers), use "poisson".  For overdispersed count data, use
-"overdispersed".}
+"negbin" to fit the model using \code{glm.nb()} from the \code{MASS} package.}
 }
 \value{
 a tibble with a column for the winning tau and a column for the

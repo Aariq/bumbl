@@ -13,7 +13,7 @@
 #'   log-link gaussian generalized linear model. Because a log link is used, the
 #'   response variable should not be log-transformed.  For count data (e.g.
 #'   number of workers), use "poisson".  For overdispersed count data, use
-#'   "overdispersed".
+#'   "negbin" to fit the model using `glm.nb()` from the `MASS` package.
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
 #'
@@ -30,7 +30,7 @@
 #' brkpt(testbees, t = date, formula = mass ~ date)
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = mass ~ week)
-brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "overdispersed")) {
+brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "negbin")) {
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
@@ -90,35 +90,20 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
       #TODO: what if there is an error?
       # LLs
     }
-  } else if (fam == "overdispersed") {
-    stop("the overdispersed feature doesn't work yet")
-    rand <- as.formula(paste0("~. + (1|", as_name(t), ")"))
-    f <- update(f, rand) #might work.  Unclear though
-      for (i in 1:length(taus)) {
-        usetau <- taus[i]
-        data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-        m0 <- try(lme4::glmer(f, family = "poisson", data = data2))
-        if (!inherits(m0, "try-error")) {
-          LLs[i] <- logLik(m0)
-        } #else?
-        #TODO: what if there is an error?
-        # LLs
-      }
+  } else if (fam == "negbin") {
+    for (i in 1:length(taus)) {
+      usetau = taus[i]
+      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+
+      m0 = try(MASS::glm.nb(f, data = data2))
+      if (!inherits(m0, "try-error")) {
+        LLs[i] = logLik(m0)
+      } #else?
+      #TODO: what if there is an error?
+      # LLs
+    }
   }
-  # } else if (fam == "overdispersed") {
-  #   for (i in 1:length(taus)) {
-  #     usetau = taus[i]
-  #     data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-  #
-  #     m0 = try(MASS::glm.nb(f, data = data2))
-  #     if (!inherits(m0, "try-error")) {
-  #       LLs[i] = logLik(m0)
-  #     } #else?
-  #     #TODO: what if there is an error?
-  #     # LLs
-  #   }
-  # }
 
   tau_win <- taus[which(LLs == max(LLs))]
 
@@ -133,11 +118,8 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
     m_win <- glm(f, family = gaussian(link = "log"), data = data_win)
   } else if (fam == "poisson") {
     m_win <- glm(f, family = poisson(link = "log"), data = data_win)
-  } else if (fam == "overdispersed") {
-    # m_win <- glm.nb(f, data = data_win)
-    rand <- as.formula(paste0("~. + (1|", as_name(t), ")"))
-    f <- update(f, rand) #might work.  Unclear though
-    m_win <- glmer(f, family = "poisson", data = data_win)
+  } else if (fam == "negbin") {
+    m_win <- glm.nb(f, data = data_win)
   }
   return(tibble(tau = tau_win, model = list(m_win)))
 }
@@ -165,7 +147,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #'   log-link gaussian generalized linear model. Because a log link is used, the
 #'   response variable should not be log-transformed.  For count data (e.g.
 #'   number of workers), use "poisson".  For overdispersed count data, use
-#'   "overdispersed".
+#'   "negbin" to fit the model using `glm.nb()` from the `MASS` package.
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
 #'   columns containing model coefficients.
@@ -213,7 +195,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
-bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "overdispersed"), augment = FALSE, taus = NULL) {
+bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "negbin"), augment = FALSE, taus = NULL) {
   #TODO: scoop up all the warnings from brkpt() and present a summary at the
   #end.
 
