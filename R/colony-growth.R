@@ -1,13 +1,21 @@
 #' Fit breakpoint model to individual colony
 #'
-#' Fits models using a range of taus and picks the best one using maximum liklihood
+#' Fits models using a range of taus and picks the best one using maximum
+#' liklihood
 #'
 #' @param data a dataframe or tibble
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used
+#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
+#'   max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `glm`.  This should include the time variable supplied to `t`
-#' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
-#' @return a tibble with a column for the winning tau and a column for the winning model
+#' @param formula a formula passed to `glm`.  This should include the time
+#'   variable supplied to `t`
+#' @param family the model family to use.  By default, the data are fit with a
+#'   log-link gaussian generalized linear model. Because a log link is used, the
+#'   response variable should not be log-transformed.  For count data (e.g.
+#'   number of workers), use "poisson".  For overdispersed count data, use
+#'   "overdispersed".
+#' @return a tibble with a column for the winning tau and a column for the
+#'   winning model
 #'
 #' @import dplyr
 #' @import rlang
@@ -22,34 +30,37 @@
 #' brkpt(testbees, t = date, formula = mass ~ date)
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = mass ~ week)
-brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "overdispersed")){
+brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "overdispersed")) {
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
   fam <- match.arg(family)
 
-  if(is.null(taus)){
+  if (is.null(taus)) {
     tvec <- data[[tvar]]
     taus <- seq(min(tvec), max(tvec), length.out = 50)
   }
 
   #Check that time variable is in the formula
-  if(!tvar %in% attr(fterms, "term.labels")) {
-    # abort(glue::glue("'{tvar}' is missing from the model formula"))
+  if (!tvar %in% attr(fterms, "term.labels")) {
     abort(paste0("'",tvar,"' is missing from the model formula"))
     }
 
   #Check that at least some taus are in range of t
-  if(all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
-    # abort(glue::glue("At least one tau must be in range of '{tvar}'"))
+  if (all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
     abort(paste0("At least one tau must be in range of '", tvar, "'"))
   }
   #If some taus are out of range of t, drop them
-  if(any(taus > max(data[[tvar]])) | any(taus < min(data[[tvar]]))){
-    # warning(glue::glue("Some taus were not used because they were outside of range of '{tvar}'"))
-    warning(paste0("Some taus were not used because they were outside of range of '", tvar, "'"))
-    taus <- taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
+  if (any(taus > max(data[[tvar]])) |
+      any(taus < min(data[[tvar]]))) {
+    warning(paste0(
+      "Some taus were not used because they were outside of range of '",
+      tvar,
+      "'"
+    ))
+    taus <-
+      taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
   }
 
   # adds `.post` to formula. Would not be difficult to modify for other interactions
@@ -57,24 +68,24 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
   LLs <- c()
   if (fam == "gaussian") {
     for (i in 1:length(taus)) {
-      usetau = taus[i]
+      usetau <- taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-      m0 = try(glm(f, family = gaussian(link = "log"), data = data2))
+      m0 <- try(glm(f, family = gaussian(link = "log"), data = data2))
       if (!inherits(m0, "try-error")) {
-        LLs[i] = logLik(m0)
+        LLs[i] <- logLik(m0)
       } #else?
       #TODO: what if there is an error?
       # LLs
     }
   } else if (fam == "poisson") {
     for (i in 1:length(taus)) {
-      usetau = taus[i]
+      usetau <- taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-      m0 = try(glm(f, family = "poisson", data = data2))
+      m0 <- try(glm(f, family = "poisson", data = data2))
       if (!inherits(m0, "try-error")) {
-        LLs[i] = logLik(m0)
+        LLs[i] <- logLik(m0)
       } #else?
       #TODO: what if there is an error?
       # LLs
@@ -84,12 +95,12 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
     rand <- as.formula(paste0("~. + (1|", as_name(t), ")"))
     f <- update(f, rand) #might work.  Unclear though
       for (i in 1:length(taus)) {
-        usetau = taus[i]
+        usetau <- taus[i]
         data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
 
-        m0 = try(lme4::glmer(f, family = "poisson", data = data2))
+        m0 <- try(lme4::glmer(f, family = "poisson", data = data2))
         if (!inherits(m0, "try-error")) {
-          LLs[i] = logLik(m0)
+          LLs[i] <- logLik(m0)
         } #else?
         #TODO: what if there is an error?
         # LLs
@@ -135,27 +146,55 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 
 #' Fit breakpoint growth models to many colonies.
 #'
-#' Fits a model that assumes bumblebee colonies will switch from growth to gyne production at some point, \eqn{\tau}.  This allows for a different switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood methods.  The function returns the original dataframe augmented with model statistics.  See **Details** for more information.
+#' Fits a model that assumes bumblebee colonies will switch from growth to gyne
+#' production at some point, \eqn{\tau}.  This allows for a different
+#' switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
+#' methods.  The function returns the original dataframe augmented with model
+#' statistics.  See **Details** for more information.
 #'
 #' @param data a dataframe or tibble
 #' @param colonyID the unquoted column name of the colony ID variable
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t), max(t), length.out = 50)` will be used.
+#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
+#'   max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
-#' @param formula a formula with the form `response ~ time + covariates` where response is your measure of colony growth, time is whatever measure of time you have (date, number of weeks, etc.) and covariates are any optional co-variates you want to fit at the colony level.
-#' @param family the model family to use.  By default, the data are fit with a log-link gaussian generalized linear model. Because a log link is used, the response variable should not be log-transformed.  For count data (e.g. number of workers), use "poisson".  For overdispersed count data, use "overdispersed".
-#' @param augment when FALSE, `bumbl` returns a summary dataframe with one row for each colonyID.  When TRUE, it returns the original data with additional columns containing model coefficients.
+#' @param formula a formula with the form `response ~ time + covariates` where
+#'   response is your measure of colony growth, time is whatever measure of time
+#'   you have (date, number of weeks, etc.) and covariates are any optional
+#'   co-variates you want to fit at the colony level.
+#' @param family the model family to use.  By default, the data are fit with a
+#'   log-link gaussian generalized linear model. Because a log link is used, the
+#'   response variable should not be log-transformed.  For count data (e.g.
+#'   number of workers), use "poisson".  For overdispersed count data, use
+#'   "overdispersed".
+#' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
+#'   for each colonyID.  When TRUE, it returns the original data with additional
+#'   columns containing model coefficients.
 #'
-#' @details Colony growth is modeled as increasing exponentialy until the colony switches to gyne production, at which time the workers die and gynes leave the colony, causing the colony to decline. The switch point, \eqn{\tau}, may vary among colonies.
+#' @details Colony growth is modeled as increasing exponentialy until the colony
+#'   switches to gyne production, at which time the workers die and gynes leave
+#'   the colony, causing the colony to decline. The switch point, \eqn{\tau},
+#'   may vary among colonies.
 #'
 #' @return The original dataframe augmented with the following columns:
-#' \itemize{
-#' \item{`tau` is the switchpoint, in the same units as `t`, for each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to decline in week \eqn{\tau + 1}.}
-#' \item{`logN0` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentially.  It would also be lower if there were a few weeks lag before growth started in the field.}
-#' \item{`logLam` is the average (log-scale) colony growth rate (i.e., rate of weight gain per unit `t`) during the growth period.}
-#' \item{`decay` reflects the rate of decline during the decline period. In fact, the way this model is set up, the actual rate of decline per unit `t` is calculated as `decay` - `logLam`.}
-#' \item{`logNmax` is the maximum weight reached by each colony.  It is a function of `tau`, `logN0` and `logLam`}
-#' \item{Additional columns are coefficients for any covariates supplied in the `formula`}
-#' }
+#'   \itemize{
+#'   \item{`tau` is the switchpoint, in the same units as `t`, for
+#'   each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to
+#'   decline in week \eqn{\tau + 1}.}
+#'   \item{`logN0` is the intercept of the
+#'   growth function.  It reflects actual initial colony size, if the colony
+#'   initially grows exponentially.  It would also be lower if there were a few
+#'   weeks lag before growth started in the field.}
+#'   \item{`logLam` is the
+#'   average (log-scale) colony growth rate (i.e., rate of weight gain per unit
+#'   `t`) during the growth period.}
+#'   \item{`decay` reflects the rate of decline
+#'   during the decline period. In fact, the way this model is set up, the
+#'   actual rate of decline per unit `t` is calculated as `decay` - `logLam`.}
+#'   \item{`logNmax` is the maximum weight reached by each colony.  It is a
+#'   function of `tau`, `logN0` and `logLam`}
+#'   \item{Additional columns are
+#'   coefficients for any covariates supplied in the `formula`}
+#'   }
 #'
 #' @import tidyr
 #' @import rlang
@@ -167,21 +206,27 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #' @export
 #'
 #' @examples
-#' # Colony 67 doesn't seem to ever switch to reproduction and results in an error
+#' # Colony 67 doesn't ever switch to reproduction and results in an error
 #' \dontrun{
 #' bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 #'}
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
-bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "overdispersed"), augment = FALSE, taus = NULL){
-  #TODO: scoop up all the warnings from brkpt() and present a summary at the end.
-  # There was a change in the vehavior of unnest with version 1.0.0 of tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries aren't available for all platforms.  So this checks for the version the user has and implements the legacy version of unnest() if appropriate.
+bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "overdispersed"), augment = FALSE, taus = NULL) {
+  #TODO: scoop up all the warnings from brkpt() and present a summary at the
+  #end.
 
-  if(packageVersion("tidyr") >= package_version("1.0.0")) {
+  #There was a change in the vehavior of unnest with version 1.0.0 of
+  #tidyr.  I dont' want to require tidyr 1.0.0 at this point because binaries
+  #aren't available for all platforms.  So this checks for the version the user
+  #has and implements the legacy version of unnest() if appropriate.
+
+  if (packageVersion("tidyr") >= package_version("1.0.0")) {
     unnest <- tidyr::unnest_legacy
   }
-  #TODO: Once tidyr 1.0.0 binaries are available for windows, require tidyr 1.0.0 or greater
+  #TODO: Once tidyr 1.0.0 binaries are available for windows,
+  #require tidyr 1.0.0 or greater
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
@@ -200,17 +245,27 @@ bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", 
   names(model_list) <- names(dflist)
 
   brkpt_w_err <- function(code, colonyID) {
-    tryCatch(code,
-             error = function(c){
-               message(glue::glue("Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."))
-             })
+    tryCatch(
+      code,
+      error = function(c) {
+        message(
+          glue::glue(
+            "Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."
+          )
+        )
+      }
+    )
   }
 
   resultdf <-
     map2_df(dflist,
             names(dflist),
-           ~brkpt_w_err(brkpt(.x, taus = {{taus}}, t = !!t, formula = formula, family = fam), .y),
-           .id = as_name(colonyID))
+            ~brkpt_w_err(brkpt(.x, taus = {{taus}},
+                               t = !!t,
+                               formula = formula,
+                               family = fam),
+                         .y),
+            .id = as_name(colonyID))
 
   predictdf <-
     resultdf %>%
@@ -225,12 +280,19 @@ bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", 
     unnest(.data$coefs, .preserve = .data$model) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
+    mutate(logNmax = map_dbl(.data$model, ~ max(predict(.), na.rm = TRUE))) %>%
     dplyr::select(-"model") %>%
-    dplyr::select(!!colonyID, "tau", logN0 = '(Intercept)', logLam = !!t, decay = '.post', "logNmax",
-           everything())
+    dplyr::select(
+      !!colonyID,
+      "tau",
+      logN0 = "(Intercept)",
+      logLam = !!t,
+      decay = ".post",
+      "logNmax",
+      everything()
+    )
 
-  if(augment == TRUE){
+  if (augment == TRUE) {
     augmented_df <-
       left_join(df, modeldf, by = as_name(colonyID))
 
