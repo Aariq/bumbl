@@ -18,8 +18,7 @@ bipm(
   trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 *
     wkr_size^2)),
   poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
-  poln_per_cell = 0.016,
-  wkr_mass_mean = 0.1476721
+  poln_per_cell = 0.016
 )
 }
 \arguments{
@@ -46,8 +45,6 @@ bipm(
 \item{poln_mass_f}{the mass of pollen returned per trip as a function of size, in grams}
 
 \item{poln_per_cell}{mean mass of pollen per cell, in grams}
-
-\item{wkr_mass_mean}{mean mass of workers, in grams}
 }
 \value{
 the full integral projection matrix (invisibly)

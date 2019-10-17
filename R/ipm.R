@@ -35,8 +35,7 @@ bipm <- function(larv_surv = 0.9804193,
                  p_forage_f = function(wkr_size) plogis(-2.392183 + 1.364705 * wkr_size),
                  trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 * wkr_size^2)),
                  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
-                 poln_per_cell = 0.016,
-                 wkr_mass_mean = 0.1476721
+                 poln_per_cell = 0.016
 ) {
   # Larva to larva
   dev_time <- dpois(1:50, dev_time_mean)
