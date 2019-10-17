@@ -12,7 +12,6 @@
 #' @param trips_f number of trips per day as a function of size
 #' @param poln_mass_f the mass of pollen returned per trip as a function of size, in grams
 #' @param poln_per_cell mean mass of pollen per cell, in grams
-#' @param wkr_mass_mean mean mass of workers, in grams
 #'
 #' @return the full integral projection matrix (invisibly)
 #'
@@ -38,7 +37,6 @@ bipm <- function(larv_surv = 0.9804193,
                  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
                  poln_per_cell = 0.016,
                  wkr_mass_mean = 0.1476721
-
 ) {
   # Larva to larva
   dev_time <- dpois(1:50, dev_time_mean)
@@ -80,10 +78,8 @@ bipm <- function(larv_surv = 0.9804193,
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
-  poln_per_wkrmass <- poln_per_cell/wkr_mass_mean
-
   wkr_larv_mat <- array(0, dim = c(n_larv, n_wkr))
-  wkr_larv_mat[1,] <- daily_poln_return / (poln_per_wkrmass *  wkr_mass_mean)
+  wkr_larv_mat[1,] <- daily_poln_return / poln_per_cell
 
   larv_mat <- rbind(larv_larv_mat, larv_wkr_mat)
   wkr_mat <- rbind(wkr_larv_mat, wkr_wkr_mat)
