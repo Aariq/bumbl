@@ -17,6 +17,7 @@
 #' @return the full integral projection matrix (invisibly)
 #'
 #' @importFrom popbio lambda
+#' @importFrom stats plogis dpois pnorm
 #' @export
 #'
 #' @examples
@@ -54,7 +55,7 @@ bipm <- function(larv_surv = 0.9804193,
   wkr_size <- seq(wkr_size_min, wkr_size_max, 0.01)
   n_wkr <- length(wkr_size) - 1
   n_larv <- length(dev_time)
-  wkr_pdist <- pnorm(wkr_size, mean = wkr_size_mean, sd = wkr_size_sd, log = FALSE)
+  wkr_pdist <- pnorm(wkr_size, mean = wkr_size_mean, sd = wkr_size_sd)
   p_wkr_size <- wkr_pdist[2:length(wkr_pdist)] - wkr_pdist[1:(length(wkr_pdist) - 1)]
 
   larv_wkr_mat <- array(0, dim = c(n_wkr, n_larv))
