@@ -1,7 +1,7 @@
 #' Integral Projection Model for Bumblebees
 #'
 #' @param larv_surv larval survival rate
-#' @param dev_time_mean mean development time from larva to worker
+#' @param dev_time_mean mean development time from egg to adult, in days
 #' @param wkr_size_min minimum observed worker size
 #' @param wkr_size_max maximum observed worker size
 #' @param wkr_size_mean mean observed worker size
@@ -91,5 +91,5 @@ bipm <- function(larv_surv = 0.9804193,
   growth_rate <- popbio::lambda(full_mat)
   print(growth_rate)
 
-  invisible(full_mat)
+  invisible(list(lambda = growth_rate, ipm = full_mat))
 }
