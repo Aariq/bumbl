@@ -35,6 +35,7 @@ bipm <- function(larv_surv = 0.9804193,
                  p_forage_f = function(wkr_size) plogis(-2.392183 + 1.364705 * wkr_size),
                  trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 * wkr_size^2)),
                  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
+                 wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
                  poln_per_cell = 0.016
 ) {
   # Larva to larva
@@ -77,8 +78,11 @@ bipm <- function(larv_surv = 0.9804193,
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
+  wkr_mass <- wkr_mass_f(wkr_size_1)
+  poln_per_wkrmass <- poln_per_cell/mean(wkr_mass)
+
   wkr_larv_mat <- array(0, dim = c(n_larv, n_wkr))
-  wkr_larv_mat[1,] <- daily_poln_return / poln_per_cell
+  wkr_larv_mat[1,] <- daily_poln_return / (poln_per_wkrmass *  wkr_mass)
 
   larv_mat <- rbind(larv_larv_mat, larv_wkr_mat)
   wkr_mat <- rbind(wkr_larv_mat, wkr_wkr_mat)
