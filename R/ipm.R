@@ -54,12 +54,12 @@ bipm <- function(larv_surv = 0.9804193,
   n_wkr <- length(wkr_size) - 1
   n_larv <- length(dev_time)
   wkr_pdist <- pnorm(wkr_size, mean = wkr_size_mean, sd = wkr_size_sd)
-  p_wkr_size <- wkr_pdist[2:length(wkr_pdist)] - wkr_pdist[1:(length(wkr_pdist) - 1)]
+  prop_wkr_size <- wkr_pdist[2:length(wkr_pdist)] - wkr_pdist[1:(length(wkr_pdist) - 1)]
 
   larv_wkr_mat <- array(0, dim = c(n_wkr, n_larv))
 
-  for (i in 1:length(p_wkr_size)) {
-    larv_wkr_mat[i,] <- dev_time * larv_surv * p_wkr_size[i]
+  for (i in 1:length(prop_wkr_size)) {
+    larv_wkr_mat[i,] <- dev_time * larv_surv * prop_wkr_size[i]
   }
 
   # Worker to worker
