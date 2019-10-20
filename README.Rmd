@@ -44,6 +44,34 @@ View the package vignette with:
 library(bumbl)
 vignette("bumbl")
 ```
+```{r include=FALSE}
+library(bumbl)
+```
+
+View the `bomubs` dataset
+
+```{r}
+head(bombus)
+```
+
+### Example use
+
+Using a subset of the `bombus` dataframe to estimate the week (tau) that colonies switch to reproduction
+
+```{r}
+bombus2 <- bombus[bombus$colony %in% c(9, 82, 98, 35), ]
+bumbl(bombus2,colonyID = colony, t = week, formula = d.mass ~ week)
+```
+
+Keep the original data and plot the results
+
+```{r}
+results <- bumbl(bombus2,colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)
+par(mfrow = c(2,2))
+bumbl_plot(results)
+par(mfrow = c(1,1))
+```
+
 
 # References
 ^1^Crone, E. E., and Williams, N. M. (2016). Bumble bee colony dynamics: quantifying the importance of land use and floral resources for colony growth and queen production. Ecol. Lett. 19, 460–468. https://doi.org/10.1111/ele.12581
