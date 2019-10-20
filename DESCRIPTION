@@ -1,6 +1,6 @@
 Package: bumbl
 Title: Tools for modeling bumblebee colony growth
-Version: 0.0.1.9000
+Version: 0.0.1
 Authors@R: c(
     person(given = c("Eric", "R."),
            family = "Scott",
