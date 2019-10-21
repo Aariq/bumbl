@@ -13,5 +13,6 @@ test_that("changing paramaters does something", {
   expect_false(bipm(trips_f = function(wkr_size) exp(-10 + (5 * wkr_size) + (-0.6 * wkr_size^2)))$lambda == test$lambda)
   expect_false(bipm(poln_mass_f = function(wkr_size) exp(-5.7 + 0.3 * wkr_size))$lambda == test$lambda)
   expect_false(bipm(poln_per_cell = 0.017)$lambda == test$lambda)
+  expect_false(bipm(prop_foraging = 0.75)$lambda == test$lambda)
 })
 

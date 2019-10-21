@@ -7,11 +7,16 @@
 #' @param wkr_size_mean mean observed worker size
 #' @param wkr_size_sd standard deviation of worker size
 #' @param wkr_surv_f worker survival as a function of size
-#' @param p_poln_ret_f probability of returning with pollen as a function of size
+#' @param p_poln_ret_f probability of returning with pollen as a function of
+#'   size
 #' @param p_forage_f probability of making a foraging trip as a function of size
 #' @param trips_f number of trips per day as a function of size
-#' @param poln_mass_f the mass of pollen returned per trip as a function of size, in grams
+#' @param poln_mass_f the mass of pollen returned per trip as a function of
+#'   size, in grams
 #' @param poln_per_cell mean mass of pollen per cell, in grams
+#' @param prop_foraging proportion of workers allowed to forage.  When less than
+#'   1, the smallest `1 - prop_foraging` workers do not contribute resources to
+#'   the hive.
 #'
 #' @return the full integral projection matrix (invisibly)
 #'
@@ -36,7 +41,8 @@ bipm <- function(larv_surv = 0.9804193,
                  trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 * wkr_size^2)),
                  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
                  wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
-                 poln_per_cell = 0.016
+                 poln_per_cell = 0.016,
+                 prop_foraging = 1
 ) {
   # Larva to larva
   dev_time <- dpois(1:50, dev_time_mean)
@@ -48,7 +54,7 @@ bipm <- function(larv_surv = 0.9804193,
     larv_larv_mat[i + 1, i] <- (1 - dev_time[i]) * larv_surv
   }
 
-  # Larvat to worker
+  # Larva to worker
 
   wkr_size <- seq(wkr_size_min, wkr_size_max, 0.01)
   n_wkr <- length(wkr_size) - 1
@@ -75,14 +81,26 @@ bipm <- function(larv_surv = 0.9804193,
   p_forage <- p_forage_f(wkr_size_1)
   trips_per_day <- trips_f(wkr_size_1)
   poln_mass <- poln_mass_f(wkr_size_1)
+  prop_nforaging <- 1 - prop_foraging
+  cum_prop <- cumsum(prop_wkr_size)
+  foraging_index <- which.min(cum_prop < prop_nforaging)
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
   wkr_mass <- wkr_mass_f(wkr_size_1)
   poln_per_wkrmass <- poln_per_cell/mean(wkr_mass)
 
+  wkr_larv <- daily_poln_return / (poln_per_wkrmass *  wkr_mass)
+
+  if (foraging_index > 1) {
+    wkr_larv[1:foraging_index - 1] <- 0
+    border_case_correction <- 1 - (prop_nforaging - max(cum_prop[1:foraging_index - 1])) / prop_wkr_size[foraging_index]
+  } else {
+    border_case_correction <- 1 - (prop_nforaging / prop_wkr_size[1])
+  }
+  wkr_larv[foraging_index] <- wkr_larv[foraging_index] * border_case_correction
   wkr_larv_mat <- array(0, dim = c(n_larv, n_wkr))
-  wkr_larv_mat[1,] <- daily_poln_return / (poln_per_wkrmass *  wkr_mass)
+  wkr_larv_mat[1,] <- wkr_larv
 
   larv_mat <- rbind(larv_larv_mat, larv_wkr_mat)
   wkr_mat <- rbind(wkr_larv_mat, wkr_wkr_mat)
