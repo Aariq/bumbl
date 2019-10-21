@@ -6,8 +6,6 @@ bombus_sub <-
   mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
   ungroup()
 
-detach("package:dplyr")
-
 test_that("plotting function displays something?", {
   results <-
     suppressWarnings(bumbl(
