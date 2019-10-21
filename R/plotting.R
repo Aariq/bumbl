@@ -19,6 +19,7 @@
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = log(mass) ~ week)
 #' bumbl_plot(results)
+
 bumbl_plot <- function(bumbldf, gg = FALSE) {
   if(!inherits(bumbldf, "bumbldf")) {
     abort("bumbl_plot() only works on dataframes output by bumbl()")

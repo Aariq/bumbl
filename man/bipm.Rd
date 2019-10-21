@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipm.R
 \name{bipm}
 \alias{bipm}
-\title{Integral Projection Model for Bumblebees}
+\title{Integral Projection Model for Bumblebee Colony Growth}
 \usage{
 bipm(
   larv_surv = 0.9804193,
@@ -18,7 +18,9 @@ bipm(
   trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 *
     wkr_size^2)),
   poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
-  poln_per_cell = 0.016
+  wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
+  poln_per_cell = 0.016,
+  prop_foraging = 1
 )
 }
 \arguments{
@@ -26,31 +28,39 @@ bipm(
 
 \item{dev_time_mean}{mean development time from egg to adult, in days}
 
-\item{wkr_size_min}{minimum observed worker size}
+\item{wkr_size_min}{minimum observed worker intertegular span (ITS) in mm.}
 
-\item{wkr_size_max}{maximum observed worker size}
+\item{wkr_size_max}{maximum observed worker ITS}
 
-\item{wkr_size_mean}{mean observed worker size}
+\item{wkr_size_mean}{mean observed worker ITS}
 
-\item{wkr_size_sd}{standard deviation of worker size}
+\item{wkr_size_sd}{standard deviation of worker ITS}
 
-\item{wkr_surv_f}{worker survival as a function of size}
+\item{wkr_surv_f}{worker survival as a function of worker ITS}
 
-\item{p_poln_ret_f}{probability of returning with pollen as a function of size}
+\item{p_poln_ret_f}{probability of returning with pollen as a function of
+worker ITS}
 
-\item{p_forage_f}{probability of making a foraging trip as a function of size}
+\item{p_forage_f}{probability of making a foraging trip as a function of
+worker ITS}
 
-\item{trips_f}{number of trips per day as a function of size}
+\item{trips_f}{number of trips per day as a function of worker ITS}
 
-\item{poln_mass_f}{the mass of pollen returned per trip as a function of size, in grams}
+\item{poln_mass_f}{the mass of pollen returned per trip as a function of ITS,
+in grams}
 
 \item{poln_per_cell}{mean mass of pollen per cell, in grams}
+
+\item{prop_foraging}{proportion of workers allowed to forage.  When less than
+1, the smallest \code{1 - prop_foraging} workers do not contribute resources to
+recruitment of new larvae.}
 }
 \value{
-the full integral projection matrix (invisibly)
+a list containing the full integral projection model and the colony
+growth rate, lambda.
 }
 \description{
-Integral Projection Model for Bumblebees
+A description I have yet to write...
 }
 \examples{
 # Original model:

@@ -1,24 +1,28 @@
-#' Integral Projection Model for Bumblebees
+#' Integral Projection Model for Bumblebee Colony Growth
+#'
+#' A description I have yet to write...
 #'
 #' @param larv_surv larval survival rate
 #' @param dev_time_mean mean development time from egg to adult, in days
-#' @param wkr_size_min minimum observed worker size
-#' @param wkr_size_max maximum observed worker size
-#' @param wkr_size_mean mean observed worker size
-#' @param wkr_size_sd standard deviation of worker size
-#' @param wkr_surv_f worker survival as a function of size
+#' @param wkr_size_min minimum observed worker intertegular span (ITS) in mm.
+#' @param wkr_size_max maximum observed worker ITS
+#' @param wkr_size_mean mean observed worker ITS
+#' @param wkr_size_sd standard deviation of worker ITS
+#' @param wkr_surv_f worker survival as a function of worker ITS
 #' @param p_poln_ret_f probability of returning with pollen as a function of
-#'   size
-#' @param p_forage_f probability of making a foraging trip as a function of size
-#' @param trips_f number of trips per day as a function of size
-#' @param poln_mass_f the mass of pollen returned per trip as a function of
-#'   size, in grams
+#'   worker ITS
+#' @param p_forage_f probability of making a foraging trip as a function of
+#'   worker ITS
+#' @param trips_f number of trips per day as a function of worker ITS
+#' @param poln_mass_f the mass of pollen returned per trip as a function of ITS,
+#'   in grams
 #' @param poln_per_cell mean mass of pollen per cell, in grams
 #' @param prop_foraging proportion of workers allowed to forage.  When less than
 #'   1, the smallest `1 - prop_foraging` workers do not contribute resources to
-#'   the hive.
+#'   recruitment of new larvae.
 #'
-#' @return the full integral projection matrix (invisibly)
+#' @return a list containing the full integral projection model and the colony
+#'   growth rate, lambda.
 #'
 #' @importFrom popbio lambda
 #' @importFrom stats plogis dpois pnorm
@@ -55,7 +59,6 @@ bipm <- function(larv_surv = 0.9804193,
   }
 
   # Larva to worker
-
   wkr_size <- seq(wkr_size_min, wkr_size_max, 0.01)
   n_wkr <- length(wkr_size) - 1
   n_larv <- length(dev_time)
@@ -65,11 +68,10 @@ bipm <- function(larv_surv = 0.9804193,
   larv_wkr_mat <- array(0, dim = c(n_wkr, n_larv))
 
   for (i in 1:length(prop_wkr_size)) {
-    larv_wkr_mat[i,] <- dev_time * larv_surv * prop_wkr_size[i]
+    larv_wkr_mat[i, ] <- dev_time * larv_surv * prop_wkr_size[i]
   }
 
   # Worker to worker
-
   wkr_size_1 <- wkr_size[1:length(wkr_size) - 1]
   wkr_surv <- wkr_surv_f(wkr_size_1)
 
@@ -83,24 +85,26 @@ bipm <- function(larv_surv = 0.9804193,
   poln_mass <- poln_mass_f(wkr_size_1)
   prop_nforaging <- 1 - prop_foraging
   cum_prop <- cumsum(prop_wkr_size)
-  foraging_index <- which.min(cum_prop < prop_nforaging)
+  foraging_index <- which.min(cum_prop < prop_nforaging) #position in vector for cutoff for foraging workers
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
   wkr_mass <- wkr_mass_f(wkr_size_1)
-  poln_per_wkrmass <- poln_per_cell/mean(wkr_mass)
+  poln_per_wkrmass <- poln_per_cell / mean(wkr_mass)
 
   wkr_larv <- daily_poln_return / (poln_per_wkrmass *  wkr_mass)
 
   if (foraging_index > 1) {
     wkr_larv[1:foraging_index - 1] <- 0
-    border_case_correction <- 1 - (prop_nforaging - max(cum_prop[1:foraging_index - 1])) / prop_wkr_size[foraging_index]
+    border_case_correction <-
+      1 - (prop_nforaging - max(cum_prop[1:foraging_index - 1])) / prop_wkr_size[foraging_index]
   } else {
-    border_case_correction <- 1 - (prop_nforaging / prop_wkr_size[1])
+    border_case_correction <-
+      1 - (prop_nforaging / prop_wkr_size[1]) #if prop_foraging = 1 this equals 1
   }
   wkr_larv[foraging_index] <- wkr_larv[foraging_index] * border_case_correction
   wkr_larv_mat <- array(0, dim = c(n_larv, n_wkr))
-  wkr_larv_mat[1,] <- wkr_larv
+  wkr_larv_mat[1, ] <- wkr_larv
 
   larv_mat <- rbind(larv_larv_mat, larv_wkr_mat)
   wkr_mat <- rbind(wkr_larv_mat, wkr_wkr_mat)
