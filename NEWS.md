@@ -9,6 +9,7 @@
 * added argument to `bumbl()` to allow for count data
 * added change in mass to `bombus` data
 * now requires tidyr version 1.0.0 or greater
+* new function, `bipm()` to calculate colony growth using integral projection models
 
 
 # bumbl 0.0.1
