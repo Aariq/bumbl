@@ -16,6 +16,7 @@
 #' @param trips_f number of trips per day as a function of worker ITS
 #' @param poln_mass_f the mass of pollen returned per trip as a function of ITS,
 #'   in grams
+#' @param wkr_mass_f a function relating worker mass to worker ITS
 #' @param poln_per_cell mean mass of pollen per cell, in grams
 #' @param prop_foraging proportion of workers allowed to forage.  When less than
 #'   1, the smallest `1 - prop_foraging` workers do not contribute resources to

@@ -49,6 +49,8 @@ worker ITS}
 \item{poln_mass_f}{the mass of pollen returned per trip as a function of ITS,
 in grams}
 
+\item{wkr_mass_f}{a function relating worker mass to worker ITS}
+
 \item{poln_per_cell}{mean mass of pollen per cell, in grams}
 
 \item{prop_foraging}{proportion of workers allowed to forage.  When less than
