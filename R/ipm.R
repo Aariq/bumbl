@@ -1,6 +1,8 @@
 #' Integral Projection Model for Bumblebee Colony Growth
 #'
-#' A description I have yet to write...
+#' (sentence about this being based off of natalie's paper). The function builds
+#' an integral projection model from continuous functions and scalars describing
+#' vital rates estimated from previously published emperical work.
 #'
 #' @param larv_surv Larval survival rate.
 #' @param dev_time_mean Mean development time from egg to adult, in days.
@@ -14,14 +16,19 @@
 #'   recruitment of new larvae.
 #' @param wkr_mass_f A function relating worker mass to worker ITS.
 #' @param wkr_surv_f Worker survival as a function of worker ITS.
-#' @param p_forage_f Probability of a worker making a foraging trip as a function of ITS.
-#' @param p_poln_ret_f Probability of a worker returning from a foraging trip with pollen, as a function of ITS.
-#' @param trips_f The average number of foraging trips per day as a function of worker ITS.
+#' @param p_forage_f Probability of a worker making a foraging trip as a
+#'   function of ITS.
+#' @param p_poln_ret_f Probability of a worker returning from a foraging trip
+#'   with pollen, as a function of ITS.
+#' @param trips_f The average number of foraging trips per day as a function of
+#'   worker ITS.
 #' @param poln_mass_f The mass of pollen returned per trip as a function of ITS,
 #'   in grams
 #'
-#' @return a list containing the full integral projection model and the colony
+#' @return A list containing the full integral projection model and the colony
 #'   growth rate, lambda.
+#'
+#' @references TODO: add references
 #'
 #' @importFrom popbio lambda
 #' @importFrom stats plogis dpois pnorm
