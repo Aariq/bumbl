@@ -49,10 +49,10 @@ bipm <- function(larv_surv = 0.9804193,
                  prop_foraging = 1,
                  wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
                  wkr_surv_f = function(wkr_size) plogis(4.5000243 - 0.4956151 * wkr_size),
-                 p_forage_f = function(wkr_size) plogis(-2.392183 + 1.364705 * wkr_size),
-                 p_poln_ret_f = function(wkr_size) plogis(7.9804084 + (-4.9121457 * wkr_size) + (0.6533555 * wkr_size^2)),
+                 p_forage_f = function(wkr_size) plogis(-7.21769 + (4.163177 * wkr_size) + (-0.3991264 * wkr_size^2)),
+                 p_poln_ret_f = function(wkr_size) plogis(3.568386 + (-2.607965 * wkr_size) + (0.3562743 * wkr_size^2)),
                  trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 * wkr_size^2)),
-                 poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size)
+                 poln_mass_f = function(wkr_size) exp(-7.3287 + (1.153302 * wkr_size) + (-0.1138477 * wkr_size^2))
 ) {
   # Larva to larva
   dev_time <- dpois(1:50, dev_time_mean)
