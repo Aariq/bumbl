@@ -16,3 +16,7 @@ test_that("changing paramaters does something", {
   expect_false(bipm(prop_foraging = 0.75)$lambda == test$lambda)
 })
 
+test_that("prop_foraging is working right", {
+  expect_lt(bipm(prop_foraging = 0)$lambda, bipm(prop_foraging = 0.1)$lambda)
+  expect_gt(bipm(prop_foraging = 1)$lambda, bipm(prop_foraging = 0.99)$lambda)
+})
