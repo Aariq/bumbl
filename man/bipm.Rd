@@ -11,51 +11,49 @@ bipm(
   wkr_size_max = 5.81,
   wkr_size_mean = 3.600687,
   wkr_size_sd = 0.4276681,
+  poln_per_cell = 0.016,
+  prop_foraging = 1,
+  wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
   wkr_surv_f = function(wkr_size) plogis(4.5000243 - 0.4956151 * wkr_size),
+  p_forage_f = function(wkr_size) plogis(-2.392183 + 1.364705 * wkr_size),
   p_poln_ret_f = function(wkr_size) plogis(7.9804084 + (-4.9121457 * wkr_size) +
     (0.6533555 * wkr_size^2)),
-  p_forage_f = function(wkr_size) plogis(-2.392183 + 1.364705 * wkr_size),
   trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 *
     wkr_size^2)),
-  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size),
-  wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
-  poln_per_cell = 0.016,
-  prop_foraging = 1
+  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size)
 )
 }
 \arguments{
-\item{larv_surv}{larval survival rate}
+\item{larv_surv}{Larval survival rate.}
 
-\item{dev_time_mean}{mean development time from egg to adult, in days}
+\item{dev_time_mean}{Mean development time from egg to adult, in days.}
 
-\item{wkr_size_min}{minimum observed worker intertegular span (ITS) in mm.}
+\item{wkr_size_min}{Minimum observed worker intertegular span (ITS), in mm.}
 
-\item{wkr_size_max}{maximum observed worker ITS}
+\item{wkr_size_max}{Maximum observed worker ITS, in mm.}
 
-\item{wkr_size_mean}{mean observed worker ITS}
+\item{wkr_size_mean}{Mean observed worker ITS, in mm.}
 
-\item{wkr_size_sd}{standard deviation of worker ITS}
+\item{wkr_size_sd}{Observed standard deviation of worker ITS.}
 
-\item{wkr_surv_f}{worker survival as a function of worker ITS}
+\item{poln_per_cell}{Mean mass of pollen per cell, in grams.}
 
-\item{p_poln_ret_f}{probability of returning with pollen as a function of
-worker ITS}
-
-\item{p_forage_f}{probability of making a foraging trip as a function of
-worker ITS}
-
-\item{trips_f}{number of trips per day as a function of worker ITS}
-
-\item{poln_mass_f}{the mass of pollen returned per trip as a function of ITS,
-in grams}
-
-\item{wkr_mass_f}{a function relating worker mass to worker ITS}
-
-\item{poln_per_cell}{mean mass of pollen per cell, in grams}
-
-\item{prop_foraging}{proportion of workers allowed to forage.  When less than
+\item{prop_foraging}{Proportion of workers allowed to forage.  When less than
 1, the smallest \code{1 - prop_foraging} workers do not contribute resources to
 recruitment of new larvae.}
+
+\item{wkr_mass_f}{A function relating worker mass to worker ITS.}
+
+\item{wkr_surv_f}{Worker survival as a function of worker ITS.}
+
+\item{p_forage_f}{Probability of a worker making a foraging trip as a function of ITS.}
+
+\item{p_poln_ret_f}{Probability of a worker returning from a foraging trip with pollen, as a function of ITS.}
+
+\item{trips_f}{The average number of foraging trips per day as a function of worker ITS.}
+
+\item{poln_mass_f}{The mass of pollen returned per trip as a function of ITS,
+in grams}
 }
 \value{
 a list containing the full integral projection model and the colony
