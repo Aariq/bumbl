@@ -39,8 +39,8 @@
 #' bipm()
 #' # Effect of reducing larval survival:
 #' bipm(larv_surv = 0.97)
-bipm <- function(larv_surv = 0.9804193,
-                 dev_time_mean = 23.56705,
+bipm <- function(larv_surv = 0.980419283573345,
+                 dev_time_mean = 23.5670474993181,
                  wkr_size_min = 2.5,
                  wkr_size_max = 5.81,
                  wkr_size_mean = 3.600687,
