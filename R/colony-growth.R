@@ -222,7 +222,10 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   \item{Additional columns are
 #'   coefficients for any covariates supplied in the `formula`}
 #'   }
-#'
+#' @references Crone, E. E., and Williams, N. M. (2016). Bumble bee colony
+#'   dynamics: quantifying the importance of land use and floral resources for
+#'   colony growth and queen production. Ecol. Lett. 19, 460–468.
+#'   https://doi.org/10.1111/ele.12581
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
