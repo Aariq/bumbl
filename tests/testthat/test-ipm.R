@@ -20,3 +20,8 @@ test_that("prop_foraging is working right", {
   expect_lt(bipm(prop_foraging = 0)$lambda, bipm(prop_foraging = 0.1)$lambda)
   expect_gt(bipm(prop_foraging = 1)$lambda, bipm(prop_foraging = 0.99)$lambda)
 })
+
+test_that("I get results close to Natalie's", {
+  expect_true(near(bipm(wkr_mass_f = function(wkr_size) 0.1476720698968)$lambda, 1.02588496303344))
+  expect_true(near(bipm(wkr_mass_f = function(x) 0.1476720698968, prop_foraging = 0.7405147)$lambda, 1.02050460784289))
+})
