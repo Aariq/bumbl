@@ -11,7 +11,11 @@ Authors@R: c(
            family = "Crone",
            role = c("aut"),
            email = "elizabeth.crone@tufts.edu",
-           comment = c(ORCID = "0000-0002-5287-221X"))
+           comment = c(ORCID = "0000-0002-5287-221X")),
+    person(given = c("Natalie", "Z."),
+           family = "Kerr",
+           role = c("ctb"),
+           comment = c(ORCID = "0000-0003-4227-2031"))
            )
 Description: Provides functions for modeling bumblebee colony growth as a growth period followed by a decline given that colonies switch from worker production to gyne production at some point.
 License: CC BY 4.0
