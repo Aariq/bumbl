@@ -1,4 +1,3 @@
-
 #' Bumblebee worker mass as a function of intertegular span (ITS)
 #'
 #' @param wkr_size a vector of worker ITS values in mm
@@ -83,8 +82,8 @@ poln_ret_func <- function(wkr_size){
 #'
 #' @param wkr_size a vector of worker ITS values in mm
 #'
-#' @return
-#' @export a vector of mean number of trips per day
+#' @return a vector of mean number of trips per day
+#' @export
 #'
 #' @references TODO: cite paper this comes from
 #'

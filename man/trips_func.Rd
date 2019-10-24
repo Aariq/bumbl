@@ -10,7 +10,7 @@ trips_func(wkr_size)
 \item{wkr_size}{a vector of worker ITS values in mm}
 }
 \value{
-
+a vector of mean number of trips per day
 }
 \description{
 Number of foraging trips per day as a function of bumblebee worker size
