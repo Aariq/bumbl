@@ -99,3 +99,9 @@ bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 bombus2 <- bombus[bombus$colony != 67, ]
 bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
 }
+\references{
+Crone, E. E., and Williams, N. M. (2016). Bumble bee colony
+dynamics: quantifying the importance of land use and floral resources for
+colony growth and queen production. Ecol. Lett. 19, 460–468.
+https://doi.org/10.1111/ele.12581
+}

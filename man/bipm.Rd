@@ -61,9 +61,14 @@ A list containing the full integral projection model and the colony
 growth rate, lambda.
 }
 \description{
-(sentence about this being based off of natalie's paper). The function builds
-an integral projection model from continuous functions and scalars describing
-vital rates estimated from previously published emperical work.
+Builds an integral projection model for bumblebee colony growth using vital
+rates estimated from previously published emperical work, as described in
+Kerr, et al. (\emph{in prep}).
+}
+\details{
+Defaults for all functions are estimated from data and published in
+Kerr et al. (\emph{in prep}). Parameters ending in \code{_f} expect the name of a
+function or an anonymous function.
 }
 \examples{
 # Original model:
@@ -72,8 +77,13 @@ bipm()
 bipm(larv_surv = 0.97)
 }
 \references{
-TODO: add references
+Kerr, N. Z., Williams, N. M., and Crone, E. E. (2020). Optimal
+life history strategies in a eusocial insect: the contribution of worker
+size polymorphism during colony establishment and growth phases in
+bumblebee colonies. Journal of Animal Ecology (\emph{in prep}).
 }
 \seealso{
-TODO: links to functions supplied as arguments.
+\code{\link{mass_func}}, \code{\link{surv_func}},
+\code{\link{forage_func}}, \code{\link{poln_ret_func}},
+\code{\link{trips_func}}, \code{\link{poln_mass_func}}
 }

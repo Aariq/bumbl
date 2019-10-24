@@ -121,9 +121,9 @@ poln_mass_func <- function(wkr_size){
 
 #' Integral Projection Model for Bumblebee Colony Growth
 #'
-#' (sentence about this being based off of natalie's paper). The function builds
-#' an integral projection model from continuous functions and scalars describing
-#' vital rates estimated from previously published emperical work.
+#' Builds an integral projection model for bumblebee colony growth using vital
+#' rates estimated from previously published emperical work, as described in
+#' Kerr, et al. (*in prep*).
 #'
 #' @param larv_surv Larval survival rate.
 #' @param dev_time_mean Mean development time from egg to adult, in days.
@@ -149,9 +149,18 @@ poln_mass_func <- function(wkr_size){
 #' @return A list containing the full integral projection model and the colony
 #'   growth rate, lambda.
 #'
-#' @seealso TODO: links to functions supplied as arguments.
+#' @details Defaults for all functions are estimated from data and published in
+#'   Kerr et al. (*in prep*). Parameters ending in `_f` expect the name of a
+#'   function or an anonymous function.
 #'
-#' @references TODO: add references
+#' @seealso \code{\link{mass_func}}, \code{\link{surv_func}},
+#'   \code{\link{forage_func}}, \code{\link{poln_ret_func}},
+#'   \code{\link{trips_func}}, \code{\link{poln_mass_func}}
+#'
+#' @references Kerr, N. Z., Williams, N. M., and Crone, E. E. (2020). Optimal
+#'   life history strategies in a eusocial insect: the contribution of worker
+#'   size polymorphism during colony establishment and growth phases in
+#'   bumblebee colonies. Journal of Animal Ecology (*in prep*).
 #'
 #' @importFrom popbio lambda
 #' @importFrom stats plogis dpois pnorm
