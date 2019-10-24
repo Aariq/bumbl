@@ -257,7 +257,7 @@ bipm <- function(larv_surv = 0.980419283573345,
   wkr_mat <- rbind(wkr_larv_mat, wkr_wkr_mat)
   full_mat <- cbind(larv_mat, wkr_mat)
 
-  growth_rate <- popbio::lambda(full_mat)
+  growth_rate <- c("lambda" = popbio::lambda(full_mat))
   print(growth_rate)
 
   invisible(list(lambda = growth_rate, ipm = full_mat))
