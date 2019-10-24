@@ -5,22 +5,20 @@
 \title{Integral Projection Model for Bumblebee Colony Growth}
 \usage{
 bipm(
-  larv_surv = 0.9804193,
-  dev_time_mean = 23.56705,
+  larv_surv = 0.980419283573345,
+  dev_time_mean = 23.5670474993181,
   wkr_size_min = 2.5,
   wkr_size_max = 5.81,
   wkr_size_mean = 3.600687,
   wkr_size_sd = 0.4276681,
   poln_per_cell = 0.016,
   prop_foraging = 1,
-  wkr_mass_f = function(wkr_size) -0.03631937 + 0.04433529 * wkr_size,
-  wkr_surv_f = function(wkr_size) plogis(4.5000243 - 0.4956151 * wkr_size),
-  p_forage_f = function(wkr_size) plogis(-2.392183 + 1.364705 * wkr_size),
-  p_poln_ret_f = function(wkr_size) plogis(7.9804084 + (-4.9121457 * wkr_size) +
-    (0.6533555 * wkr_size^2)),
-  trips_f = function(wkr_size) exp(-10.4418003 + (5.6902411 * wkr_size) + (-0.6896561 *
-    wkr_size^2)),
-  poln_mass_f = function(wkr_size) exp(-5.7240368 + 0.2914442 * wkr_size)
+  wkr_mass_f = mass_func,
+  wkr_surv_f = surv_func,
+  p_forage_f = forage_func,
+  p_poln_ret_f = poln_ret_func,
+  trips_f = trips_func,
+  poln_mass_f = poln_mass_func
 )
 }
 \arguments{
@@ -46,25 +44,36 @@ recruitment of new larvae.}
 
 \item{wkr_surv_f}{Worker survival as a function of worker ITS.}
 
-\item{p_forage_f}{Probability of a worker making a foraging trip as a function of ITS.}
+\item{p_forage_f}{Probability of a worker making a foraging trip as a
+function of ITS.}
 
-\item{p_poln_ret_f}{Probability of a worker returning from a foraging trip with pollen, as a function of ITS.}
+\item{p_poln_ret_f}{Probability of a worker returning from a foraging trip
+with pollen, as a function of ITS.}
 
-\item{trips_f}{The average number of foraging trips per day as a function of worker ITS.}
+\item{trips_f}{The average number of foraging trips per day as a function of
+worker ITS.}
 
 \item{poln_mass_f}{The mass of pollen returned per trip as a function of ITS,
 in grams}
 }
 \value{
-a list containing the full integral projection model and the colony
+A list containing the full integral projection model and the colony
 growth rate, lambda.
 }
 \description{
-A description I have yet to write...
+(sentence about this being based off of natalie's paper). The function builds
+an integral projection model from continuous functions and scalars describing
+vital rates estimated from previously published emperical work.
 }
 \examples{
 # Original model:
 bipm()
 # Effect of reducing larval survival:
 bipm(larv_surv = 0.97)
+}
+\references{
+TODO: add references
+}
+\seealso{
+TODO: links to functions supplied as arguments.
 }

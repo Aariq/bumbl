@@ -1,3 +1,125 @@
+
+#' Bumblebee worker mass as a function of intertegular span (ITS)
+#'
+#' @param wkr_size a vector of worker ITS values in mm
+#'
+#' @return a vector of worker mass in grams
+#' @export
+#'
+#' @references TODO: cite paper this comes from
+#'
+#' @examples
+#' mass_func(4.1)
+mass_func <- function(wkr_size){
+  return(-0.03631937362579  + (0.0443352875958048 * wkr_size))
+}
+
+
+#' Bumblebee worker survival as a function of size
+#'
+#' @param wkr_size a vector of worker ITS values in mm
+#'
+#' @return a vector of survival probabilities
+#' @export
+#'
+#' @references TODO: cite paper this comes from
+#'
+#' @examples
+#' surv_func(4)
+surv_func <- function(wkr_size){
+  return(plogis(4.50002431428571 - 0.495615057142857 * wkr_size))
+}
+
+
+#' Probability of foraging as a function of bumblbee worker size
+#'
+#' @param wkr_size a vector of worker ITS values in mm
+#'
+#' @return a vector of foraging probabilities
+#' @export
+#'
+#' @references  TODO: cite paper this comes from
+#'
+#' @examples
+#' forage_func(4)
+forage_func <- function(wkr_size){
+  m1 = -10.262929037574773 + (5.929037608743619 * wkr_size) + (-0.650980787040497 * wkr_size^2)
+  m2 = -2.39218349485354 + (1.36470460119029 * wkr_size)
+
+  wts = c(0.613097385000364, 0.386902614999636)
+
+  m_avg <- plogis(m1) * wts[1] + plogis(m2) * wts[2]
+
+  return(m_avg)
+}
+
+
+#' Probability of pollen return as a funciton of bumblebee worker size
+#'
+#' @param wkr_size a vector of worker ITS values in mm
+#'
+#' @return a vector of pollen return probabilities
+#' @export
+#'
+#' @references TODO: cite paper this comes from
+#'
+#' @examples
+#' poln_ret_func(4)
+poln_ret_func <- function(wkr_size){
+  m1 = 7.98040838924227 + (-4.91214574943515 * wkr_size) + (0.653355474683423 * wkr_size^2)
+  m2 = -2.1959139376487 + (0.277436710524086  * wkr_size)
+  m3 = -1.12292287816589 + (0 * wkr_size)
+
+  wts = c(0.545262160009476, 0.253848107890376, 0.200889732100148)
+
+  m_avg <- plogis(m1) * wts[1] + plogis(m2) * wts[2] + plogis(m3) * wts[3]
+
+  return(m_avg)
+
+}
+
+
+#' Number of foraging trips per day as a function of bumblebee worker size
+#'
+#' @param wkr_size a vector of worker ITS values in mm
+#'
+#' @return
+#' @export a vector of mean number of trips per day
+#'
+#' @references TODO: cite paper this comes from
+#'
+#' @examples
+#' trips_func(4)
+trips_func <- function(wkr_size) {
+  return(exp(-10.441800289970 + (5.690241104687 * wkr_size) + (-0.689656110476 * wkr_size^2)))
+}
+
+
+#' Pollen mass as a function of bumblbee worker size
+#'
+#' @param wkr_size a vector of worker ITS values in mm
+#'
+#' @return a vector of pollen mass in grams
+#' @export
+#'
+#' @references TODO: cite paper this comes from
+#'
+#' @examples
+#' poln_mass_func(4)
+poln_mass_func <- function(wkr_size){
+  m1 = -9.322439490493416 + (2.099089029256157 * wkr_size) + (-0.223761025727937 * wkr_size^2)
+  m2 = -5.724036797919059 + (0.291444174297121 * wkr_size)
+  m3 = -4.58078536341549 + (0 * wkr_size)
+
+  wts = c(0.508702819088624, 0.293356371483592, 0.197940809427784)
+
+  m_avg <- exp(m1) * wts[1] + exp(m2) * wts[2] + exp(m3) * wts[3]
+
+  return(m_avg)
+
+}
+
+
 #' Integral Projection Model for Bumblebee Colony Growth
 #'
 #' (sentence about this being based off of natalie's paper). The function builds
@@ -28,6 +150,8 @@
 #' @return A list containing the full integral projection model and the colony
 #'   growth rate, lambda.
 #'
+#' @seealso TODO: links to functions supplied as arguments.
+#'
 #' @references TODO: add references
 #'
 #' @importFrom popbio lambda
@@ -47,12 +171,12 @@ bipm <- function(larv_surv = 0.980419283573345,
                  wkr_size_sd = 0.4276681,
                  poln_per_cell = 0.016,
                  prop_foraging = 1,
-                 wkr_mass_f = function(wkr_size) -0.03631937362579  + (0.0443352875958048 * wkr_size),
-                 wkr_surv_f = function(wkr_size) plogis(4.50002431428571 - 0.495615057142857 * wkr_size),
-                 p_forage_f = function(wkr_size) plogis(-7.2177170050992 + (4.16308523239208 * wkr_size) + (-0.399114618220008 * wkr_size^2)),
-                 p_poln_ret_f = function(wkr_size) plogis(3.56840244174988 + (-2.60798041759251 * wkr_size) + (0.3562500173799 * wkr_size^2)),
-                 trips_f = function(wkr_size) exp(-10.441800289970 + (5.690241104687 * wkr_size) + (-0.689656110476 * wkr_size^2)),
-                 poln_mass_f = function(wkr_size) exp(-7.32825827752262 + (1.15330951216244 * wkr_size) + (-0.113827864589964 * wkr_mass^2))
+                 wkr_mass_f = mass_func,
+                 wkr_surv_f = surv_func,
+                 p_forage_f = forage_func,
+                 p_poln_ret_f = poln_ret_func,
+                 trips_f = trips_func,
+                 poln_mass_f = poln_mass_func
 ) {
   # Larva to larva
   dev_time <- dpois(1:50, dev_time_mean)
@@ -121,3 +245,4 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   invisible(list(lambda = growth_rate, ipm = full_mat))
 }
+
