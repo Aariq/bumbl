@@ -13,18 +13,6 @@ test_that("plotting function displays something?", {
       colonyID = colony,
       t = week,
       formula = d.mass ~ week,
-      augment = TRUE
-    ))
-  expect_invisible(bumbl_plot(results))
-})
-
-test_that("plotting works with augment = FALSE", {
-  results <-
-    suppressWarnings(bumbl(
-      bombus_sub,
-      colonyID = colony,
-      t = week,
-      formula = d.mass ~ week,
       augment = FALSE
     ))
   expect_invisible(bumbl_plot(results))
@@ -38,28 +26,18 @@ test_that("plotting function errors when not a bumbl object", {
   )
 })
 
-test_that("plotting works with count data", {
-  results_count <-
-    bumbl(
-      bombus_sub,
-      colonyID = colony,
-      t = week,
-      formula = count ~ week,
-      family = "poisson",
-      augment = TRUE
-    )
-  expect_invisible(bumbl_plot(results_count))
-})
 
-test_that("plotting works with bumbl.nb", {
-  skip("This test will fail until I have a properly overdispersed dataset to test it on I think.")
+
+test_that("plotting works with all families", {
+  results_count <-
+    suppressWarnings(bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
+                           family = "poisson", augment = TRUE))
+
+  expect_invisible(bumbl_plot(results_count))
+
+  skip("need propperly overdispersed data to really test this")
   results_overdisp <-
-    bumbl.nb(
-      bombus_sub,
-      colonyID = colony,
-      t = week,
-      formula = count ~ week,
-      augment = TRUE
-    )
+    suppressWarnings(bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
+                           family = "negbin", augment = TRUE))
   expect_invisible(bumbl_plot(results_overdisp))
 })
