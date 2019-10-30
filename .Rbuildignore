@@ -7,3 +7,4 @@
 ^LICENSE$
 ^LICENSE\.md$
 ^appveyor\.yml$
+^\.Rhistory$
