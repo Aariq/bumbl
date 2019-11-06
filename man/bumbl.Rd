@@ -62,12 +62,12 @@ growth function.  It reflects actual initial colony size, if the colony
 initially grows exponentially.  It would also be lower if there were a few
 weeks lag before growth started in the field.}
 \item{\code{logLam} is the
-average (log-scale) colony growth rate (i.e., rate of weight gain per unit
+average (log-scale) colony growth rate (e.g., rate of weight gain per unit
 \code{t}) during the growth period.}
 \item{\code{decay} reflects the rate of decline
 during the decline period. In fact, the way this model is set up, the
 actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{logLam}.}
-\item{\code{logNmax} is the maximum weight reached by each colony.  It is a
+\item{\code{logNmax} is the maximum weight (or count) reached by each colony.  It is a
 function of \code{tau}, \code{logN0} and \code{logLam}}
 \item{Additional columns are
 coefficients for any covariates supplied in the \code{formula}}
@@ -83,7 +83,7 @@ methods.
 Colony growth is modeled as increasing exponentialy until the colony
 switches to gyne production, at which time the workers die and gynes leave
 the colony, causing the colony to decline. The switch point, \eqn{\tau},
-may vary among colonies.
+may vary among colonies. The model is described further in Crone and Williams (2016).
 }
 \section{Functions}{
 \itemize{
