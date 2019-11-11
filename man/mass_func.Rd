@@ -19,5 +19,8 @@ Bumblebee worker mass as a function of intertegular span (ITS)
 mass_func(4.1)
 }
 \references{
-TODO: cite paper this comes from
+Kerr, N. Z., Williams, N. M., and Crone, E. E. (2020). Optimal
+life history strategies in a eusocial insect: the contribution of worker
+size polymorphism during colony establishment and growth phases in
+bumblebee colonies. Journal of Animal Ecology (\emph{in prep}).
 }

@@ -61,9 +61,9 @@ A list containing the full integral projection model and the colony
 growth rate, lambda.
 }
 \description{
-Builds an integral projection model for bumblebee colony growth using vital
-rates estimated from previously published emperical work, as described in
-Kerr, et al. (\emph{in prep}).
+Builds an size- and age-based integral projection model to estimate bumblebee
+colony growth using vital rates estimated from previously published emperical
+work, as described in Kerr, et al. (\emph{in prep}).
 }
 \details{
 Defaults for all functions are estimated from data and published in
@@ -81,6 +81,10 @@ Kerr, N. Z., Williams, N. M., and Crone, E. E. (2020). Optimal
 life history strategies in a eusocial insect: the contribution of worker
 size polymorphism during colony establishment and growth phases in
 bumblebee colonies. Journal of Animal Ecology (\emph{in prep}).
+
+Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates explains
+optimal worker size for resource return by bumblebee workers. Funct Ecol
+33:467–478. doi: 10.1111/1365-2435.13251
 }
 \seealso{
 \code{\link{mass_func}}, \code{\link{surv_func}},

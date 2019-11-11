@@ -19,5 +19,7 @@ Probability of foraging as a function of bumblbee worker size
 forage_func(4)
 }
 \references{
-TODO: cite paper this comes from
+Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+explains optimal worker size for resource return by bumblebee workers.
+Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 }

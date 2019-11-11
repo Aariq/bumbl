@@ -5,7 +5,10 @@
 #' @return a vector of worker mass in grams
 #' @export
 #'
-#' @references TODO: cite paper this comes from
+#' @references Kerr, N. Z., Williams, N. M., and Crone, E. E. (2020). Optimal
+#'   life history strategies in a eusocial insect: the contribution of worker
+#'   size polymorphism during colony establishment and growth phases in
+#'   bumblebee colonies. Journal of Animal Ecology (*in prep*).
 #'
 #' @examples
 #' mass_func(4.1)
@@ -21,7 +24,9 @@ mass_func <- function(wkr_size){
 #' @return a vector of survival probabilities
 #' @export
 #'
-#' @references TODO: cite paper this comes from
+#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+#'   explains optimal worker size for resource return by bumblebee workers.
+#'   Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @examples
 #' surv_func(4)
@@ -37,7 +42,9 @@ surv_func <- function(wkr_size){
 #' @return a vector of foraging probabilities
 #' @export
 #'
-#' @references  TODO: cite paper this comes from
+#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+#'   explains optimal worker size for resource return by bumblebee workers.
+#'   Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @examples
 #' forage_func(4)
@@ -60,7 +67,9 @@ forage_func <- function(wkr_size){
 #' @return a vector of pollen return probabilities
 #' @export
 #'
-#' @references TODO: cite paper this comes from
+#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+#'   explains optimal worker size for resource return by bumblebee workers.
+#'   Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @examples
 #' poln_ret_func(4)
@@ -85,7 +94,7 @@ poln_ret_func <- function(wkr_size){
 #' @return a vector of mean number of trips per day
 #' @export
 #'
-#' @references TODO: cite paper this comes from
+#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates explains optimal worker size for resource return by bumblebee workers. Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @examples
 #' trips_func(4)
@@ -101,7 +110,9 @@ trips_func <- function(wkr_size) {
 #' @return a vector of pollen mass in grams
 #' @export
 #'
-#' @references TODO: cite paper this comes from
+#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+#'   explains optimal worker size for resource return by bumblebee workers.
+#'   Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @examples
 #' poln_mass_func(4)
@@ -121,9 +132,9 @@ poln_mass_func <- function(wkr_size){
 
 #' Integral Projection Model for Bumblebee Colony Growth
 #'
-#' Builds an integral projection model for bumblebee colony growth using vital
-#' rates estimated from previously published emperical work, as described in
-#' Kerr, et al. (*in prep*).
+#' Builds an size- and age-based integral projection model to estimate bumblebee
+#' colony growth using vital rates estimated from previously published emperical
+#' work, as described in Kerr, et al. (*in prep*).
 #'
 #' @param larv_surv Larval survival rate.
 #' @param dev_time_mean Mean development time from egg to adult, in days.
@@ -161,6 +172,10 @@ poln_mass_func <- function(wkr_size){
 #'   life history strategies in a eusocial insect: the contribution of worker
 #'   size polymorphism during colony establishment and growth phases in
 #'   bumblebee colonies. Journal of Animal Ecology (*in prep*).
+#'
+#'   Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates explains
+#'   optimal worker size for resource return by bumblebee workers. Funct Ecol
+#'   33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @importFrom popbio lambda
 #' @importFrom stats plogis dpois pnorm
