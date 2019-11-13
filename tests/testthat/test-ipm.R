@@ -22,8 +22,28 @@ test_that("prop_foraging is working right", {
 })
 
 test_that("I get results close to Natalie's", {
-  expect_true(near(bipm(wkr_mass_f = function(wkr_size) 0.1476720698968)$lambda, 1.02588496303344))
-  expect_true(near(bipm(wkr_mass_f = function(x) 0.1476720698968, prop_foraging = 0.7405147)$lambda, 1.02050460784289))
-  expect_true(near(bipm(wkr_size_mean = 3.9, wkr_size_sd = 0.23, prop_foraging = 0.7405147)$lambda, 1.027))
+  #task undefined field colonies
+  expect_true(near(bipm(wkr_mass_f = function(wkr_size) 0.1476720698968)$lambda,
+                   1.02588496303344,
+                   tol = 0.0005))
+  #task defined field colonies
+  expect_true(near(bipm(wkr_mass_f = function(x) 0.1476720698968, prop_foraging = 0.7405147)$lambda,
+                   1.02050460784289,
+                   tol = 0.0005))
+  #task undefined with first cohort
+  expect_true(near(bipm(wkr_size_mean = 4.09, wkr_size_sd = 0.3246114)$lambda,
+                   1.032,
+                   tol = 0.0005))
+  #task defined with first cohort
+  expect_true(near(bipm(wkr_size_mean = 4.09, wkr_size_sd = 0.3246114, prop_foraging = 0.7405147)$lambda,
+                   1.025,
+                   tol = 0.0005))
+  #task undefined highest growth rate
+  expect_true(near(bipm(wkr_size_mean = 4.17, wkr_size_sd = 0.0002)$lambda,
+                   1.037,
+                   tol = 0.0005))
+  #task defined highest growth rate
+  expect_true(near(bipm(wkr_size_mean = 3.9, wkr_size_sd = 0.23, prop_foraging = 0.7405147)$lambda,
+                   1.027,
+                   tol = 0.0005))
 })
-
