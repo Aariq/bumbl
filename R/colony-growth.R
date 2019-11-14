@@ -128,13 +128,12 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 
 
 
-#' Fit breakpoint growth models to many colonies.
+#' Estimate colony growth, switch point, and decay parameters
 #'
-#' Fits a model that assumes bumblebee colonies will switch from growth to gyne
-#' production at some point, \eqn{\tau}.  This allows for a different
+#' Fits models that assume bumblebee colonies will switch from growth to gyne
+#' production at some point, \eqn{\tau}. This allows for a different
 #' switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
-#' methods.  The function returns the original dataframe augmented with model
-#' statistics.  See **Details** for more information.
+#' methods.
 #'
 #' @param data a dataframe or tibble
 #' @param colonyID the unquoted column name of the colony ID variable
