@@ -4,8 +4,8 @@
 \alias{bumbl}
 \title{Fit breakpoint growth models to many colonies.}
 \usage{
-bumbl(data, colonyID, t, formula, family = c("gaussian", "poisson",
-  "negbin"), augment = FALSE, taus = NULL)
+bumbl(data, colonyID = NULL, t, formula, family = c("gaussian",
+  "poisson", "negbin"), augment = FALSE, taus = NULL)
 }
 \arguments{
 \item{data}{a dataframe or tibble}

@@ -6,6 +6,8 @@ bombus_sub <-
   mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
   ungroup()
 
+bombus_67 <- bombus %>% filter(colony == 67)
+
 noerrs <- bombus_sub %>% filter(colony != 67)
 
 test_that("bumbl works", {
@@ -67,4 +69,15 @@ test_that("bumbl works with overdispersed count data", {
           family = "negbin", augment = TRUE))
   expect_s3_class(count.out, "data.frame")
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
+})
+
+test_that("bumbl works when no Colony ID supplied", {
+  expect_s3_class(
+    bumbl(bombus_67, t = week, formula = d.mass ~ week),
+    "data.frame"
+  )
+  expect_s3_class(
+    bumbl(bombus_67, t = week, formula = d.mass ~ week, augment = TRUE),
+    "data.frame"
+  )
 })

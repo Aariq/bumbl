@@ -21,14 +21,17 @@
 #' @import rlang
 #' @importFrom stats update logLik terms glm poisson as.formula gaussian
 #' @importFrom MASS glm.nb
-#' @export
+#'
+#' @keywords internal
 #'
 #' @examples
 #' testbees <- bombus[bombus$colony == 9, ]
 #' # Using dates
+#' \dontrun{
 #' brkpt(testbees, t = date, formula = mass ~ date)
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = mass ~ week)
+#' }
 brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "negbin")) {
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
@@ -194,22 +197,29 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
-bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", "negbin"), augment = FALSE, taus = NULL) {
+bumbl <- function(data, colonyID = NULL, t, formula, family = c("gaussian", "poisson", "negbin"), augment = FALSE, taus = NULL) {
   #TODO: scoop up all the warnings from brkpt() and present a summary at the
   #end.
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
   fam <- match.arg(family)
-  df <-
-    data %>%
-    # make sure colonyID is a character vector
-    mutate(!!colonyID := as.character(!!colonyID)) %>%
-    group_by(!!colonyID)
 
-  dflist <- group_split(df)
+  if (quo_is_null(colonyID)) {
+    df <- data
+    dflist <- list("NA" = data)
+    colonyID <- "colony"
 
-  names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
+  } else {
+    df <-
+      data %>%
+      # make sure colonyID is a character vector
+      mutate(!!colonyID := as.character(!!colonyID)) %>%
+      group_by(!!colonyID)
+
+    dflist <- group_split(df)
+    names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
+  }
 
   model_list <- vector("list", length(dflist))
   names(model_list) <- names(dflist)
@@ -228,29 +238,29 @@ bumbl <- function(data, colonyID, t, formula, family = c("gaussian", "poisson", 
   }
 
   resultdf <-
-    map2_df(dflist,
-            names(dflist),
-            ~brkpt_w_err(brkpt(.x, taus = {{taus}},
-                               t = !!t,
-                               formula = formula,
-                               family = fam),
-                         .y),
-            .id = as_name(colonyID))
+    purrr::map2_df(dflist,
+                   names(dflist),
+                   ~brkpt_w_err(brkpt(.x, taus = {{taus}},
+                                      t = !!t,
+                                      formula = formula,
+                                      family = fam),
+                                .y),
+                   .id = as_name(colonyID))
 
   predictdf <-
     resultdf %>%
     dplyr::select(-"tau") %>%
-    mutate(aug = map(.data$model, broom::augment)) %>%
+    mutate(aug = purrr::map(.data$model, broom::augment)) %>%
     unnest(.data$aug) %>%
     dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
   modeldf <-
     resultdf %>%
-    mutate(coefs = map(.data$model, broom::tidy)) %>%
+    mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
     unnest(.data$coefs) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = map_dbl(.data$model, ~ max(predict(.), na.rm = TRUE))) %>%
+    mutate(logNmax = purrr::map_dbl(.data$model, ~ max(predict(.), na.rm = TRUE))) %>%
     dplyr::select(-"model") %>%
     dplyr::select(
       !!colonyID,
