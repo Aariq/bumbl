@@ -8,17 +8,10 @@ lildf <-
   mutate(count = as.integer(d.mass)) %>%
   ungroup()
 
-results <-
-  bumbl(lildf, colonyID = colony, t = week, formula = d.mass ~ week,
-        augment = TRUE)
-results_count <-
-  bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
-        family = "poisson", augment = TRUE)
-results_overdisp <-
-  bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
-        family = "negbin", augment = TRUE)
-
 test_that("plotting function displays something?", {
+  results <-
+    bumbl(lildf, colonyID = colony, t = week, formula = d.mass ~ week,
+          augment = TRUE)
   expect_invisible(bumbl_plot(results))
 })
 
@@ -28,7 +21,15 @@ test_that("plotting function errors when not a bumbl(augment = TRUE) object", {
                fixed = TRUE)
 })
 
-test_that("plotting works with all families", {
+test_that("plotting works with count data", {
+  results_count <-
+    bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
+          family = "poisson", augment = TRUE)
   expect_invisible(bumbl_plot(results_count))
+})
+
+test_that("plotting works with bumbl.nb", {
+  results_overdisp <-
+    bumbl.nb(lildf, colonyID = colony, t = week, formula = count ~ week, augment = TRUE)
   expect_invisible(bumbl_plot(results_overdisp))
 })

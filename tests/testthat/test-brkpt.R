@@ -64,8 +64,16 @@ test_that("brkpt works with poisson dist", {
   expect_is(count.model$model[[1]], "glm")
 })
 
-test_that("brkpt works with overdispersed data", {
-  negbin.model <- brkpt(testcount, t = week, formula = count ~ week, family = "negbin")
+test_that("brkpt.nb works with overdispersed data", {
+  negbin.model <- brkpt.nb(testcount, t = week, formula = count ~ week)
   expect_s3_class(negbin.model, "data.frame")
   expect_is(negbin.model$model[[1]], "negbin")
+})
+
+test_that("dots pass arguments to glm()", {
+  #this isn't a great test.  Just checks that there's no error.  Can't tell if additional arg actually worked
+  expect_s3_class(
+    brkpt(testbees, t = week, formula = mass ~ week, model = FALSE),
+    "data.frame"
+  )
 })

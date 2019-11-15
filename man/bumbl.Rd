@@ -2,10 +2,14 @@
 % Please edit documentation in R/colony-growth.R
 \name{bumbl}
 \alias{bumbl}
-\title{Fit breakpoint growth models to many colonies.}
+\alias{bumbl.nb}
+\title{Estimate colony growth, switch point, and decay parameters}
 \usage{
-bumbl(data, colonyID = NULL, t, formula, family = c("gaussian",
-  "poisson", "negbin"), augment = FALSE, taus = NULL)
+bumbl(data, colonyID = NULL, t, formula, family = gaussian(link =
+  "log"), augment = FALSE, taus = NULL, ...)
+
+bumbl.nb(data, colonyID = NULL, t, formula, link = "log",
+  augment = FALSE, taus = NULL, ...)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -19,17 +23,17 @@ response is your measure of colony growth, time is whatever measure of time
 you have (date, number of weeks, etc.) and covariates are any optional
 co-variates you want to fit at the colony level.}
 
-\item{family}{the model family to use.  By default, the data are fit with a
-log-link gaussian generalized linear model. Because a log link is used, the
-response variable should not be log-transformed.  For count data (e.g.
-number of workers), use "poisson".  For overdispersed count data, use
-"negbin" to fit the model using \code{glm.nb()} from the \code{MASS} package.}
+\item{family}{passed to \code{glm()}.}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional
 columns containing model coefficients.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
+
+\item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}.}
+
+\item{link}{passed to \code{glm.nb()} from the \code{MASS} package}
 }
 \value{
 The original dataframe augmented with the following columns:
@@ -54,11 +58,10 @@ coefficients for any covariates supplied in the \code{formula}}
 }
 }
 \description{
-Fits a model that assumes bumblebee colonies will switch from growth to gyne
-production at some point, \eqn{\tau}.  This allows for a different
+Fits models that assume bumblebee colonies will switch from growth to gyne
+production at some point, \eqn{\tau}. This allows for a different
 switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
-methods.  The function returns the original dataframe augmented with model
-statistics.  See \strong{Details} for more information.
+methods.
 }
 \details{
 Colony growth is modeled as increasing exponentialy until the colony
@@ -66,6 +69,11 @@ switches to gyne production, at which time the workers die and gynes leave
 the colony, causing the colony to decline. The switch point, \eqn{\tau},
 may vary among colonies.
 }
+\section{Functions}{
+\itemize{
+\item \code{bumbl.nb}: 
+}}
+
 \examples{
 # Colony 67 doesn't ever switch to reproduction and results in an error
 \dontrun{

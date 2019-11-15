@@ -52,21 +52,19 @@ test_that("no unexpected warnings", {
 test_that("bumbl works with poisson count data", {
   count.out <-
     bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "poisson")
+          family = poisson(link = "log"))
   count.out.aug <-
     bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "poisson", augment = TRUE)
+          family = poisson(link = "log"), augment = TRUE)
   expect_s3_class(count.out, "data.frame")
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
 
-test_that("bumbl works with overdispersed count data", {
+test_that("bumbl.nb works with overdispersed count data", {
   count.out <-
-    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "negbin"))
+    suppressWarnings(bumbl.nb(noerrs, colonyID = colony, t = week, formula = d.mass ~ week))
   count.out.aug <-
-    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "negbin", augment = TRUE))
+    suppressWarnings(bumbl.nb(noerrs, colonyID = colony, t = week, formula = count ~ week, augment = TRUE))
   expect_s3_class(count.out, "data.frame")
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
