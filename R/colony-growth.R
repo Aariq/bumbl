@@ -198,8 +198,7 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   response is your measure of colony growth, time is whatever measure of time
 #'   you have (date, number of weeks, etc.) and covariates are any optional
 #'   co-variates you want to fit at the colony level.
-#' @param family passed to `glm()` unless `family = "negbin"`, in which case the
-#'   model is run using `glm.nb()` from the `MASS` package
+#' @param family passed to `glm()`.
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
 #'   columns containing model coefficients.
@@ -351,53 +350,10 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "l
 
 
 
-#' Estimate colony growth, switch point, and decay parameters
+
+#' @describeIn bumbl Fit bumbl model on overdispersed count response
 #'
-#' Fits models that assume bumblebee colonies will switch from growth to gyne
-#' production at some point, \eqn{\tau}. This allows for a different
-#' switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
-#' methods.
-#'
-#' @param data a dataframe or tibble
-#' @param colonyID the unquoted column name of the colony ID variable
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used.
-#' @param t the unquoted column name of the time variable in (units???)
-#' @param formula a formula with the form `response ~ time + covariates` where
-#'   response is your measure of colony growth, time is whatever measure of time
-#'   you have (date, number of weeks, etc.) and covariates are any optional
-#'   co-variates you want to fit at the colony level.
 #' @param link passed to `glm.nb()` from the `MASS` package
-#' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
-#'   for each colonyID.  When TRUE, it returns the original data with additional
-#'   columns containing model coefficients.
-#' @param ... additional arguments passed to `glm.nb()`.
-#'
-#' @details Colony growth is modeled as increasing exponentialy until the colony
-#'   switches to gyne production, at which time the workers die and gynes leave
-#'   the colony, causing the colony to decline. The switch point, \eqn{\tau},
-#'   may vary among colonies.
-#'
-#' @return The original dataframe augmented with the following columns:
-#'   \itemize{
-#'   \item{`tau` is the switchpoint, in the same units as `t`, for
-#'   each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to
-#'   decline in week \eqn{\tau + 1}.}
-#'   \item{`logN0` is the intercept of the
-#'   growth function.  It reflects actual initial colony size, if the colony
-#'   initially grows exponentially.  It would also be lower if there were a few
-#'   weeks lag before growth started in the field.}
-#'   \item{`logLam` is the
-#'   average (log-scale) colony growth rate (i.e., rate of weight gain per unit
-#'   `t`) during the growth period.}
-#'   \item{`decay` reflects the rate of decline
-#'   during the decline period. In fact, the way this model is set up, the
-#'   actual rate of decline per unit `t` is calculated as `decay` - `logLam`.}
-#'   \item{`logNmax` is the maximum weight reached by each colony.  It is a
-#'   function of `tau`, `logN0` and `logLam`}
-#'   \item{Additional columns are
-#'   coefficients for any covariates supplied in the `formula`}
-#'   }
 #'
 #' @import tidyr
 #' @import rlang
@@ -407,14 +363,6 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "l
 #' @importFrom glue glue
 #' @export
 #'
-#' @examples
-#' # Colony 67 doesn't ever switch to reproduction and results in an error
-#' \dontrun{
-#' bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
-#'}
-#'
-#' bombus2 <- bombus[bombus$colony != 67, ]
-#' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
 bumbl.nb <- function(data, colonyID = NULL, t, formula, link = "log", augment = FALSE, taus = NULL, ...) {
   #TODO: scoop up all the warnings from brkpt() and present a summary at the
   #end.
