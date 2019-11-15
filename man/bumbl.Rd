@@ -71,7 +71,7 @@ may vary among colonies.
 }
 \section{Functions}{
 \itemize{
-\item \code{bumbl.nb}: Fit bumbl model on overdispersed count response
+\item \code{bumbl.nb}: 
 }}
 
 \examples{

@@ -7,11 +7,10 @@
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `glm()`.  This should include the time
+#' @param formula a formula passed to `glm()` or `glm.nb()`.  This should include the time
 #'   variable supplied to `t`
-#' @param family passed to `glm()`. Note that this model should be a log-link or
-#'   use a log transformed response.
-#' @param ... additional arguments passed to `glm()`.
+#' @param family passed to `glm()`
+#' @param ... additional arguments passed to `glm()` or `glm.nb()`
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
 #'
@@ -90,23 +89,8 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
 }
 
 
-
-
-#' Fit breakpoint model to individual colony
-#'
-#' Fits models using a range of taus and picks the best one using maximum
-#' liklihood
-#'
-#' @param data a dataframe or tibble
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used
-#' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `glm()`.  This should include the time
-#'   variable supplied to `t`
+#' @describeIn brkpt
 #' @param link passed to `glm.nb()`
-#' @param ... additional arguments passed to `glm()`.
-#' @return a tibble with a column for the winning tau and a column for the
-#'   winning model
 #'
 #' @import dplyr
 #' @import rlang
@@ -115,14 +99,6 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
 #'
 #' @keywords internal
 #'
-#' @examples
-#' testbees <- bombus[bombus$colony == 9, ]
-#' # Using dates
-#' \dontrun{
-#' brkpt(testbees, t = date, formula = mass ~ date)
-#' # Using weeks
-#' brkpt(testbees, t = week, formula = mass ~ week)
-#' }
 brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
@@ -351,7 +327,7 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "l
 
 
 
-#' @describeIn bumbl Fit bumbl model on overdispersed count response
+#' @describeIn bumbl
 #'
 #' @param link passed to `glm.nb()` from the `MASS` package
 #'

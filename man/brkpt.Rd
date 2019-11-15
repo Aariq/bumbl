@@ -14,13 +14,12 @@ brkpt(data, taus = NULL, t, formula, family = gaussian(link = "log"),
 
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
-\item{formula}{a formula passed to \code{glm()}.  This should include the time
+\item{formula}{a formula passed to \code{glm()} or \code{glm.nb()}.  This should include the time
 variable supplied to \code{t}}
 
-\item{family}{passed to \code{glm()}. Note that this model should be a log-link or
-use a log transformed response.}
+\item{family}{passed to \code{glm()}}
 
-\item{...}{additional arguments passed to \code{glm()}.}
+\item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the
