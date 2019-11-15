@@ -60,13 +60,11 @@ test_that("bumbl works with poisson count data", {
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
 
-test_that("bumbl works with overdispersed count data", {
+test_that("bumbl.nb works with overdispersed count data", {
   count.out <-
-    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ week,
-          family = "negbin"))
+    suppressWarnings(bumbl.nb(noerrs, colonyID = colony, t = week, formula = d.mass ~ week))
   count.out.aug <-
-    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
-          family = "negbin", augment = TRUE))
+    suppressWarnings(bumbl.nb(noerrs, colonyID = colony, t = week, formula = count ~ week, augment = TRUE))
   expect_s3_class(count.out, "data.frame")
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
