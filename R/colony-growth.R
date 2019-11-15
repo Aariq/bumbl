@@ -7,13 +7,10 @@
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `glm`.  This should include the time
+#' @param formula a formula passed to `glm()`.  This should include the time
 #'   variable supplied to `t`
-#' @param family the model family to use.  By default, the data are fit with a
-#'   log-link gaussian generalized linear model. Because a log link is used, the
-#'   response variable should not be log-transformed.  For count data (e.g.
-#'   number of workers), use "poisson".  For overdispersed count data, use
-#'   "negbin" to fit the model using `glm.nb()` from the `MASS` package.
+#' @param family passed to `glm()` unless `family = "negbin"`, in which case the model is run using `glm.nb()`
+#' @param ... additional arguments passed to `glm()`.
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
 #'
@@ -32,12 +29,13 @@
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = mass ~ week)
 #' }
-brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson", "negbin")) {
+brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log"), ...) {
   #TODO: make sure none of the variables are called '.post'?
   fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
-  fam <- match.arg(family)
+  fam <- enquo(family)
+  more_args <- list2(...)
 
   if (is.null(taus)) {
     tvec <- data[[tvar]]
@@ -68,45 +66,22 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
   # adds `.post` to formula. Would not be difficult to modify for other interactions
   f <- update(formula, ~. + .post)
   LLs <- c()
-  if (fam == "gaussian") {
+
+  if (quo_get_expr(fam) == "negbin") {
     for (i in 1:length(taus)) {
       usetau <- taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-
-      m0 <- try(glm(f, family = gaussian(link = "log"), data = data2))
-      if (!inherits(m0, "try-error")) {
-        LLs[i] <- logLik(m0)
-      } #else?
-      #TODO: what if there is an error?
-      # LLs
+      m0 <- exec("glm.nb", formula = f, data = data2, !!!more_args)
+      LLs[i] <- logLik(m0)
     }
-  } else if (fam == "poisson") {
+  } else {
     for (i in 1:length(taus)) {
       usetau <- taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-
-      m0 <- try(glm(f, family = "poisson", data = data2))
-      if (!inherits(m0, "try-error")) {
-        LLs[i] <- logLik(m0)
-      } #else?
-      #TODO: what if there is an error?
-      # LLs
-    }
-
-  } else if (fam == "negbin") {
-    for (i in 1:length(taus)) {
-      usetau = taus[i]
-      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-
-      m0 = try(MASS::glm.nb(f, data = data2))
-      if (!inherits(m0, "try-error")) {
-        LLs[i] = logLik(m0)
-      } #else?
-      #TODO: what if there is an error?
-      # LLs
+      m0 <- exec("glm", formula = f, family = family, data = data2, !!!more_args)
+      LLs[i] <- logLik(m0)
     }
   }
-
   tau_win <- taus[which(LLs == max(LLs))]
 
   # if multiple equivalent taus are found, this should fail
@@ -116,13 +91,12 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
   #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
 
-  if (fam == "gaussian") {
-    m_win <- glm(f, family = gaussian(link = "log"), data = data_win)
-  } else if (fam == "poisson") {
-    m_win <- glm(f, family = poisson(link = "log"), data = data_win)
-  } else if (fam == "negbin") {
-    m_win <- glm.nb(f, data = data_win)
+  if (quo_get_expr(fam) == "negbin") {
+    m_win <- exec("glm.nb",formula = f, data = data_win, !!!more_args)
+  } else {
+    m_win <- exec("glm", formula = f, family = family, data = data_win, !!!more_args)
   }
+
   return(tibble(tau = tau_win, model = list(m_win)))
 }
 
@@ -144,14 +118,12 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #'   response is your measure of colony growth, time is whatever measure of time
 #'   you have (date, number of weeks, etc.) and covariates are any optional
 #'   co-variates you want to fit at the colony level.
-#' @param family the model family to use.  By default, the data are fit with a
-#'   log-link gaussian generalized linear model. Because a log link is used, the
-#'   response variable should not be log-transformed.  For count data (e.g.
-#'   number of workers), use "poisson".  For overdispersed count data, use
-#'   "negbin" to fit the model using `glm.nb()` from the `MASS` package.
+#' @param family passed to `glm()` unless `family = "negbin"`, in which case the
+#'   model is run using `glm.nb()` from the `MASS` package
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
 #'   columns containing model coefficients.
+#' @param ... additional arguments passed to `glm()` or `glm.nb()`.
 #'
 #' @details Colony growth is modeled as increasing exponentialy until the colony
 #'   switches to gyne production, at which time the workers die and gynes leave
@@ -196,13 +168,14 @@ brkpt <- function(data, taus = NULL, t, formula, family = c("gaussian", "poisson
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
-bumbl <- function(data, colonyID = NULL, t, formula, family = c("gaussian", "poisson", "negbin"), augment = FALSE, taus = NULL) {
+bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "log"), augment = FALSE, taus = NULL, ...) {
   #TODO: scoop up all the warnings from brkpt() and present a summary at the
   #end.
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
-  fam <- match.arg(family)
+  family <- enquo(family)
+  more_args <- list2(...)
 
   if (quo_is_null(colonyID)) {
     df <- data
@@ -239,10 +212,12 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = c("gaussian", "poi
   resultdf <-
     purrr::map2_df(dflist,
                    names(dflist),
-                   ~brkpt_w_err(brkpt(.x, taus = {{taus}},
+                   ~brkpt_w_err(brkpt(data = .x,
+                                      taus = {{taus}},
                                       t = !!t,
                                       formula = formula,
-                                      family = fam),
+                                      family = !!family,
+                                      !!!more_args),
                                 .y),
                    .id = as_name(colonyID))
 

@@ -69,3 +69,10 @@ test_that("brkpt works with overdispersed data", {
   expect_s3_class(negbin.model, "data.frame")
   expect_is(negbin.model$model[[1]], "negbin")
 })
+
+test_that("dots pass arguments to glm()", {
+  expect_s3_class(
+    brkpt(testbees, t = week, formula = d.mass ~ week, model = FALSE),
+    "data.frame"
+  )
+})
