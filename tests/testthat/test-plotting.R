@@ -26,18 +26,15 @@ test_that("plotting function errors when not a bumbl object", {
   )
 })
 
-
-
-test_that("plotting works with all families", {
+test_that("plotting works with count data", {
   results_count <-
-    suppressWarnings(bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
-                           family = "poisson", augment = TRUE))
-
+    bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
+          family = "poisson", augment = TRUE)
   expect_invisible(bumbl_plot(results_count))
+})
 
-  skip("need propperly overdispersed data to really test this")
+test_that("plotting works with bumbl.nb", {
   results_overdisp <-
-    suppressWarnings(bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
-                           family = "negbin", augment = TRUE))
+    bumbl.nb(lildf, colonyID = colony, t = week, formula = count ~ week, augment = TRUE)
   expect_invisible(bumbl_plot(results_overdisp))
 })
