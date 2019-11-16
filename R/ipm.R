@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' mass_func(4.1)
-mass_func <- function(wkr_size){
+mass_func <- function(wkr_size) {
   return(-0.03631937362579  + (0.0443352875958048 * wkr_size))
 }
 
@@ -30,7 +30,7 @@ mass_func <- function(wkr_size){
 #'
 #' @examples
 #' surv_func(4)
-surv_func <- function(wkr_size){
+surv_func <- function(wkr_size) {
   return(plogis(4.50002431428571 - 0.495615057142857 * wkr_size))
 }
 
@@ -48,11 +48,11 @@ surv_func <- function(wkr_size){
 #'
 #' @examples
 #' forage_func(4)
-forage_func <- function(wkr_size){
-  m1 = -10.262929037574773 + (5.929037608743619 * wkr_size) + (-0.650980787040497 * wkr_size^2)
-  m2 = -2.39218349485354 + (1.36470460119029 * wkr_size)
+forage_func <- function(wkr_size) {
+  m1 <- -10.262929037574773 + (5.929037608743619 * wkr_size) + (-0.650980787040497 * wkr_size^2)
+  m2 <- -2.39218349485354 + (1.36470460119029 * wkr_size)
 
-  wts = c(0.613097385000364, 0.386902614999636)
+  wts <- c(0.613097385000364, 0.386902614999636)
 
   m_avg <- plogis(m1) * wts[1] + plogis(m2) * wts[2]
 
@@ -73,12 +73,12 @@ forage_func <- function(wkr_size){
 #'
 #' @examples
 #' poln_ret_func(4)
-poln_ret_func <- function(wkr_size){
-  m1 = 7.98040838924227 + (-4.91214574943515 * wkr_size) + (0.653355474683423 * wkr_size^2)
-  m2 = -2.1959139376487 + (0.277436710524086  * wkr_size)
-  m3 = -1.12292287816589 + (0 * wkr_size)
+poln_ret_func <- function(wkr_size) {
+  m1 <- 7.98040838924227 + (-4.91214574943515 * wkr_size) + (0.653355474683423 * wkr_size^2)
+  m2 <- -2.1959139376487 + (0.277436710524086  * wkr_size)
+  m3 <- -1.12292287816589 + (0 * wkr_size)
 
-  wts = c(0.545262160009476, 0.253848107890376, 0.200889732100148)
+  wts <- c(0.545262160009476, 0.253848107890376, 0.200889732100148)
 
   m_avg <- plogis(m1) * wts[1] + plogis(m2) * wts[2] + plogis(m3) * wts[3]
 
@@ -94,7 +94,9 @@ poln_ret_func <- function(wkr_size){
 #' @return a vector of mean number of trips per day
 #' @export
 #'
-#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates explains optimal worker size for resource return by bumblebee workers. Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
+#' @references Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+#'   explains optimal worker size for resource return by bumblebee workers.
+#'   Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 #'
 #' @examples
 #' trips_func(4)
@@ -116,12 +118,12 @@ trips_func <- function(wkr_size) {
 #'
 #' @examples
 #' poln_mass_func(4)
-poln_mass_func <- function(wkr_size){
-  m1 = -9.322439490493416 + (2.099089029256157 * wkr_size) + (-0.223761025727937 * wkr_size^2)
-  m2 = -5.724036797919059 + (0.291444174297121 * wkr_size)
-  m3 = -4.58078536341549 + (0 * wkr_size)
+poln_mass_func <- function(wkr_size) {
+  m1 <- -9.322439490493416 + (2.099089029256157 * wkr_size) + (-0.223761025727937 * wkr_size^2)
+  m2 <- -5.724036797919059 + (0.291444174297121 * wkr_size)
+  m3 <- -4.58078536341549 + (0 * wkr_size)
 
-  wts = c(0.508702819088624, 0.293356371483592, 0.197940809427784)
+  wts <- c(0.508702819088624, 0.293356371483592, 0.197940809427784)
 
   m_avg <- exp(m1) * wts[1] + exp(m2) * wts[2] + exp(m3) * wts[3]
 
@@ -265,7 +267,8 @@ bipm <- function(larv_surv = 0.980419283573345,
   }
 
   if (!is.na(foraging_index)) {
-    wkr_larv[foraging_index] <- wkr_larv[foraging_index] * border_case_correction
+    wkr_larv[foraging_index] <-
+      wkr_larv[foraging_index] * border_case_correction
   }
 
   wkr_larv_mat <- array(0, dim = c(n_larv, n_wkr))
@@ -280,4 +283,3 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   invisible(list(lambda = growth_rate, ipm = full_mat))
 }
-
