@@ -246,10 +246,12 @@ bipm <- function(larv_surv = 0.980419283573345,
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
   wkr_mass <- wkr_mass_f(wkr_size_1)
-  poln_per_wkrmass <- # actually cells per gram of pollen
-    poln_per_cell / 0.1254111 #observed from natalie's data
+  poln_per_wkrmass <- poln_per_cell / 0.1254111 #mean worker mass observed from natalie's data
 
-  wkr_larv <- daily_poln_return / (poln_per_wkrmass *  mean(wkr_mass))
+  # wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass)
+  # wkr_larv <- daily_poln_return / (poln_per_wkrmass * mean(wkr_mass))
+  wkr_larv <- daily_poln_return / (poln_per_wkrmass *  0.1254111)
+
 
   if (is.na(foraging_index)) { #i.e., no foraging workers
     wkr_larv[] <- 0
