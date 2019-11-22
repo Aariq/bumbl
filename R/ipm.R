@@ -192,7 +192,7 @@ bipm <- function(larv_surv = 0.980419283573345,
                  dev_time_mean = 23.5670474993181,
                  wkr_size_min = 2.5,
                  wkr_size_max = 5.81,
-                 wkr_size_mean = 3.600687,
+                 wkr_size_mean = 3.647895,
                  wkr_size_sd = 0.4276681,
                  poln_per_cell = 0.016,
                  prop_foraging = 1,
@@ -247,13 +247,10 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
-  wkr_mass <- wkr_mass_f(wkr_size_1)
-  poln_per_wkrmass <- poln_per_cell / 0.1254111 #mean worker mass observed from natalie's data
+  wkr_mass_mean <- wkr_mass_f(wkr_size_mean)
+  poln_per_wkrmass <- poln_per_cell / 0.1254111
 
-  # wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass)
-  # wkr_larv <- daily_poln_return / (poln_per_wkrmass * mean(wkr_mass))
-  wkr_larv <- daily_poln_return / (poln_per_wkrmass *  0.1254111)
-
+  wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass_mean)
 
   if (is.na(foraging_index)) { #i.e., no foraging workers
     wkr_larv[] <- 0
