@@ -239,11 +239,9 @@ bipm <- function(larv_surv = 0.980419283573345,
   trips_per_day <- trips_f(wkr_size_1)
   poln_mass <- poln_mass_f(wkr_size_1)
   prop_nforaging <- 1 - prop_foraging
-  cum_prop <- cumsum(prop_wkr_size)
 
-  #position in vector for cutoff for foraging workers.
-  #When prop_nforaging = 1, foraging_index is NA
-  foraging_index <- match(FALSE, cum_prop < prop_nforaging)
+
+
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
@@ -252,15 +250,21 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass_mean)
 
+  #position in vector for cutoff for foraging workers.
+  #When prop_nforaging = 1, foraging_index is NA
+  cum_prop <- cumsum(prop_wkr_size)
+  foraging_index <- match(FALSE, cum_prop < prop_nforaging)
+  min_wkr_index <- match(TRUE, prop_wkr_size > 0)
+
   if (is.na(foraging_index)) { #i.e., no foraging workers
-    wkr_larv[] <- 0
-  } else if (foraging_index > 1) {
+    wkr_larv[] <- 0 #no recruitment
+  } else if (foraging_index > min_wkr_index) { #some workers left behind
     wkr_larv[1:foraging_index - 1] <- 0
     border_case_correction <-
       1 - (prop_nforaging - max(cum_prop[1:foraging_index - 1])) / prop_wkr_size[foraging_index]
-  } else if (foraging_index == 1) { #i.e only part of the smallest size class doesn't forage
+  } else if (foraging_index == min_wkr_index) { #i.e only part of the smallest size class doesn't forage
     border_case_correction <-
-      1 - (prop_nforaging / prop_wkr_size[1]) #if prop_foraging = 1 this equals 1
+      1 - (prop_nforaging / prop_wkr_size[min_wkr_index]) #if prop_foraging = 1 this equals 1
   }
 
   if (!is.na(foraging_index)) {
