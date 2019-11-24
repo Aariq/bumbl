@@ -7,8 +7,8 @@
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `glm()` or `glm.nb()`.  This should include the time
-#'   variable supplied to `t`
+#' @param formula a formula passed to `glm()` or `glm.nb()`.  This should
+#'   include the time variable supplied to `t`
 #' @param family passed to `glm()`
 #' @param ... additional arguments passed to `glm()` or `glm.nb()`
 #' @return a tibble with a column for the winning tau and a column for the
@@ -28,19 +28,22 @@
 #' # Using weeks
 #' brkpt(testbees, t = week, formula = mass ~ week)
 #' }
-brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log"), ...) {
-  #TODO: make sure none of the variables are called '.post'?
+brkpt <-
+  function(data,
+           taus = NULL,
+           t,
+           formula,
+           family = gaussian(link = "log"),
+           ...) {
+    #TODO: make sure none of the variables are called '.post'?
   t <- enquo(t)
-  tvar <-as_name(t)
-  # fam <- enquo(family)
+  tvar <- as_name(t)
   more_args <- list2(...)
 
   if (is.null(taus)) {
     tvec <- data[[tvar]]
     taus <- seq(min(tvec), max(tvec), length.out = 50)
   }
-
-
 
   #Check that at least some taus are in range of t
   if (all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
@@ -58,7 +61,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
       taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
   }
 
-  # adds `.post` to formula. Would not be difficult to modify for other interactions
+  # adds `.post` to formula.
   f <- update(formula, ~. + .post)
   LLs <- c()
 
@@ -76,16 +79,24 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
   if (length(tau_win) > 1) {
     abort("More than one equivalent tau found")
   }
-  #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
+  #TODO: I don't really like that it re-fits the model.  I could have it save
+  #them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
 
-  m_win <- exec("glm", formula = f, family = family, data = data_win, !!!more_args)
+  m_win <-
+    exec(
+      "glm",
+      formula = f,
+      family = family,
+      data = data_win,
+      !!!more_args
+    )
 
   return(tibble(tau = tau_win, model = list(m_win)))
 }
 
 
-#' @describeIn brkpt
+#' @describeIn brkpt passes arguments to `MASS::glm.nb()`
 #' @param link passed to `glm.nb()`
 #'
 #' @import dplyr
@@ -98,8 +109,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
 brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   #TODO: make sure none of the variables are called '.post'?
   t <- enquo(t)
-  tvar <-as_name(t)
-  # fam <- enquo(family)
+  tvar <- as_name(t)
   more_args <- list2(...)
 
   if (is.null(taus)) {
@@ -123,7 +133,7 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
       taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
   }
 
-  # adds `.post` to formula. Would not be difficult to modify for other interactions
+  # adds `.post` to formula.
   f <- update(formula, ~. + .post)
   LLs <- c()
 
@@ -140,9 +150,10 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   if (length(tau_win) > 1) {
     abort("More than one equivalent tau found")
   }
-  #TODO: I don't really like that it re-fits the model.  I could have it save them all and only re-fit in the case of a tau tie.
+  #TODO: I don't really like that it re-fits the model.  I could have it save
+  #them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
-  m_win <- exec("glm.nb",formula = f, data = data_win, !!!more_args)
+  m_win <- exec("glm.nb", formula = f, data = data_win, !!!more_args)
   return(tibble(tau = tau_win, model = list(m_win)))
 }
 
@@ -212,18 +223,25 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
-bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "log"), augment = FALSE, taus = NULL, ...) {
+bumbl <-
+  function(data,
+           colonyID = NULL,
+           t,
+           formula,
+           family = gaussian(link = "log"),
+           augment = FALSE,
+           taus = NULL,
+           ...) {
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
-  tvar <- quo_name(t)
-  # family <- enquo(family)
+  tvar <- as_name(t)
   more_args <- list2(...)
   fterms <- terms(formula)
 
   #Check that time variable is in the formula
   if (!tvar %in% attr(fterms, "term.labels")) {
-    abort(paste0("'",tvar,"' is missing from the model formula"))
+    abort(paste0("'", tvar, "' is missing from the model formula"))
   }
 
   if (quo_is_null(colonyID)) {
@@ -283,7 +301,9 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "l
     unnest(.data$coefs) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = purrr::map_dbl(.data$model, ~ max(predict(.), na.rm = TRUE))) %>%
+    mutate(logNmax = purrr::map_dbl(.data$model,
+                                    ~ max(predict(.),
+                                          na.rm = TRUE))) %>%
     dplyr::select(-"model") %>%
     dplyr::select(
       !!colonyID,
@@ -320,9 +340,7 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "l
 
 
 
-
-
-#' @describeIn bumbl
+#' @describeIn bumbl passes arguments to `MASS::glm.nb()` rather than `glm()`
 #'
 #' @param link passed to `glm.nb()` from the `MASS` package
 #'
@@ -334,20 +352,25 @@ bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "l
 #' @importFrom glue glue
 #' @export
 #'
-bumbl.nb <- function(data, colonyID = NULL, t, formula, link = "log", augment = FALSE, taus = NULL, ...) {
-  #TODO: scoop up all the warnings from brkpt() and present a summary at the
-  #end.
+bumbl.nb <-
+  function(data,
+           colonyID = NULL,
+           t,
+           formula,
+           link = "log",
+           augment = FALSE,
+           taus = NULL,
+           ...) {
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
-  tvar <- quo_name(t)
-  # family <- enquo(family)
+  tvar <- as_name(t)
   more_args <- list2(...)
   fterms <- terms(formula)
 
   #Check that time variable is in the formula
   if (!tvar %in% attr(fterms, "term.labels")) {
-    abort(paste0("'",tvar,"' is missing from the model formula"))
+    abort(paste0("'", tvar, "' is missing from the model formula"))
   }
 
   if (quo_is_null(colonyID)) {
@@ -407,7 +430,9 @@ bumbl.nb <- function(data, colonyID = NULL, t, formula, link = "log", augment = 
     unnest(.data$coefs) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = purrr::map_dbl(.data$model, ~ max(predict(.), na.rm = TRUE))) %>%
+    mutate(logNmax = purrr::map_dbl(.data$model,
+                                    ~ max(predict(.),
+                                          na.rm = TRUE))) %>%
     dplyr::select(-"model") %>%
     dplyr::select(
       !!colonyID,

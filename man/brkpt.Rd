@@ -2,10 +2,13 @@
 % Please edit documentation in R/colony-growth.R
 \name{brkpt}
 \alias{brkpt}
+\alias{brkpt.nb}
 \title{Fit breakpoint model to individual colony}
 \usage{
 brkpt(data, taus = NULL, t, formula, family = gaussian(link = "log"),
   ...)
+
+brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -14,12 +17,14 @@ brkpt(data, taus = NULL, t, formula, family = gaussian(link = "log"),
 
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
-\item{formula}{a formula passed to \code{glm()} or \code{glm.nb()}.  This should include the time
-variable supplied to \code{t}}
+\item{formula}{a formula passed to \code{glm()} or \code{glm.nb()}.  This should
+include the time variable supplied to \code{t}}
 
 \item{family}{passed to \code{glm()}}
 
 \item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}}
+
+\item{link}{passed to \code{glm.nb()}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the
@@ -29,6 +34,11 @@ winning model
 Fits models using a range of taus and picks the best one using maximum
 liklihood
 }
+\section{Functions}{
+\itemize{
+\item \code{brkpt.nb}: passes arguments to \code{MASS::glm.nb()}
+}}
+
 \examples{
 testbees <- bombus[bombus$colony == 9, ]
 # Using dates

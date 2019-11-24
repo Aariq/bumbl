@@ -71,7 +71,7 @@ may vary among colonies.
 }
 \section{Functions}{
 \itemize{
-\item \code{bumbl.nb}: 
+\item \code{bumbl.nb}: passes arguments to \code{MASS::glm.nb()} rather than \code{glm()}
 }}
 
 \examples{
