@@ -30,7 +30,6 @@
 #' }
 brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log"), ...) {
   #TODO: make sure none of the variables are called '.post'?
-  fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
   # fam <- enquo(family)
@@ -41,10 +40,7 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
     taus <- seq(min(tvec), max(tvec), length.out = 50)
   }
 
-  #Check that time variable is in the formula
-  if (!tvar %in% attr(fterms, "term.labels")) {
-    abort(paste0("'",tvar,"' is missing from the model formula"))
-    }
+
 
   #Check that at least some taus are in range of t
   if (all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
@@ -101,7 +97,6 @@ brkpt <- function(data, taus = NULL, t, formula, family = gaussian(link = "log")
 #'
 brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   #TODO: make sure none of the variables are called '.post'?
-  fterms <- terms(formula)
   t <- enquo(t)
   tvar <-as_name(t)
   # fam <- enquo(family)
@@ -110,11 +105,6 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   if (is.null(taus)) {
     tvec <- data[[tvar]]
     taus <- seq(min(tvec), max(tvec), length.out = 50)
-  }
-
-  #Check that time variable is in the formula
-  if (!tvar %in% attr(fterms, "term.labels")) {
-    abort(paste0("'",tvar,"' is missing from the model formula"))
   }
 
   #Check that at least some taus are in range of t
@@ -223,13 +213,18 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #' bombus2 <- bombus[bombus$colony != 67, ]
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
 bumbl <- function(data, colonyID = NULL, t, formula, family = gaussian(link = "log"), augment = FALSE, taus = NULL, ...) {
-  #TODO: scoop up all the warnings from brkpt() and present a summary at the
-  #end.
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
+  tvar <- quo_name(t)
   # family <- enquo(family)
   more_args <- list2(...)
+  fterms <- terms(formula)
+
+  #Check that time variable is in the formula
+  if (!tvar %in% attr(fterms, "term.labels")) {
+    abort(paste0("'",tvar,"' is missing from the model formula"))
+  }
 
   if (quo_is_null(colonyID)) {
     df <- data
@@ -345,8 +340,15 @@ bumbl.nb <- function(data, colonyID = NULL, t, formula, link = "log", augment = 
 
   colonyID <- enquo(colonyID)
   t <- enquo(t)
+  tvar <- quo_name(t)
   # family <- enquo(family)
   more_args <- list2(...)
+  fterms <- terms(formula)
+
+  #Check that time variable is in the formula
+  if (!tvar %in% attr(fterms, "term.labels")) {
+    abort(paste0("'",tvar,"' is missing from the model formula"))
+  }
 
   if (quo_is_null(colonyID)) {
     df <- data

@@ -6,12 +6,6 @@ testcount <-
   #fake count data
   mutate(count = as.integer(mass) - min(as.integer(mass)))
 
-test_that("brkpt errors if time variable is missing from formula", {
-  expect_error(
-    brkpt(testbees, t = week, formula = mass ~ 1),
-    "'week' is missing from the model formula"
-  )
-})
 
 test_that("brkpt errors if taus don't match t", {
   expect_error(

@@ -10,6 +10,13 @@ bombus_67 <- bombus %>% filter(colony == 67)
 
 noerrs <- bombus_sub %>% filter(colony != 67)
 
+test_that("bumbl errors if time variable is missing from formula", {
+  expect_error(
+    bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ date),
+    "'week' is missing from the model formula"
+  )
+})
+
 test_that("bumbl works", {
   expect_s3_class(
     bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week),
