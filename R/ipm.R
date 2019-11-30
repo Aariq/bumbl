@@ -217,6 +217,13 @@ bipm <- function(larv_surv = 0.980419283573345,
   wkr_size <- seq(wkr_size_min, wkr_size_max, 0.01)
   n_wkr <- length(wkr_size) - 1
   n_larv <- length(dev_time)
+
+  # I think this is where the inconsistency with Natalie's code is She uses
+  # mean(Massvals), but in some instances this should be the mean of the
+  # hypothetical worker mass distribution, and in at least once place it's 0.125
+  # (the mean from observed colonies).  I'm not sure whether this size should be
+  # the original size (3.600687).  Natalie uses fixef(size.mo1)[1] for this
+  # instance of wkr_size_mean.
   wkr_pdist <- pnorm(wkr_size, mean = wkr_size_mean, sd = wkr_size_sd)
   prop_wkr_size <- wkr_pdist[2:length(wkr_pdist)] - wkr_pdist[1:(length(wkr_pdist) - 1)]
 
