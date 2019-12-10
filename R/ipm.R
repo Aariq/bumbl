@@ -192,7 +192,7 @@ bipm <- function(larv_surv = 0.980419283573345,
                  dev_time_mean = 23.5670474993181,
                  wkr_size_min = 2.5,
                  wkr_size_max = 5.81,
-                 wkr_size_mean = 3.647895, #to get 0.125 for mean mass
+                 wkr_size_mean = 3.600687, #3.647895, #to get 0.1254111 for mean mass
                  wkr_size_sd = 0.4276681,
                  poln_per_cell = 0.016,
                  prop_foraging = 1,
@@ -242,7 +242,7 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   # Worker to larva
   p_poln_return <- p_poln_ret_f(wkr_size_1)
-  p_forage <- p_forage_f(wkr_size_1)
+  p_forage <- p_forage_f(wkr_size_1) #might need to set this to zero if prop_foraging < 1. Check manuscript.
   trips_per_day <- trips_f(wkr_size_1)
   poln_mass <- poln_mass_f(wkr_size_1)
   prop_nforaging <- 1 - prop_foraging
@@ -250,9 +250,10 @@ bipm <- function(larv_surv = 0.980419283573345,
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
   wkr_mass_mean <- wkr_mass_f(wkr_size_mean)
-  poln_per_wkrmass <- poln_per_cell / 0.1254111
+  poln_per_wkrmass <- poln_per_cell / 0.1254111 #natalie said this should be constant.  This is the mean worker mass from some observational study.  Can't remember exactly where this number comes from.
 
   wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass_mean)
+  #this doesn't match equation in manuscript, but talked to Natalie and she said it should be mean worker mass in denominator, not a vector of worker mass.  This cancels out in her model because mean worker mass is 0.1254111
 
   #position in vector for cutoff for foraging workers.
   #When prop_nforaging = 1, foraging_index can be NA
