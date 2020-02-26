@@ -5,11 +5,27 @@
 \alias{bumbl.nb}
 \title{Estimate colony growth, switch point, and decay parameters}
 \usage{
-bumbl(data, colonyID = NULL, t, formula, family = gaussian(link =
-  "log"), augment = FALSE, taus = NULL, ...)
+bumbl(
+  data,
+  colonyID = NULL,
+  t,
+  formula,
+  family = gaussian(link = "log"),
+  augment = FALSE,
+  taus = NULL,
+  ...
+)
 
-bumbl.nb(data, colonyID = NULL, t, formula, link = "log",
-  augment = FALSE, taus = NULL, ...)
+bumbl.nb(
+  data,
+  colonyID = NULL,
+  t,
+  formula,
+  link = "log",
+  augment = FALSE,
+  taus = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{a dataframe or tibble}

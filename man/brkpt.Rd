@@ -5,8 +5,7 @@
 \alias{brkpt.nb}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, taus = NULL, t, formula, family = gaussian(link = "log"),
-  ...)
+brkpt(data, taus = NULL, t, formula, family = gaussian(link = "log"), ...)
 
 brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 }
