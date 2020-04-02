@@ -4,7 +4,8 @@
 \name{bombus}
 \alias{bombus}
 \title{\emph{Bombus vosnesenskii} colony growth and estimated floral resrouces}
-\format{A data frame with 178 rows and 10 columns
+\format{
+A data frame with 178 rows and 10 columns
 \describe{
 \item{site}{The site ID}
 \item{colony}{The colony ID}
@@ -16,7 +17,8 @@
 \item{d.mass}{Difference in mass from the smallest mass for each colony, in grams}
 \item{floral_resources}{Floral density in millions of flowers within a 2km radius around the colony, weighted as a function of distance from colony}
 \item{cum_floral}{Cumulative floral resources from the start of the study}
-}}
+}
+}
 \usage{
 bombus
 }
