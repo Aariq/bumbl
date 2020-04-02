@@ -326,7 +326,7 @@ bumbl <-
     attr(full_augmented_df, "colonyID") <- as_name(colonyID)
     attr(full_augmented_df, "t") <- as_name(t)
     attr(full_augmented_df, "formula") <- formula
-    attributes(full_augmented_df)
+    # attributes(full_augmented_df)
 
     class(full_augmented_df) <- c(class(full_augmented_df), "bumbldf")
 
@@ -457,7 +457,7 @@ bumbl.nb <-
     attr(full_augmented_df, "formula") <- formula
     attributes(full_augmented_df)
 
-    class(full_augmented_df) <- c(class(full_augmented_df), "bumbldf")
+    class(full_augmented_df) <- c("bumbldf", class(full_augmented_df))
 
     return(full_augmented_df)
 
