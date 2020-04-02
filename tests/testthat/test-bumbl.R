@@ -9,7 +9,7 @@ bombus_sub <-
 bombus_67 <- bombus %>% filter(colony == 67)
 
 noerrs <- bombus_sub %>% filter(colony != 67)
-
+detach("package:dplyr")
 test_that("bumbl errors if time variable is missing from formula", {
   expect_error(
     bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ date),
@@ -20,6 +20,10 @@ test_that("bumbl errors if time variable is missing from formula", {
 test_that("bumbl works", {
   expect_s3_class(
     bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week),
+    "data.frame"
+  )
+  expect_s3_class(
+    bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week, augment = TRUE),
     "data.frame"
   )
 })
@@ -41,7 +45,8 @@ test_that("bumbl drops colonies that produce errors", {
 
 test_that("bumbl returns NAs for colonies that produce errors when augment = TRUE", {
   expect_message({
-    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week, augment = TRUE)
+    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week,
+                 augment = TRUE)
   }, "Warning: More than one equivalent tau found for colonyID '67'. Omitting from results.")
   expect_equal(nrow(bombus_sub), nrow(out))
 })
