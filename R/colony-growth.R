@@ -292,13 +292,13 @@ bumbl <-
     resultdf %>%
     dplyr::select(-"tau") %>%
     mutate(aug = purrr::map(.data$model, broom::augment)) %>%
-    unnest(.data$aug) %>%
+    tidyr::unnest(.data$aug) %>%
     dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
   modeldf <-
     resultdf %>%
     mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
-    unnest(.data$coefs) %>%
+    tidyr::unnest(.data$coefs) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = purrr::map_dbl(.data$model,
@@ -328,7 +328,7 @@ bumbl <-
     attr(full_augmented_df, "formula") <- formula
     # attributes(full_augmented_df)
 
-    class(full_augmented_df) <- c(class(full_augmented_df), "bumbldf")
+    class(full_augmented_df) <- c("bumbldf", class(full_augmented_df))
 
     return(full_augmented_df)
 
@@ -421,13 +421,13 @@ bumbl.nb <-
     resultdf %>%
     dplyr::select(-"tau") %>%
     mutate(aug = purrr::map(.data$model, broom::augment)) %>%
-    unnest(.data$aug) %>%
+    tidyr::unnest(.data$aug) %>%
     dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
   modeldf <-
     resultdf %>%
     mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
-    unnest(.data$coefs) %>%
+    tidyr::unnest(.data$coefs) %>%
     dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = purrr::map_dbl(.data$model,
@@ -455,7 +455,7 @@ bumbl.nb <-
     attr(full_augmented_df, "colonyID") <- as_name(colonyID)
     attr(full_augmented_df, "t") <- as_name(t)
     attr(full_augmented_df, "formula") <- formula
-    attributes(full_augmented_df)
+    # attributes(full_augmented_df)
 
     class(full_augmented_df) <- c("bumbldf", class(full_augmented_df))
 
