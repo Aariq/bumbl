@@ -1,6 +1,6 @@
 #' Plot observed and fitted results from bumbl()
 #'
-#' @param bumbldf A dataframe produced by `bumbl()` with `augment = TRUE`
+#' @param x A dataframe produced by `bumbl()` with `augment = TRUE`
 #'
 #' @return currently doesn't return an object, just prints plots
 #'
@@ -15,19 +15,19 @@
 #' colony_subset <- bombus[bombus$colony %in% colonyID_subset, ]
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = log(mass) ~ week, augment = TRUE)
-#' bumbl_plot(results)
-bumbl_plot <- function(bumbldf) {
-  if(!inherits(bumbldf, "bumbldf")) {
-    abort("bumbl_plot() only works on dataframes output by bumbl() with augment = TRUE")
+#' plot(results)
+plot.bumbldf <- function(x) {
+  if(!inherits(x, "bumbldf")) {
+    abort("plot.bumbldf() only works on dataframes output by bumbl() with augment = TRUE")
   }
-  colonyID <- attr(bumbldf, "colonyID")
-  t <- attr(bumbldf, "t")
-  formula <- attr(bumbldf, "formula")
+  colonyID <- attr(x, "colonyID")
+  t <- attr(x, "t")
+  formula <- attr(x, "formula")
 
   yvar <- all.vars(formula)[1]
 
   gdf <-
-    bumbldf %>%
+    x %>%
     group_by(!!sym(colonyID))  #might be able to replace with base::split()
 
   gdf %>%

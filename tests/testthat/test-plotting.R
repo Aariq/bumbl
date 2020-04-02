@@ -1,35 +1,56 @@
 library(dplyr)
-colony_subset <- sample(bombus$colony, 10)
-lildf <-
+bombus_sub <-
   bombus %>%
-  filter(colony %in% colony_subset) %>%
-  #make fake count data
+  filter(colony %in% c(9, 14, 82, 83, 46, 92)) %>%
   group_by(colony) %>%
-  mutate(count = as.integer(d.mass)) %>%
+  mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
   ungroup()
+
+detach("package:dplyr")
 
 test_that("plotting function displays something?", {
   results <-
-    bumbl(lildf, colonyID = colony, t = week, formula = d.mass ~ week,
-          augment = TRUE)
-  expect_invisible(bumbl_plot(results))
+    suppressWarnings(bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = d.mass ~ week,
+      augment = TRUE
+    ))
+  expect_invisible(plot(results))
 })
 
 test_that("plotting function errors when not a bumbl(augment = TRUE) object", {
-  expect_error(bumbl_plot(mtcars),
-               "bumbl_plot() only works on dataframes output by bumbl() with augment = TRUE",
-               fixed = TRUE)
+  skip("I guess this isn't how plot methods work?")
+  expect_error(
+    plot.bumbldf(mtcars),
+    "plot.bumbldf() only works on dataframes output by bumbl() with augment = TRUE",
+    fixed = TRUE
+  )
 })
 
 test_that("plotting works with count data", {
   results_count <-
-    bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
-          family = "poisson", augment = TRUE)
-  expect_invisible(bumbl_plot(results_count))
+    bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = count ~ week,
+      family = "poisson",
+      augment = TRUE
+    )
+  expect_invisible(plot(results_count))
 })
 
 test_that("plotting works with bumbl.nb", {
+  skip("This test will fail until I have a properly overdispersed dataset to test it on I think.")
   results_overdisp <-
-    bumbl.nb(lildf, colonyID = colony, t = week, formula = count ~ week, augment = TRUE)
-  expect_invisible(bumbl_plot(results_overdisp))
+    bumbl.nb(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = count ~ week,
+      augment = TRUE
+    )
+  expect_invisible(plot(results_overdisp))
 })

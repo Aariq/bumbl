@@ -116,10 +116,10 @@ aug_out <- bumbl(bombus2, colonyID = colony, t = week,
 head(aug_out)
 ```
 
-Then you can plot this dataframe with `bumbl_plot()`.
+Then you can plot this dataframe with `plot()`.
 
 ```{r}
-bumbl_plot(aug_out)
+plot(aug_out)
 ```
 
 From this it's clear that for colony 38, the model is incorrect.
