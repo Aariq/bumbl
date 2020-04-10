@@ -319,23 +319,20 @@ bumbl <-
     augmented_df <-
       left_join(df, modeldf, by = as_name(colonyID))
 
-    full_augmented_df <-
+    out <-
       left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
 
-    #add attributes
-    attr(full_augmented_df, "colonyID") <- as_name(colonyID)
-    attr(full_augmented_df, "t") <- as_name(t)
-    attr(full_augmented_df, "formula") <- formula
-    # attributes(full_augmented_df)
-
-    class(full_augmented_df) <- c("bumbldf", class(full_augmented_df))
-
-    return(full_augmented_df)
-
   } else {
-    return(modeldf)
+    out <- modeldf
+    attr(out, "predict") <- predictdf
   }
+  attr(out, "colonyID") <- as_name(colonyID)
+  attr(out, "t") <- as_name(t)
+  attr(out, "formula") <- formula
 
+  class(out) <- c("bumbldf", class(out))
+
+  return(out)
 }
 
 
@@ -448,21 +445,18 @@ bumbl.nb <-
     augmented_df <-
       left_join(df, modeldf, by = as_name(colonyID))
 
-    full_augmented_df <-
+    out <-
       left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
 
-    #add attributes
-    attr(full_augmented_df, "colonyID") <- as_name(colonyID)
-    attr(full_augmented_df, "t") <- as_name(t)
-    attr(full_augmented_df, "formula") <- formula
-    # attributes(full_augmented_df)
-
-    class(full_augmented_df) <- c("bumbldf", class(full_augmented_df))
-
-    return(full_augmented_df)
-
   } else {
-    return(modeldf)
+    out <- modeldf
+    attr(out, "predict") <- predictdf
   }
 
+  attr(out, "colonyID") <- as_name(colonyID)
+  attr(out, "t") <- as_name(t)
+  attr(out, "formula") <- formula
+
+  class(out) <- c("bumbldf", class(out))
+  return(out)
 }

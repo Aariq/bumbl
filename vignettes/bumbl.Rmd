@@ -104,7 +104,7 @@ head(out2)
 
 ## Plotting results
 
-To check that these results are sensible, you should plot them.  To do this, you first need an "augmented" dataframe that you can get using the `augment = TRUE` argument in `bumbl()`.
+To check that these results are sensible, you should plot them.
 
 ```{r}
 #using a subset of bomubs for this
@@ -116,10 +116,10 @@ aug_out <- bumbl(bombus2, colonyID = colony, t = week,
 head(aug_out)
 ```
 
-Then you can plot this dataframe with `plot()`.
+Then you can plot this dataframe with `bumbl_plot()`.
 
 ```{r}
-plot(aug_out)
+bumbl_plot(aug_out)
 ```
 
 From this it's clear that for colony 38, the model is incorrect.

@@ -1,6 +1,6 @@
 #' Plot observed and fitted results from bumbl()
 #'
-#' @param x A dataframe produced by `bumbl()` with `augment = TRUE`
+#' @param bumbldf A dataframe produced by `bumbl()` with `augment = TRUE`
 #'
 #' @return currently doesn't return an object, just prints plots
 #'
@@ -15,14 +15,22 @@
 #' colony_subset <- bombus[bombus$colony %in% colonyID_subset, ]
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = log(mass) ~ week, augment = TRUE)
-#' plot(results)
-plot.bumbldf <- function(x) {
-  if(!inherits(x, "bumbldf")) {
-    abort("plot.bumbldf() only works on dataframes output by bumbl() with augment = TRUE")
+#' bumbl_plot(results)
+bumbl_plot <- function(bumbldf) {
+  if(!inherits(bumbldf, "bumbldf")) {
+    abort("bumbl_plot() only works on dataframes output by bumbl() with augment = TRUE")
   }
-  colonyID <- attr(x, "colonyID")
-  t <- attr(x, "t")
-  formula <- attr(x, "formula")
+  colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
+  t <- attr(bumbldf, "t", exact = TRUE)
+  formula <- attr(bumbldf, "formula", exact = TRUE)
+  predict <- attr(bumbldf, "predict", exact = TRUE)
+
+  if(is.null(predict)) {
+    x <- bumbldf
+  } else {
+    x <- predict
+  }
+
 
   yvar <- all.vars(formula)[1]
 

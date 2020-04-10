@@ -17,14 +17,26 @@ test_that("plotting function displays something?", {
       formula = d.mass ~ week,
       augment = TRUE
     ))
-  expect_invisible(plot(results))
+  expect_invisible(bumbl_plot(results))
+})
+
+test_that("plotting works with augment = FALSE", {
+  results <-
+    suppressWarnings(bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = d.mass ~ week,
+      augment = FALSE
+    ))
+  expect_invisible(bumbl_plot(results))
 })
 
 test_that("plotting function errors when not a bumbl(augment = TRUE) object", {
   skip("I guess this isn't how plot methods work?")
   expect_error(
-    plot.bumbldf(mtcars),
-    "plot.bumbldf() only works on dataframes output by bumbl() with augment = TRUE",
+    bumbl_plot(mtcars),
+    "bumbl_plot() only works on dataframes output by bumbl()",
     fixed = TRUE
   )
 })
@@ -39,7 +51,7 @@ test_that("plotting works with count data", {
       family = "poisson",
       augment = TRUE
     )
-  expect_invisible(plot(results_count))
+  expect_invisible(bumbl_plot(results_count))
 })
 
 test_that("plotting works with bumbl.nb", {
@@ -52,5 +64,5 @@ test_that("plotting works with bumbl.nb", {
       formula = count ~ week,
       augment = TRUE
     )
-  expect_invisible(plot(results_overdisp))
+  expect_invisible(bumbl_plot(results_overdisp))
 })
