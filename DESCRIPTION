@@ -27,7 +27,8 @@ Suggests:
     knitr,
     rmarkdown,
     covr,
-    car
+    car,
+    ggplot2
 Imports: 
     dplyr,
     rlang,

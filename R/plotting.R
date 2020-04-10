@@ -1,8 +1,11 @@
 #' Plot observed and fitted results from bumbl()
 #'
 #' @param bumbldf A dataframe produced by `bumbl()`
+#' @param gg use `ggplot2` for plotting
 #'
-#' @return currently doesn't return an object, just prints plots
+#' @return if `gg = TRUE`, returns a \code{\link[ggplot2:ggplot]{ggplot}}
+#'   object, otherwise returns (invisibly) a list of data frames used for
+#'   creating the plots.
 #'
 #' @import rlang
 #' @import dplyr
@@ -16,7 +19,7 @@
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = log(mass) ~ week)
 #' bumbl_plot(results)
-bumbl_plot <- function(bumbldf) {
+bumbl_plot <- function(bumbldf, gg = FALSE) {
   if(!inherits(bumbldf, "bumbldf")) {
     abort("bumbl_plot() only works on dataframes output by bumbl()")
   }
@@ -24,6 +27,7 @@ bumbl_plot <- function(bumbldf) {
   t <- attr(bumbldf, "t", exact = TRUE)
   formula <- attr(bumbldf, "formula", exact = TRUE)
   predict <- attr(bumbldf, "predict", exact = TRUE)
+  yvar <- all.vars(formula)[1]
 
   if(is.null(predict)) {
     x <- bumbldf
@@ -31,8 +35,15 @@ bumbl_plot <- function(bumbldf) {
     x <- predict
   }
 
-
-  yvar <- all.vars(formula)[1]
+  if(gg == TRUE){
+    requireNamespace("ggplot2", quietly = TRUE)
+    p <- ggplot2::ggplot(x, ggplot2::aes_string(x = t)) +
+      ggplot2::geom_point(ggplot2::aes_string(y = yvar)) +
+      ggplot2::geom_line(ggplot2::aes(y = exp(.data$.fitted)), color = "red") +
+      ggplot2::facet_wrap(colonyID)
+    print(p)
+    invisible(p)
+  } else {
 
   gdf <-
     x %>%
@@ -48,5 +59,5 @@ bumbl_plot <- function(bumbldf) {
                    points(.x[[t]], exp(.x[[".fitted"]]), type = "l", col = "red")
 
                  })
-
+  }
 }
