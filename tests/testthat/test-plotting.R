@@ -32,8 +32,7 @@ test_that("plotting works with augment = FALSE", {
   expect_invisible(bumbl_plot(results))
 })
 
-test_that("plotting function errors when not a bumbl(augment = TRUE) object", {
-  skip("I guess this isn't how plot methods work?")
+test_that("plotting function errors when not a bumbl object", {
   expect_error(
     bumbl_plot(mtcars),
     "bumbl_plot() only works on dataframes output by bumbl()",
