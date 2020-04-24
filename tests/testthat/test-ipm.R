@@ -25,35 +25,51 @@ test_that("small worker size SDs work", {
   expect_type(bipm(wkr_size_sd = 0.0002), "list")
 })
 test_that("I get results close to Natalie's", {
+
   #task undefined field colonies
-  expect_true(dplyr::near(bipm()$lambda,
-                   # 1.02588496303344,
-                   1.026,
-                   tol = 0.0005))
+  expect_equivalent(
+    bipm()$lambda, 1.026,
+    tolerance = 0.0005
+  )
+
   #task defined field colonies
-  expect_true(dplyr::near(bipm(prop_foraging = 0.7405147)$lambda,
-                   # 1.02050460784289,
-                   1.022,
-                   tol = 0.0005))
+  expect_equivalent(
+    bipm(prop_foraging = 0.7405147)$lambda, 1.022,
+    tolerance = 0.0005
+  )
+
   #task undefined with first cohort
-  expect_true(near(bipm(wkr_size_mean = 4.02,
-                        wkr_size_sd = 0.3246114)$lambda, #this SD is from an old version.  Not sure if correct
-                   1.032,
-                   tol = 0.0005))
+  expect_equivalent(
+    bipm(wkr_size_mean = 4.02,
+         wkr_size_sd = 0.3246114
+         #this SD is from an old version.  Not sure if correct
+    )$lambda, 1.032,
+    tolerance = 0.0005
+  )
+
   #task defined with first cohort
-  expect_true(dplyr::near(bipm(wkr_size_mean = 4.02,
-                               wkr_size_sd = 0.3246114, #an old number, not sure if correct
-                               prop_foraging = 0.7405147)$lambda,
-                   1.023,
-                   tol = 0.0005))
+  expect_equivalent(
+    bipm(wkr_size_mean = 4.02,
+         wkr_size_sd = 0.3246114,
+         prop_foraging = 0.7405147
+    )$lambda, 1.023,
+    tolerance = 0.0005
+  )
+
   #polymorphic, task undefined highest growth rate
-  expect_true(dplyr::near(bipm(wkr_size_mean = 4.02, wkr_size_sd = 0)$lambda,
-                   1.031,
-                   tol = 0.0005))
+  expect_equivalent(
+    bipm(wkr_size_mean = 4.02, wkr_size_sd = 0)$lambda, 1.031,
+    tolerance = 0.0005
+  )
+
   #polymorphic, task defined highest growth rate
-  expect_true(dplyr::near(bipm(wkr_size_mean = 3.79, wkr_size_sd = 0.28, prop_foraging = 0.7405147)$lambda,
-                   1.022,
-                   tol = 0.0005))
+  expect_equivalent(
+    bipm(wkr_size_mean = 3.79,
+         wkr_size_sd = 0.28,
+         prop_foraging = 0.7405147
+         )$lambda, 1.022,
+    tolerance = 0.0005
+  )
   # # monomorphic, no production cost(not sure how to do that)
   # expect_true(dplyr::near(bipm(wkr_size_mean = 4.27, wkr_size_sd = 0)$lambda,
   #                         ???,
