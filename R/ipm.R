@@ -192,9 +192,9 @@ bipm <- function(larv_surv = 0.980419283573345,
                  dev_time_mean = 23.5670474993181,
                  wkr_size_min = 2.5,
                  wkr_size_max = 5.81,
-                 wkr_size_mean = 3.600687, #3.647895, #to get 0.1254111 for mean mass
-                 wkr_size_sd = 0.4276681,
-                 poln_per_cell = 0.016,
+                 wkr_size_mean = 3.60068671381606,
+                 wkr_size_sd = 0.427668095606862,
+                 poln_per_cell = 0.016, #should the param be poln_per_wkrmass instead? I think probably yes.
                  prop_foraging = 1,
                  wkr_mass_f = mass_func,
                  wkr_surv_f = surv_func,
@@ -218,12 +218,6 @@ bipm <- function(larv_surv = 0.980419283573345,
   n_wkr <- length(wkr_size) - 1
   n_larv <- length(dev_time)
 
-  # I think this is where the inconsistency with Natalie's code is She uses
-  # mean(Massvals), but in some instances this should be the mean of the
-  # hypothetical worker mass distribution, and in at least once place it's 0.125
-  # (the mean from observed colonies).  I'm not sure whether this size should be
-  # the original size (3.600687).  Natalie uses fixef(size.mo1)[1] for this
-  # instance of wkr_size_mean.
   wkr_pdist <- pnorm(wkr_size, mean = wkr_size_mean, sd = wkr_size_sd)
   prop_wkr_size <- wkr_pdist[2:length(wkr_pdist)] - wkr_pdist[1:(length(wkr_pdist) - 1)]
 
@@ -232,6 +226,7 @@ bipm <- function(larv_surv = 0.980419283573345,
   for (i in 1:length(prop_wkr_size)) {
     larv_wkr_mat[i, ] <- dev_time * larv_surv * prop_wkr_size[i]
   }
+  #(matches natalie's results)
 
   # Worker to worker
   wkr_size_1 <- wkr_size[1:length(wkr_size) - 1]
@@ -239,6 +234,7 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   wkr_wkr_mat <- array(0, dim = c(n_wkr, n_wkr))
   diag(wkr_wkr_mat) <- wkr_surv
+  #(matches natalie's results)
 
   # Worker to larva
   p_poln_return <- p_poln_ret_f(wkr_size_1)
@@ -249,11 +245,16 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
-  wkr_mass_mean <- wkr_mass_f(wkr_size_mean)
-  poln_per_wkrmass <- poln_per_cell / 0.1254111 #natalie said this should be constant.  This is the mean worker mass from some observational study.  Can't remember exactly where this number comes from.
+  #This is where the inconsistency with Natalie's code starts.  I'm having trouble reconciling her code with what is written in the manuscript.
+  #should wkr_mass_mean be predicted mass of mean size (0.123) or mean of masses of predicted sizes (0.148)? Natalie's original code is the latter.
+  # wkr_mass_mean <- wkr_mass_f(wkr_size_mean)
+  wkr_mass_mean <- mean(wkr_mass_f(wkr_size_1))
+
+  poln_per_wkrmass <- poln_per_cell / 0.1254111
+  #natalie said this denominator should be constant. Her original code has mean(Massvals) which is 0.14767, but at some point she told me to change it to 0.1254111. Can't remember exactly where this number comes from.  I haven't seen her updated code.
 
   wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass_mean)
-  #this doesn't match equation in manuscript, but talked to Natalie and she said it should be mean worker mass in denominator, not a vector of worker mass.  This cancels out in her model because mean worker mass is 0.1254111
+  #this doesn't match equation 4 in manuscript, but talked to Natalie and she said that y_x in her manuscript should be mean worker mass, not a vector of worker mass and that p in her manuscript should be a vector of daily pollen return, not a single number. The result is that in her code this value cancels out completely and she could have simplified the equation.  This seems like a mistake? Also, I no longer know if wkr_mass_mean should observed mean (0.1254111), mean of predicted masses (0.14767) or mass of mean size (0.123).
 
   #position in vector for cutoff for foraging workers.
   #When prop_nforaging = 1, foraging_index can be NA
@@ -280,6 +281,7 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   wkr_larv_mat <- array(0, dim = c(n_larv, n_wkr))
   wkr_larv_mat[1, ] <- wkr_larv
+  #(this is NOT the same as natalie's results)
 
   larv_mat <- rbind(larv_larv_mat, larv_wkr_mat)
   wkr_mat <- rbind(wkr_larv_mat, wkr_wkr_mat)
