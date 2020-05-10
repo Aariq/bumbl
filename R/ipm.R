@@ -144,7 +144,7 @@ poln_mass_func <- function(wkr_size) {
 #' @param wkr_size_max Maximum observed worker ITS, in mm.
 #' @param wkr_size_mean Mean observed worker ITS, in mm.
 #' @param wkr_size_sd Observed standard deviation of worker ITS.
-#' @param poln_per_cell Mean mass of pollen per cell, in grams.
+#' @param poln_cost Grams of pollen needed to make a gram of new worker.  The default was estimated as the mean mass of pollen per cell / mean worker mass.
 #' @param prop_foraging Proportion of workers allowed to forage.  When less than
 #'   1, the smallest `1 - prop_foraging` workers do not contribute resources to
 #'   recruitment of new larvae.
@@ -192,9 +192,10 @@ bipm <- function(larv_surv = 0.980419283573345,
                  dev_time_mean = 23.5670474993181,
                  wkr_size_min = 2.5,
                  wkr_size_max = 5.81,
-                 wkr_size_mean = 3.60068671381606,
+                 # wkr_size_mean = 3.60068671381606,#Do I need to back-calculate from observed worker mass to get default size?  Observed mean mass is 0.1254111
+                 wkr_size_mean = 3.64789499281592,
                  wkr_size_sd = 0.427668095606862,
-                 poln_per_cell = 0.016, #should the param be poln_per_wkrmass instead? I think probably yes.
+                 poln_cost = 0.1275805,
                  prop_foraging = 1,
                  wkr_mass_f = mass_func,
                  wkr_surv_f = surv_func,
@@ -245,16 +246,10 @@ bipm <- function(larv_surv = 0.980419283573345,
 
   daily_poln_return <- p_poln_return * p_forage * trips_per_day * poln_mass
 
-  #This is where the inconsistency with Natalie's code starts.  I'm having trouble reconciling her code with what is written in the manuscript.
-  #should wkr_mass_mean be predicted mass of mean size (0.123) or mean of masses of predicted sizes (0.148)? Natalie's original code is the latter.
-  # wkr_mass_mean <- wkr_mass_f(wkr_size_mean)
-  wkr_mass_mean <- mean(wkr_mass_f(wkr_size_1))
+  wkr_mass_mean <- wkr_mass_f(wkr_size_mean)
+  #according to Natalie, the wkr_mass_mean should be the mass of the average worker, since only average sized workers are being produced.
 
-  poln_per_wkrmass <- poln_per_cell / 0.1254111
-  #natalie said this denominator should be constant. Her original code has mean(Massvals) which is 0.14767, but at some point she told me to change it to 0.1254111. Can't remember exactly where this number comes from.  I haven't seen her updated code.
-
-  wkr_larv <- daily_poln_return / (poln_per_wkrmass * wkr_mass_mean)
-  #this doesn't match equation 4 in manuscript, but talked to Natalie and she said that y_x in her manuscript should be mean worker mass, not a vector of worker mass and that p in her manuscript should be a vector of daily pollen return, not a single number. The result is that in her code this value cancels out completely and she could have simplified the equation.  This seems like a mistake? Also, I no longer know if wkr_mass_mean should observed mean (0.1254111), mean of predicted masses (0.14767) or mass of mean size (0.123).
+  wkr_larv <- daily_poln_return / (poln_cost * wkr_mass_mean)
 
   #position in vector for cutoff for foraging workers.
   #When prop_nforaging = 1, foraging_index can be NA
