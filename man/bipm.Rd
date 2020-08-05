@@ -70,7 +70,11 @@ work, as described in Kerr, et al. (\emph{in prep}).
 \details{
 Defaults for all functions are estimated from data and published in
 Kerr et al. (\emph{in prep}). Parameters ending in \verb{_f} expect the name of a
-function or an anonymous function.
+function or an anonymous function, for example, \code{bipm(wkr_mass_f =
+  function(x) -0.4 + 0.05 * x)}. You can supply a constant as an anonymous
+function that returns a constant, e.g., \code{bipm(poln_mass_f = function(x)
+  0.1)}. The default functions provided are derived from Kerr et al. 2019 and
+2020 and can be viewed in their help files or using \code{View()}.
 }
 \examples{
 # Original model:

@@ -80,3 +80,12 @@ test_that("I get results close to Natalie's", {
   #                         ???,
   #                         tol = 0.0005))
 })
+
+test_that("bipm() accepts anonymous functions", {
+  expect_true(bipm()$lambda != bipm(wkr_mass_f = function(x) -0.04 + 0.05 * x)$lambda)
+  expect_true(bipm()$lambda != bipm(wkr_surv_f = function(x) plogis(4.6 - 0.47 * x))$lambda)
+  expect_true(bipm()$lambda != bipm(p_forage_f = function(x) -2.4 + 1.4 * x)$lambda)
+  expect_true(bipm()$lambda != bipm(p_poln_ret_f = function(x) -2.2 + (0.23 * x))$lambda)
+  expect_true(bipm()$lambda != bipm(trips_f = function(x) exp(-10 + 5 * x))$lambda)
+  expect_true(bipm()$lambda != bipm(poln_mass_f = function(x) 0.1)$lambda)
+})
