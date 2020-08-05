@@ -13,7 +13,9 @@ surv_func(wkr_size)
 a vector of survival probabilities
 }
 \description{
-Bumblebee worker survival as a function of size
+Survival probabilities as a function of body size (intertegular span) for
+bumblebee workers described in Kerr et al. 2019. Specifically, p =
+plogis(4.50002431428571 - 0.495615057142857 * wkr_size)
 }
 \examples{
 surv_func(4)

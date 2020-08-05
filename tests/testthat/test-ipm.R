@@ -24,6 +24,7 @@ test_that("prop_foraging is working right", {
 test_that("small worker size SDs work", {
   expect_type(bipm(wkr_size_sd = 0.0002), "list")
 })
+
 test_that("I get results close to Natalie's", {
 
   #task undefined field colonies

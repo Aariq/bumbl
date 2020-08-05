@@ -1,5 +1,8 @@
 #' Bumblebee worker mass as a function of intertegular span (ITS)
 #'
+#' A relationship between bumblebee worker intertegular span and mass, described
+#' in Kerr et al. 2020. Specifically, mass = -0.03631937362579  +
+#' (0.0443352875958048 * wkr_size)
 #' @param wkr_size a vector of worker ITS values in mm
 #'
 #' @return a vector of worker mass in grams
@@ -19,6 +22,10 @@ mass_func <- function(wkr_size) {
 
 #' Bumblebee worker survival as a function of size
 #'
+#' Survival probabilities as a function of body size (intertegular span) for
+#' bumblebee workers described in Kerr et al. 2019. Specifically, p =
+#' plogis(4.50002431428571 - 0.495615057142857 * wkr_size)
+#'
 #' @param wkr_size a vector of worker ITS values in mm
 #'
 #' @return a vector of survival probabilities
@@ -35,8 +42,10 @@ surv_func <- function(wkr_size) {
 }
 
 
-#' Probability of foraging as a function of bumblbee worker size
+#' Probability of foraging as a function of bumblebee worker size
 #'
+#' Foraging probability as a function of bumblebee worker size (intertegular
+#' span), described in Kerr et al. 2019.
 #' @param wkr_size a vector of worker ITS values in mm
 #'
 #' @return a vector of foraging probabilities
@@ -60,7 +69,10 @@ forage_func <- function(wkr_size) {
 }
 
 
-#' Probability of pollen return as a funciton of bumblebee worker size
+#' Probability of pollen return as a function of bumblebee worker size
+#'
+#' Probability of pollen return by a foraging worker bumblebee as a function of
+#' worker size (intertegular span), described in Kerr et al. 2019.
 #'
 #' @param wkr_size a vector of worker ITS values in mm
 #'
@@ -89,6 +101,11 @@ poln_ret_func <- function(wkr_size) {
 
 #' Number of foraging trips per day as a function of bumblebee worker size
 #'
+#' Estimates the number of foraging trips per day of a worker bumblebee as a
+#' function of body size (intertegular span) as described in Kerr et al. 2019.
+#' Specifically, trips = exp(-10.441800289970 + (5.690241104687 * wkr_size) +
+#' (-0.689656110476 * wkr_size^2))
+#'
 #' @param wkr_size a vector of worker ITS values in mm
 #'
 #' @return a vector of mean number of trips per day
@@ -105,7 +122,11 @@ trips_func <- function(wkr_size) {
 }
 
 
-#' Pollen mass as a function of bumblbee worker size
+#' Pollen mass as a function of bumblebee worker size
+#'
+#' The estimated pollen mass returned per foraging trip by a foraging worker
+#' bumblebee as a function of body size (intertegular span) as described in Kerr
+#' et al. 2019.
 #'
 #' @param wkr_size a vector of worker ITS values in mm
 #'
@@ -135,7 +156,7 @@ poln_mass_func <- function(wkr_size) {
 #' Integral Projection Model for Bumblebee Colony Growth
 #'
 #' Builds an size- and age-based integral projection model to estimate bumblebee
-#' colony growth using vital rates estimated from previously published emperical
+#' colony growth using vital rates estimated from previously published empirical
 #' work, as described in Kerr, et al. (*in prep*).
 #'
 #' @param larv_surv Larval survival rate.
@@ -144,7 +165,9 @@ poln_mass_func <- function(wkr_size) {
 #' @param wkr_size_max Maximum observed worker ITS, in mm.
 #' @param wkr_size_mean Mean observed worker ITS, in mm.
 #' @param wkr_size_sd Observed standard deviation of worker ITS.
-#' @param poln_cost Grams of pollen needed to make a gram of new worker.  The default was estimated as the mean mass of pollen per cell / mean worker mass.
+#' @param poln_cost Grams of pollen needed to make a gram of new worker.  The
+#'   default was estimated as the mean mass of pollen per cell / mean worker
+#'   mass.
 #' @param prop_foraging Proportion of workers allowed to forage.  When less than
 #'   1, the smallest `1 - prop_foraging` workers do not contribute resources to
 #'   recruitment of new larvae.

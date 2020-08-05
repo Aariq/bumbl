@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipm.R
 \name{poln_mass_func}
 \alias{poln_mass_func}
-\title{Pollen mass as a function of bumblbee worker size}
+\title{Pollen mass as a function of bumblebee worker size}
 \usage{
 poln_mass_func(wkr_size)
 }
@@ -13,7 +13,9 @@ poln_mass_func(wkr_size)
 a vector of pollen mass in grams
 }
 \description{
-Pollen mass as a function of bumblbee worker size
+The estimated pollen mass returned per foraging trip by a foraging worker
+bumblebee as a function of body size (intertegular span) as described in Kerr
+et al. 2019.
 }
 \examples{
 poln_mass_func(4)

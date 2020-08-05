@@ -13,7 +13,9 @@ mass_func(wkr_size)
 a vector of worker mass in grams
 }
 \description{
-Bumblebee worker mass as a function of intertegular span (ITS)
+A relationship between bumblebee worker intertegular span and mass, described
+in Kerr et al. 2020. Specifically, mass = -0.03631937362579  +
+(0.0443352875958048 * wkr_size)
 }
 \examples{
 mass_func(4.1)

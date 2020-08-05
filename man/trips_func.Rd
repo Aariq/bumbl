@@ -13,11 +13,16 @@ trips_func(wkr_size)
 a vector of mean number of trips per day
 }
 \description{
-Number of foraging trips per day as a function of bumblebee worker size
+Estimates the number of foraging trips per day of a worker bumblebee as a
+function of body size (intertegular span) as described in Kerr et al. 2019.
+Specifically, trips = exp(-10.441800289970 + (5.690241104687 * wkr_size) +
+(-0.689656110476 * wkr_size^2))
 }
 \examples{
 trips_func(4)
 }
 \references{
-Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates explains optimal worker size for resource return by bumblebee workers. Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
+Kerr NZ, Crone EE, Williams NM (2019) Integrating vital rates
+explains optimal worker size for resource return by bumblebee workers.
+Funct Ecol 33:467–478. doi: 10.1111/1365-2435.13251
 }

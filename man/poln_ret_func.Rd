@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipm.R
 \name{poln_ret_func}
 \alias{poln_ret_func}
-\title{Probability of pollen return as a funciton of bumblebee worker size}
+\title{Probability of pollen return as a function of bumblebee worker size}
 \usage{
 poln_ret_func(wkr_size)
 }
@@ -13,7 +13,8 @@ poln_ret_func(wkr_size)
 a vector of pollen return probabilities
 }
 \description{
-Probability of pollen return as a funciton of bumblebee worker size
+Probability of pollen return by a foraging worker bumblebee as a function of
+worker size (intertegular span), described in Kerr et al. 2019.
 }
 \examples{
 poln_ret_func(4)

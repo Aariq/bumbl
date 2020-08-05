@@ -9,9 +9,9 @@ bipm(
   dev_time_mean = 23.5670474993181,
   wkr_size_min = 2.5,
   wkr_size_max = 5.81,
-  wkr_size_mean = 3.600687,
-  wkr_size_sd = 0.4276681,
-  poln_per_cell = 0.016,
+  wkr_size_mean = 3.64789499281592,
+  wkr_size_sd = 0.427668095606862,
+  poln_cost = 0.1275805,
   prop_foraging = 1,
   wkr_mass_f = mass_func,
   wkr_surv_f = surv_func,
@@ -34,7 +34,9 @@ bipm(
 
 \item{wkr_size_sd}{Observed standard deviation of worker ITS.}
 
-\item{poln_per_cell}{Mean mass of pollen per cell, in grams.}
+\item{poln_cost}{Grams of pollen needed to make a gram of new worker.  The
+default was estimated as the mean mass of pollen per cell / mean worker
+mass.}
 
 \item{prop_foraging}{Proportion of workers allowed to forage.  When less than
 1, the smallest \code{1 - prop_foraging} workers do not contribute resources to
@@ -62,7 +64,7 @@ growth rate, lambda.
 }
 \description{
 Builds an size- and age-based integral projection model to estimate bumblebee
-colony growth using vital rates estimated from previously published emperical
+colony growth using vital rates estimated from previously published empirical
 work, as described in Kerr, et al. (\emph{in prep}).
 }
 \details{

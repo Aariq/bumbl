@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipm.R
 \name{forage_func}
 \alias{forage_func}
-\title{Probability of foraging as a function of bumblbee worker size}
+\title{Probability of foraging as a function of bumblebee worker size}
 \usage{
 forage_func(wkr_size)
 }
@@ -13,7 +13,8 @@ forage_func(wkr_size)
 a vector of foraging probabilities
 }
 \description{
-Probability of foraging as a function of bumblbee worker size
+Foraging probability as a function of bumblebee worker size (intertegular
+span), described in Kerr et al. 2019.
 }
 \examples{
 forage_func(4)
