@@ -4,12 +4,12 @@
 #' liklihood
 #'
 #' @param data a dataframe or tibble
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used
 #' @param t the unquoted column name for the time variable in `data`
 #' @param formula a formula passed to `glm()` or `glm.nb()`.  This should
 #'   include the time variable supplied to `t`
 #' @param family passed to `glm()`
+#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
+#'   max(t), length.out = 50)` will be used
 #' @param ... additional arguments passed to `glm()` or `glm.nb()`
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
@@ -30,10 +30,10 @@
 #' }
 brkpt <-
   function(data,
-           taus = NULL,
            t,
            formula,
            family = gaussian(link = "log"),
+           taus = NULL,
            ...) {
     #TODO: make sure none of the variables are called '.post'?
   t <- enquo(t)
@@ -63,22 +63,30 @@ brkpt <-
 
   # adds `.post` to formula.
   f <- update(formula, ~. + .post)
-  LLs <- c()
-
+  LLs <- numeric()
 
   for (i in 1:length(taus)) {
     usetau <- taus[i]
     data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-    m0 <- exec("glm", formula = f, family = family, data = data2, !!!more_args)
-    LLs[i] <- logLik(m0)
+    m0 <- try(exec("glm", formula = f, family = family, data = data2, !!!more_args), silent = TRUE)
+    if (inherits(m0, "try-error")) {
+      LLs[i] <- NA
+    } else {
+      LLs[i] <- logLik(m0)
+    }
   }
 
-  tau_win <- taus[which(LLs == max(LLs))]
+  if (all(is.na(LLs))) {
+    abort("No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)")
+  }
+
+  tau_win <- taus[which(LLs == max(LLs, na.rm = TRUE))]
 
   # if multiple equivalent taus are found, this should fail
   if (length(tau_win) > 1) {
     abort("More than one equivalent tau found")
   }
+
   #TODO: I don't really like that it re-fits the model.  I could have it save
   #them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
@@ -167,18 +175,18 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #' methods.
 #'
 #' @param data a dataframe or tibble
-#' @param colonyID the unquoted column name of the colony ID variable
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used.
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula with the form `response ~ time + covariates` where
 #'   response is your measure of colony growth, time is whatever measure of time
 #'   you have (date, number of weeks, etc.) and covariates are any optional
 #'   co-variates you want to fit at the colony level.
 #' @param family passed to `glm()`.
+#' @param colonyID the unquoted column name of the colony ID variable
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
 #'   columns containing model coefficients.
+#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
+#'   max(t), length.out = 50)` will be used.
 #' @param ... additional arguments passed to `glm()` or `glm.nb()`.
 #'
 #' @details Colony growth is modeled as increasing exponentialy until the colony
@@ -225,10 +233,10 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
 bumbl <-
   function(data,
-           colonyID = NULL,
            t,
            formula,
            family = gaussian(link = "log"),
+           colonyID = NULL,
            augment = FALSE,
            taus = NULL,
            ...) {
@@ -288,10 +296,14 @@ bumbl <-
                                 .y),
                    .id = as_name(colonyID))
 
+  if(nrow(resultdf) == 0) {
+    abort("Model fitting failed for all colonies.")
+  }
+
   predictdf <-
     resultdf %>%
     dplyr::select(-"tau") %>%
-    mutate(aug = purrr::map(.data$model, broom::augment)) %>%
+    mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
     tidyr::unnest(.data$aug) %>%
     dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 

@@ -5,14 +5,12 @@
 \alias{brkpt.nb}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, taus = NULL, t, formula, family = gaussian(link = "log"), ...)
+brkpt(data, t, formula, family = gaussian(link = "log"), taus = NULL, ...)
 
 brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
-
-\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used}
 
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
@@ -20,6 +18,8 @@ brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 include the time variable supplied to \code{t}}
 
 \item{family}{passed to \code{glm()}}
+
+\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used}
 
 \item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}}
 
