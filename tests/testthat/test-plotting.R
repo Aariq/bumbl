@@ -6,7 +6,21 @@ bombus_sub <-
   mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
   ungroup()
 
+detach("package:dplyr")
+
 test_that("plotting function displays something?", {
+  results <-
+    suppressWarnings(bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = d.mass ~ week,
+      augment = TRUE
+    ))
+  expect_invisible(bumbl_plot(results))
+})
+
+test_that("plotting works with augment = FALSE", {
   results <-
     suppressWarnings(bumbl(
       bombus_sub,
@@ -28,13 +42,26 @@ test_that("plotting function errors when not a bumbl object", {
 
 test_that("plotting works with count data", {
   results_count <-
-    bumbl(lildf, colonyID = colony, t = week, formula = count ~ week,
-          family = "poisson", augment = TRUE)
+    bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = count ~ week,
+      family = "poisson",
+      augment = TRUE
+    )
   expect_invisible(bumbl_plot(results_count))
 })
 
 test_that("plotting works with bumbl.nb", {
+  skip("This test will fail until I have a properly overdispersed dataset to test it on I think.")
   results_overdisp <-
-    bumbl.nb(lildf, colonyID = colony, t = week, formula = count ~ week, augment = TRUE)
+    bumbl.nb(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = count ~ week,
+      augment = TRUE
+    )
   expect_invisible(bumbl_plot(results_overdisp))
 })

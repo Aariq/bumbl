@@ -60,7 +60,7 @@ test_that("brkpt works with poisson dist", {
 
 
 test_that("brkpt works with overdispersed data", {
-  negbin.model <- suppressWarnings(brkpt(testcount, t = week, formula = count ~ week, family = "negbin"))
+  negbin.model <- brkpt.nb(testcount, t = week, formula = count ~ week)
   expect_s3_class(negbin.model, "data.frame")
   expect_is(negbin.model$model[[1]], "negbin")
 })

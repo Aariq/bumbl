@@ -71,8 +71,8 @@ test_that("I get results close to Natalie's", {
          )$lambda, 1.022,
     tolerance = 0.0005
   )
-  # # monomorphic, no production cost(not sure how to do that)
-  # expect_true(dplyr::near(bipm(wkr_size_mean = 4.27, wkr_size_sd = 0)$lambda,
+  # # monomorphic, no production cost
+  # expect_true(dplyr::near(bipm(wkr_size_mean = 4.27, wkr_size_sd = 0, poln_cost = 0)$lambda,
   #                         ???,
   #                         tol = 0.0005))
   # # monomorphic with production cost--the same as polymorphic task undefined, right?
