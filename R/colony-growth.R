@@ -148,11 +148,19 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
     for (i in 1:length(taus)) {
       usetau <- taus[i]
       data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-      m0 <- exec("glm.nb", formula = f, data = data2, link = link, !!!more_args)
-      LLs[i] <- logLik(m0)
+      m0 <- try(exec("glm.nb", formula = f, data = data2, link = link, !!!more_args))
+      if (inherits(m0, "try-error")) {
+        LLs[i] <- NA
+      } else {
+        LLs[i] <- logLik(m0)
+      }
     }
 
-  tau_win <- taus[which(LLs == max(LLs))]
+  if (all(is.na(LLs))) {
+    abort("No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)")
+  }
+
+  tau_win <- taus[which(LLs == max(LLs, na.rm = TRUE))]
 
   # if multiple equivalent taus are found, this should fail
   if (length(tau_win) > 1) {
@@ -426,10 +434,14 @@ bumbl.nb <-
                                 .y),
                    .id = as_name(colonyID))
 
+  if(nrow(resultdf) == 0) {
+    abort("Model fitting failed for all colonies.")
+  }
+
   predictdf <-
     resultdf %>%
     dplyr::select(-"tau") %>%
-    mutate(aug = purrr::map(.data$model, broom::augment)) %>%
+    mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
     tidyr::unnest(.data$aug) %>%
     dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
