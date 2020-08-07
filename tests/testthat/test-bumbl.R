@@ -102,3 +102,8 @@ test_that("bumbl works when no Colony ID supplied", {
     "data.frame"
   )
 })
+
+test_that("error handling", {
+  expect_error(brkpt(bombus_67, t = week, formula = I(d.mass-1) ~ week), regexp = "No valid values for tau found.+")
+  expect_error(bumbl(bombus_sub, t = week, formula = I(d.mass - 1) ~ week), "Model fitting failed for all colonies.")
+})

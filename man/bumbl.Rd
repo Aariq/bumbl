@@ -7,10 +7,10 @@
 \usage{
 bumbl(
   data,
-  colonyID = NULL,
   t,
   formula,
   family = gaussian(link = "log"),
+  colonyID = NULL,
   augment = FALSE,
   taus = NULL,
   ...
@@ -30,8 +30,6 @@ bumbl.nb(
 \arguments{
 \item{data}{a dataframe or tibble}
 
-\item{colonyID}{the unquoted column name of the colony ID variable}
-
 \item{t}{the unquoted column name of the time variable in (units???)}
 
 \item{formula}{a formula with the form \code{response ~ time + covariates} where
@@ -40,6 +38,8 @@ you have (date, number of weeks, etc.) and covariates are any optional
 co-variates you want to fit at the colony level.}
 
 \item{family}{passed to \code{glm()}.}
+
+\item{colonyID}{the unquoted column name of the colony ID variable}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional
