@@ -2,11 +2,11 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^notes$
-^\.travis\.yml$
+
 ^codecov\.yml$
 ^LICENSE$
 ^LICENSE\.md$
-^appveyor\.yml$
+
 ^\.Rhistory$
 .github
 ^\.github$

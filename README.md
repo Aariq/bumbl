@@ -5,18 +5,15 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.org/Aariq/bumbl.svg?branch=master)](https://travis-ci.org/Aariq/bumbl)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/Aariq/bumbl?branch=master&svg=true)](https://ci.appveyor.com/project/Aariq/bumbl)
+[![R build
+status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https://github.com/Aariq/bumbl/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](https://codecov.io/gh/Aariq/bumbl?branch=master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
-[![R build
-status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https://github.com/Aariq/bumbl/actions)
+
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
