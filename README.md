@@ -5,26 +5,25 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.org/Aariq/bumbl.svg?branch=master)](https://travis-ci.org/Aariq/bumbl)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/Aariq/bumbl?branch=master&svg=true)](https://ci.appveyor.com/project/Aariq/bumbl)
+[![R build
+status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https://github.com/Aariq/bumbl/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](https://codecov.io/gh/Aariq/bumbl?branch=master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
+
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
 Crone and Williams 2019<sup>1</sup>. The `brkpt` function models colony
 growth as having a change point at some time, *tau*, where the colony
 switches from growth and worker production to gyne production. The
-`bumbl` function applies this model to a dataframe of data from multiple
-colonies, allowing for each colony to have it’s own *tau* and returns
-the original data augmented with coefficients from the changepoint
-model.
+`bumbl` function applies this model to a data frame of data from
+multiple colonies, allowing for each colony to have it’s own *tau* and
+returns the original data augmented with coefficients from the
+changepoint model.
 
 This is still in very early development, so use at your own risk.
 
@@ -70,7 +69,7 @@ colonies switch to reproduction
 
 ``` r
 bombus2 <- bombus[bombus$colony %in% c(9, 82, 98, 35), ]
-bumbl(bombus2,colonyID = colony, t = week, formula = d.mass ~ week)
+bumbl(bombus2, colonyID = colony, t = week, formula = d.mass ~ week)
 #> Warning: glm.fit: algorithm did not converge
 
 #> Warning: glm.fit: algorithm did not converge
@@ -83,22 +82,21 @@ bumbl(bombus2,colonyID = colony, t = week, formula = d.mass ~ week)
 #> 4 98      6.37  1.27  0.570 -0.578    4.90
 ```
 
-Keep the original data and plot the
-results
+Keep the original data and plot the results
 
 ``` r
-results <- bumbl(bombus2,colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)
+results <- bumbl(bombus2, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)
 #> Warning: glm.fit: algorithm did not converge
 
 #> Warning: glm.fit: algorithm did not converge
-par(mfrow = c(2,2))
+par(mfrow = c(2, 2))
 bumbl_plot(results)
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 ``` r
-par(mfrow = c(1,1))
+par(mfrow = c(1, 1))
 ```
 
 # References
