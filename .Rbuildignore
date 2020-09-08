@@ -9,3 +9,4 @@
 ^appveyor\.yml$
 ^\.Rhistory$
 .github
+^\.github$
