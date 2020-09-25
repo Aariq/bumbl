@@ -52,7 +52,7 @@ columns containing model coefficients.}
 \item{link}{passed to \code{glm.nb()} from the \code{MASS} package}
 }
 \value{
-The original dataframe augmented with the following columns:
+A summary of the data with a row for every colony and the following columns:
 \itemize{
 \item{\code{tau} is the switchpoint, in the same units as \code{t}, for
 each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to
@@ -72,6 +72,9 @@ function of \code{tau}, \code{logN0} and \code{logLam}}
 \item{Additional columns are
 coefficients for any covariates supplied in the \code{formula}}
 }
+When \code{augment = TRUE}, the original data are returned with these columns as
+well as fitted values (\code{.fitted}) residuals (\code{.resid}) and standard error
+(\code{.se.fit})
 }
 \description{
 Fits models that assume bumblebee colonies will switch from growth to gyne
