@@ -202,7 +202,8 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   the colony, causing the colony to decline. The switch point, \eqn{\tau},
 #'   may vary among colonies.
 #'
-#' @return A summary of the data with a row for every colony and the following columns:
+#' @return A `data.frame` with the additional class `bumbldf` containing a
+#'   summary of the data with a row for every colony and the following columns:
 #'   \itemize{
 #'   \item{`tau` is the switchpoint, in the same units as `t`, for
 #'   each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to
@@ -258,6 +259,7 @@ bumbl <-
     t <- enquo(t)
     tvar <- as_name(t)
     more_args <- list2(...)
+    formula <- formula(formula)
     fterms <- terms(formula)
 
     #Check that time variable is in the formula
@@ -390,6 +392,7 @@ bumbl.nb <-
     t <- enquo(t)
     tvar <- as_name(t)
     more_args <- list2(...)
+    formula <- formula(formula)
     fterms <- terms(formula)
 
     #Check that time variable is in the formula
