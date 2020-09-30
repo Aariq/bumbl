@@ -20,7 +20,7 @@
 #'                  formula = log(mass) ~ week)
 #' bumbl_plot(results)
 bumbl_plot <- function(bumbldf, gg = FALSE) {
-  if(!inherits(bumbldf, "bumbldf")) {
+  if (!inherits(bumbldf, "bumbldf")) {
     abort("bumbl_plot() only works on dataframes output by bumbl()")
   }
   colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
@@ -29,13 +29,13 @@ bumbl_plot <- function(bumbldf, gg = FALSE) {
   predict <- attr(bumbldf, "predict", exact = TRUE)
   yvar <- all.vars(formula)[1]
 
-  if(is.null(predict)) {
+  if (is.null(predict)) {
     x <- bumbldf
   } else {
     x <- predict
   }
 
-  if(gg == TRUE){
+  if (gg == TRUE) {
     requireNamespace("ggplot2", quietly = TRUE)
     p <- ggplot2::ggplot(x, ggplot2::aes_string(x = t)) +
       ggplot2::geom_point(ggplot2::aes_string(y = yvar)) +

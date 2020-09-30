@@ -202,7 +202,8 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   the colony, causing the colony to decline. The switch point, \eqn{\tau},
 #'   may vary among colonies.
 #'
-#' @return The original dataframe augmented with the following columns:
+#' @return A `data.frame` with the additional class `bumbldf` containing a
+#'   summary of the data with a row for every colony and the following columns:
 #'   \itemize{
 #'   \item{`tau` is the switchpoint, in the same units as `t`, for
 #'   each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to
@@ -222,6 +223,9 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   \item{Additional columns are
 #'   coefficients for any covariates supplied in the `formula`}
 #'   }
+#'   When `augment = TRUE`, the original data are returned with these columns as
+#'   well as fitted values (`.fitted`) residuals (`.resid`) and standard error
+#'   (`.se.fit`)
 #'
 #' @import tidyr
 #' @import rlang
@@ -249,111 +253,114 @@ bumbl <-
            taus = NULL,
            ...) {
 
-  colonyID <- enquo(colonyID)
-  t <- enquo(t)
-  tvar <- as_name(t)
-  more_args <- list2(...)
-  fterms <- terms(formula)
+    if (!inherits(data, "data.frame")) abort("`data` must be a data farme or tibble.")
+    if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
+    colonyID <- enquo(colonyID)
+    t <- enquo(t)
+    tvar <- as_name(t)
+    more_args <- list2(...)
+    formula <- formula(formula)
+    fterms <- terms(formula)
 
-  #Check that time variable is in the formula
-  if (!tvar %in% attr(fterms, "term.labels")) {
-    abort(paste0("'", tvar, "' is missing from the model formula"))
-  }
+    #Check that time variable is in the formula
+    if (!tvar %in% attr(fterms, "term.labels")) {
+      abort(paste0("'", tvar, "' is missing from the model formula"))
+    }
 
-  if (quo_is_null(colonyID)) {
-    df <- data
-    dflist <- list("NA" = data)
-    colonyID <- "colony"
+    if (quo_is_null(colonyID)) {
+      df <- data
+      dflist <- list("NA" = data)
+      colonyID <- "colony"
 
-  } else {
-    df <-
-      data %>%
-      # make sure colonyID is a character vector
-      mutate(!!colonyID := as.character(!!colonyID)) %>%
-      group_by(!!colonyID)
+    } else {
+      df <-
+        data %>%
+        # make sure colonyID is a character vector
+        mutate(!!colonyID := as.character(!!colonyID)) %>%
+        group_by(!!colonyID)
 
-    dflist <- group_split(df)
-    names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
-  }
+      dflist <- group_split(df)
+      names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
+    }
 
-  model_list <- vector("list", length(dflist))
-  names(model_list) <- names(dflist)
+    model_list <- vector("list", length(dflist))
+    names(model_list) <- names(dflist)
 
-  brkpt_w_err <- function(code, colonyID) {
-    tryCatch(
-      code,
-      error = function(c) {
-        message(
-          glue::glue(
-            "Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."
+    brkpt_w_err <- function(code, colonyID) {
+      tryCatch(
+        code,
+        error = function(c) {
+          message(
+            glue::glue(
+              "Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."
+            )
           )
-        )
-      }
-    )
+        }
+      )
+    }
+
+    resultdf <-
+      purrr::map2_df(dflist,
+                     names(dflist),
+                     ~brkpt_w_err(brkpt(data = .x,
+                                        taus = {{taus}},
+                                        t = !!t,
+                                        formula = formula,
+                                        family = family,
+                                        !!!more_args),
+                                  .y),
+                     .id = as_name(colonyID))
+
+    if (nrow(resultdf) == 0) {
+      abort("Model fitting failed for all colonies.")
+    }
+
+    predictdf <-
+      resultdf %>%
+      dplyr::select(-"tau") %>%
+      mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
+      tidyr::unnest(.data$aug) %>%
+      dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
+
+    modeldf <-
+      resultdf %>%
+      mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
+      tidyr::unnest(.data$coefs) %>%
+      dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
+      spread(key = "term", value = "estimate") %>%
+      mutate(logNmax = purrr::map_dbl(.data$model,
+                                      ~ max(predict(.),
+                                            na.rm = TRUE))) %>%
+      dplyr::select(-"model") %>%
+      dplyr::select(
+        !!colonyID,
+        "tau",
+        logN0 = "(Intercept)",
+        logLam = !!t,
+        decay = ".post",
+        "logNmax",
+        everything()
+      )
+
+    augmented_df <-
+      left_join(df, modeldf, by = as_name(colonyID))
+
+    full_df <-
+      left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
+    if (augment == TRUE) {
+      out <- full_df
+    } else {
+      out <- modeldf
+      attr(out, "predict") <- full_df
+    }
+
+    attr(out, "colonyID") <- as_name(colonyID)
+    attr(out, "t") <- as_name(t)
+    attr(out, "formula") <- formula
+
+    class(out) <- c("bumbldf", class(out))
+    return(out)
   }
-
-  resultdf <-
-    purrr::map2_df(dflist,
-                   names(dflist),
-                   ~brkpt_w_err(brkpt(data = .x,
-                                      taus = {{taus}},
-                                      t = !!t,
-                                      formula = formula,
-                                      family = family,
-                                      !!!more_args),
-                                .y),
-                   .id = as_name(colonyID))
-
-  if(nrow(resultdf) == 0) {
-    abort("Model fitting failed for all colonies.")
-  }
-
-  predictdf <-
-    resultdf %>%
-    dplyr::select(-"tau") %>%
-    mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
-    tidyr::unnest(.data$aug) %>%
-    dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
-
-  modeldf <-
-    resultdf %>%
-    mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
-    tidyr::unnest(.data$coefs) %>%
-    dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
-    spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = purrr::map_dbl(.data$model,
-                                    ~ max(predict(.),
-                                          na.rm = TRUE))) %>%
-    dplyr::select(-"model") %>%
-    dplyr::select(
-      !!colonyID,
-      "tau",
-      logN0 = "(Intercept)",
-      logLam = !!t,
-      decay = ".post",
-      "logNmax",
-      everything()
-    )
-
-  augmented_df <-
-    left_join(df, modeldf, by = as_name(colonyID))
-
-  full_df <-
-    left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
-  if (augment == TRUE) {
-    out <- full_df
-  } else {
-    out <- modeldf
-    attr(out, "predict") <- full_df
-  }
-
-  attr(out, "colonyID") <- as_name(colonyID)
-  attr(out, "t") <- as_name(t)
-  attr(out, "formula") <- formula
-
-  class(out) <- c("bumbldf", class(out))
-  return(out)
-}
 
 
 
@@ -379,108 +386,111 @@ bumbl.nb <-
            taus = NULL,
            ...) {
 
-  colonyID <- enquo(colonyID)
-  t <- enquo(t)
-  tvar <- as_name(t)
-  more_args <- list2(...)
-  fterms <- terms(formula)
+    if (!inherits(data, "data.frame")) abort("`data` must be a data farme or tibble.")
+    if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
+    colonyID <- enquo(colonyID)
+    t <- enquo(t)
+    tvar <- as_name(t)
+    more_args <- list2(...)
+    formula <- formula(formula)
+    fterms <- terms(formula)
 
-  #Check that time variable is in the formula
-  if (!tvar %in% attr(fterms, "term.labels")) {
-    abort(paste0("'", tvar, "' is missing from the model formula"))
-  }
+    #Check that time variable is in the formula
+    if (!tvar %in% attr(fterms, "term.labels")) {
+      abort(paste0("'", tvar, "' is missing from the model formula"))
+    }
 
-  if (quo_is_null(colonyID)) {
-    df <- data
-    dflist <- list("NA" = data)
-    colonyID <- "colony"
+    if (quo_is_null(colonyID)) {
+      df <- data
+      dflist <- list("NA" = data)
+      colonyID <- "colony"
 
-  } else {
-    df <-
-      data %>%
-      # make sure colonyID is a character vector
-      mutate(!!colonyID := as.character(!!colonyID)) %>%
-      group_by(!!colonyID)
+    } else {
+      df <-
+        data %>%
+        # make sure colonyID is a character vector
+        mutate(!!colonyID := as.character(!!colonyID)) %>%
+        group_by(!!colonyID)
 
-    dflist <- group_split(df)
-    names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
-  }
+      dflist <- group_split(df)
+      names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
+    }
 
-  model_list <- vector("list", length(dflist))
-  names(model_list) <- names(dflist)
+    model_list <- vector("list", length(dflist))
+    names(model_list) <- names(dflist)
 
-  brkpt_w_err <- function(code, colonyID) {
-    tryCatch(
-      code,
-      error = function(c) {
-        message(
-          glue::glue(
-            "Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."
+    brkpt_w_err <- function(code, colonyID) {
+      tryCatch(
+        code,
+        error = function(c) {
+          message(
+            glue::glue(
+              "Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."
+            )
           )
-        )
-      }
-    )
+        }
+      )
+    }
+
+    resultdf <-
+      purrr::map2_df(dflist,
+                     names(dflist),
+                     ~brkpt_w_err(brkpt.nb(data = .x,
+                                           taus = {{taus}},
+                                           t = !!t,
+                                           formula = formula,
+                                           link = link,
+                                           !!!more_args),
+                                  .y),
+                     .id = as_name(colonyID))
+
+    if (nrow(resultdf) == 0) {
+      abort("Model fitting failed for all colonies.")
+    }
+
+    predictdf <-
+      resultdf %>%
+      dplyr::select(-"tau") %>%
+      mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
+      tidyr::unnest(.data$aug) %>%
+      dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
+
+    modeldf <-
+      resultdf %>%
+      mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
+      tidyr::unnest(.data$coefs) %>%
+      dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
+      spread(key = "term", value = "estimate") %>%
+      mutate(logNmax = purrr::map_dbl(.data$model,
+                                      ~ max(predict(.),
+                                            na.rm = TRUE))) %>%
+      dplyr::select(-"model") %>%
+      dplyr::select(
+        !!colonyID,
+        "tau",
+        logN0 = "(Intercept)",
+        logLam = !!t,
+        decay = ".post",
+        "logNmax",
+        everything()
+      )
+
+    augmented_df <-
+      left_join(df, modeldf, by = as_name(colonyID))
+
+    full_df <-
+      left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
+    if (augment == TRUE) {
+      out <- full_df
+    } else {
+      out <- modeldf
+      attr(out, "predict") <- full_df
+    }
+
+    attr(out, "colonyID") <- as_name(colonyID)
+    attr(out, "t") <- as_name(t)
+    attr(out, "formula") <- formula
+
+    class(out) <- c("bumbldf", class(out))
+    return(out)
   }
-
-  resultdf <-
-    purrr::map2_df(dflist,
-                   names(dflist),
-                   ~brkpt_w_err(brkpt.nb(data = .x,
-                                      taus = {{taus}},
-                                      t = !!t,
-                                      formula = formula,
-                                      link = link,
-                                      !!!more_args),
-                                .y),
-                   .id = as_name(colonyID))
-
-  if(nrow(resultdf) == 0) {
-    abort("Model fitting failed for all colonies.")
-  }
-
-  predictdf <-
-    resultdf %>%
-    dplyr::select(-"tau") %>%
-    mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
-    tidyr::unnest(.data$aug) %>%
-    dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
-
-  modeldf <-
-    resultdf %>%
-    mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
-    tidyr::unnest(.data$coefs) %>%
-    dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
-    spread(key = "term", value = "estimate") %>%
-    mutate(logNmax = purrr::map_dbl(.data$model,
-                                    ~ max(predict(.),
-                                          na.rm = TRUE))) %>%
-    dplyr::select(-"model") %>%
-    dplyr::select(
-      !!colonyID,
-      "tau",
-      logN0 = "(Intercept)",
-      logLam = !!t,
-      decay = ".post",
-      "logNmax",
-      everything()
-    )
-
-  augmented_df <-
-    left_join(df, modeldf, by = as_name(colonyID))
-
-  full_df <-
-    left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
-  if (augment == TRUE) {
-    out <- full_df
-  } else {
-    out <- modeldf
-    attr(out, "predict") <- full_df
-  }
-
-  attr(out, "colonyID") <- as_name(colonyID)
-  attr(out, "t") <- as_name(t)
-  attr(out, "formula") <- formula
-
-  class(out) <- c("bumbldf", class(out))
-  return(out)
-}
