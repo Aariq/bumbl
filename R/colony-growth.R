@@ -253,7 +253,7 @@ bumbl <-
            taus = NULL,
            ...) {
 
-    if (!inherits(data, "data.frame")) abort("`data` must be a data farme or tibble.")
+    if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
     if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
     colonyID <- enquo(colonyID)
     t <- enquo(t)
@@ -386,7 +386,7 @@ bumbl.nb <-
            taus = NULL,
            ...) {
 
-    if (!inherits(data, "data.frame")) abort("`data` must be a data farme or tibble.")
+    if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
     if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
     colonyID <- enquo(colonyID)
     t <- enquo(t)
