@@ -60,7 +60,7 @@ $$
 \ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + (t-\tau)\ln(\delta)
 $$
 
-Turning that into a simple linter regression looks like:
+Turning that into a simple linear regression looks like:
 
 $$
 ln(W_t) = \beta_0 + \beta_1*t + \beta_2*post

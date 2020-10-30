@@ -177,12 +177,14 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 
 #' Estimate colony growth, switch point, and decay parameters
 #'
-#' Fits models that assume bumblebee colonies will switch from growth to gyne
-#' production at some point, \eqn{\tau}. This allows for a different
-#' switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
-#' methods.
+#' Fits generalized linear models that assume bumblebee colonies will switch
+#' from growth to gyne production at some point, \eqn{\tau}. This allows for a
+#' different switchpoint (\eqn{\tau}) for each colony, chosen by maximum
+#' likelihood methods.
 #'
-#' @param data a dataframe or tibble
+#' @param data a dataframe or tibble with a column for colony ID (as a character
+#'   or factor), a column for some measure of time (numeric or date), and a
+#'   column for some measure of colony growth (numeric), at minimum.
 #' @param t the unquoted column name of the time variable in (units???)
 #' @param formula a formula with the form `response ~ time + covariates` where
 #'   response is your measure of colony growth, time is whatever measure of time
@@ -197,10 +199,11 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   max(t), length.out = 50)` will be used.
 #' @param ... additional arguments passed to `glm()` or `glm.nb()`.
 #'
-#' @details Colony growth is modeled as increasing exponentialy until the colony
-#'   switches to gyne production, at which time the workers die and gynes leave
-#'   the colony, causing the colony to decline. The switch point, \eqn{\tau},
-#'   may vary among colonies.
+#' @details Colony growth is modeled as increasing exponentially until the
+#'   colony switches to gyne production, at which time the workers die and gynes
+#'   leave the colony, causing the colony to decline. The switch point,
+#'   \eqn{\tau}, may vary among colonies. See `vignette("bumbl", package =
+#'   "bumbl")` for more details on the underlying math of the model.
 #'
 #' @return A `data.frame` with the additional class `bumbldf` containing a
 #'   summary of the data with a row for every colony and the following columns:
@@ -226,7 +229,10 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   When `augment = TRUE`, the original data are returned with these columns as
 #'   well as fitted values (`.fitted`) residuals (`.resid`) and standard error
 #'   (`.se.fit`)
-#'
+#' @references Crone EE, Williams NM (2016) Bumble bee colony dynamics:
+#'   quantifying the importance of land use and floral resources for colony
+#'   growth and queen production. Ecology Letters 19:460–468.
+#'   https://doi.org/10.1111/ele.12581
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
@@ -329,8 +335,7 @@ bumbl <-
       dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
       spread(key = "term", value = "estimate") %>%
       mutate(logNmax = purrr::map_dbl(.data$model,
-                                      ~ max(predict(.),
-                                            na.rm = TRUE))) %>%
+                                      ~ max(predict(.)))) %>%
       dplyr::select(-"model") %>%
       dplyr::select(
         !!colonyID,
@@ -462,8 +467,7 @@ bumbl.nb <-
       dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
       spread(key = "term", value = "estimate") %>%
       mutate(logNmax = purrr::map_dbl(.data$model,
-                                      ~ max(predict(.),
-                                            na.rm = TRUE))) %>%
+                                      ~ max(predict(.)))) %>%
       dplyr::select(-"model") %>%
       dplyr::select(
         !!colonyID,
