@@ -1,7 +1,7 @@
 #' Fit breakpoint model to individual colony
 #'
 #' Fits models using a range of taus and picks the best one using maximum
-#' liklihood
+#' liklihood. Typically only used internally by `bumbl`.
 #'
 #' @param data a dataframe or tibble
 #' @param t the unquoted column name for the time variable in `data`
@@ -39,7 +39,7 @@ brkpt <-
   t <- enquo(t)
   tvar <- as_name(t)
   more_args <- list2(...)
-
+  if (!is.null(taus) & !is.numeric(taus)) abort()
   if (is.null(taus)) {
     tvec <- data[[tvar]]
     taus <- seq(min(tvec), max(tvec), length.out = 50)
@@ -106,7 +106,7 @@ brkpt <-
 }
 
 
-#' @describeIn brkpt passes arguments to `MASS::glm.nb()`
+#' @describeIn brkpt fits model with a negative binomial family error distribution by passing arguments to `MASS::glm.nb()` instead of `glm()`
 #' @param link passed to `glm.nb()`
 #'
 #' @import dplyr
@@ -122,6 +122,7 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   tvar <- as_name(t)
   more_args <- list2(...)
 
+  if (!is.null(taus) & !is.numeric(taus)) abort()
   if (is.null(taus)) {
     tvec <- data[[tvar]]
     taus <- seq(min(tvec), max(tvec), length.out = 50)
@@ -276,7 +277,7 @@ bumbl <-
     fterms <- terms(formula)
 
     # Check types of variables
-    if (!is.numeric(data[[!!tvar]])){
+    if (!is.numeric(data[[tvar]])){
       abort(paste0("Time variable,", tvar, "must be numeric."))
     }
 
@@ -382,7 +383,7 @@ bumbl <-
 
 
 
-#' @describeIn bumbl passes arguments to `MASS::glm.nb()` rather than `glm()`
+#' @describeIn bumbl fits model with a negative binomial family error distribution by passing arguments to `MASS::glm.nb()` instead of `glm()`
 #'
 #' @param link passed to `glm.nb()` from the `MASS` package
 #'
@@ -412,6 +413,11 @@ bumbl.nb <-
     more_args <- list2(...)
     formula <- formula(formula)
     fterms <- terms(formula)
+
+    # Check types of variables
+    if (!is.numeric(data[[tvar]])){
+      abort(paste0("Time variable,", tvar, "must be numeric."))
+    }
 
     #Check that time variable is in the formula
     if (!tvar %in% attr(fterms, "term.labels")) {

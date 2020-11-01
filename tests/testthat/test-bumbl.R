@@ -116,10 +116,10 @@ test_that("error handling", {
 
 test_that("results are correct", {
   # runif(1, 1, 1000)
-  x <- sim_colony(seed = 852)
+  x <- sim_colony(seed = 846)
   params <- attributes(x)
   testcol <- tibble(week = 1:20, mass = x, colony = "a")
-  out <- bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log"))
+  out <- suppressWarnings(bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log")))
   expect_equal(out$tau, params$tau, tolerance = 0.1)
   expect_equal(out$logN0, log(params$n0), tolerance = 0.1)
   expect_equal(out$logLam, log(params$lambda), tolerance = 0.05)
@@ -128,12 +128,12 @@ test_that("results are correct", {
 
 test_that("results are robust", {
   # runif(1, 1, 1000)
-  x <- sim_colony(seed = 852)
+  x <- sim_colony(seed = 846)
   testcol <-
     tibble(week = 1:20, mass = x, colony = "a") %>%
     mutate(mass2 = jitter(mass))
-  out1 <- bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log"))
-  out2 <- bumbl(testcol, t = week, mass2 ~ week, family = gaussian(link = "log"))
+  out1 <- suppressWarnings(bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log")))
+  out2 <- suppressWarnings(bumbl(testcol, t = week, mass2 ~ week, family = gaussian(link = "log")))
   expect_equal(out1$tau, out2$tau, tolerance = 0.0001)
   expect_equal(out1$logN0, out2$logN0, tolerance = 0.0001)
   expect_equal(out1$logLam, out2$logLam, tolerance = 0.0001)
@@ -141,12 +141,12 @@ test_that("results are robust", {
 })
 
 test_that("results are not dependent on row order", {
-  x <- sim_colony(seed = 852)
+  x <- sim_colony(seed = 846)
   testcol <-
     tibble(week = 1:20, mass = x, colony = "a")
   testcol2 <-
     sample_n(testcol, nrow(testcol))
-  out1 <- bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log"))
-  out2 <- bumbl(testcol2, t = week, mass ~ week, family = gaussian(link = "log"))
+  out1 <- suppressWarnings(bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log")))
+  out2 <- suppressWarnings(bumbl(testcol2, t = week, mass ~ week, family = gaussian(link = "log")))
   expect_equivalent(out1, out2)
 })
