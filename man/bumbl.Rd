@@ -89,7 +89,11 @@ likelihood methods.
 Colony growth is modeled as increasing exponentially until the
 colony switches to gyne production, at which time the workers die and gynes
 leave the colony, causing the colony to decline. The switch point,
-\eqn{\tau}, may vary among colonies. See \code{vignette("bumbl", package = "bumbl")} for more details on the underlying math of the model.
+\eqn{\tau}, may vary among colonies. This function works by modifying the
+data and fitting genearlized linear models (GLMs). Because of this, the
+assumptions for GLMs apply, namely independence and homogeneity of
+variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
+the underlying math of the model.
 }
 \section{Functions}{
 \itemize{
