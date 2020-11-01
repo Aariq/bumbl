@@ -28,9 +28,11 @@ bumbl.nb(
 )
 }
 \arguments{
-\item{data}{a dataframe or tibble}
+\item{data}{a dataframe or tibble with a column for colony ID (as a
+\code{character} or \code{factor}), a column for some measure of time (\code{numeric}),
+and a column for some measure of colony growth (\code{numeric}), at minimum.}
 
-\item{t}{the unquoted column name of the time variable in (units???)}
+\item{t}{the unquoted column name of the time variable.}
 
 \item{formula}{a formula with the form \code{response ~ time + covariates} where
 response is your measure of colony growth, time is whatever measure of time
@@ -52,7 +54,8 @@ columns containing model coefficients.}
 \item{link}{passed to \code{glm.nb()} from the \code{MASS} package}
 }
 \value{
-A summary of the data with a row for every colony and the following columns:
+A \code{data.frame} with the additional class \code{bumbldf} containing a
+summary of the data with a row for every colony and the following columns:
 \itemize{
 \item{\code{tau} is the switchpoint, in the same units as \code{t}, for
 each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to
@@ -64,9 +67,9 @@ weeks lag before growth started in the field.}
 \item{\code{logLam} is the
 average (log-scale) colony growth rate (i.e., rate of weight gain per unit
 \code{t}) during the growth period.}
-\item{\code{decay} reflects the rate of decline
-during the decline period. In fact, the way this model is set up, the
-actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{logLam}.}
+\item{\code{decay} reflects the rate of decline during the decline period.
+Equivalent to ln(\eqn{\delta}) - ln(\eqn{\lambda}) (see vignette for more
+in-depth explanation).}
 \item{\code{logNmax} is the maximum weight reached by each colony.  It is a
 function of \code{tau}, \code{logN0} and \code{logLam}}
 \item{Additional columns are
@@ -77,16 +80,16 @@ well as fitted values (\code{.fitted}) residuals (\code{.resid}) and standard er
 (\code{.se.fit})
 }
 \description{
-Fits models that assume bumblebee colonies will switch from growth to gyne
-production at some point, \eqn{\tau}. This allows for a different
-switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
-methods.
+Fits generalized linear models that assume bumblebee colonies will switch
+from growth to gyne production at some point, \eqn{\tau}. This allows for a
+different switchpoint (\eqn{\tau}) for each colony, chosen by maximum
+likelihood methods.
 }
 \details{
-Colony growth is modeled as increasing exponentialy until the colony
-switches to gyne production, at which time the workers die and gynes leave
-the colony, causing the colony to decline. The switch point, \eqn{\tau},
-may vary among colonies.
+Colony growth is modeled as increasing exponentially until the
+colony switches to gyne production, at which time the workers die and gynes
+leave the colony, causing the colony to decline. The switch point,
+\eqn{\tau}, may vary among colonies. See \code{vignette("bumbl", package = "bumbl")} for more details on the underlying math of the model.
 }
 \section{Functions}{
 \itemize{
@@ -101,4 +104,10 @@ bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 
 bombus2 <- bombus[bombus$colony != 67, ]
 bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
+}
+\references{
+Crone EE, Williams NM (2016) Bumble bee colony dynamics:
+quantifying the importance of land use and floral resources for colony
+growth and queen production. Ecology Letters 19:460–468.
+https://doi.org/10.1111/ele.12581
 }

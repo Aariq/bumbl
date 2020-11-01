@@ -77,7 +77,9 @@ brkpt <-
   }
 
   if (all(is.na(LLs))) {
-    abort("No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)")
+    abort(
+      "No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)"
+      )
   }
 
   tau_win <- taus[which(LLs == max(LLs, na.rm = TRUE))]
@@ -182,10 +184,10 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #' different switchpoint (\eqn{\tau}) for each colony, chosen by maximum
 #' likelihood methods.
 #'
-#' @param data a dataframe or tibble with a column for colony ID (as a character
-#'   or factor), a column for some measure of time (numeric or date), and a
-#'   column for some measure of colony growth (numeric), at minimum.
-#' @param t the unquoted column name of the time variable in (units???)
+#' @param data a dataframe or tibble with a column for colony ID (as a
+#'   `character` or `factor`), a column for some measure of time (`numeric`),
+#'   and a column for some measure of colony growth (`numeric`), at minimum.
+#' @param t the unquoted column name of the time variable.
 #' @param formula a formula with the form `response ~ time + covariates` where
 #'   response is your measure of colony growth, time is whatever measure of time
 #'   you have (date, number of weeks, etc.) and covariates are any optional
@@ -218,9 +220,9 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   \item{`logLam` is the
 #'   average (log-scale) colony growth rate (i.e., rate of weight gain per unit
 #'   `t`) during the growth period.}
-#'   \item{`decay` reflects the rate of decline
-#'   during the decline period. In fact, the way this model is set up, the
-#'   actual rate of decline per unit `t` is calculated as `decay` - `logLam`.}
+#'   \item{`decay` reflects the rate of decline during the decline period.
+#'   Equivalent to ln(\eqn{\delta}) - ln(\eqn{\lambda}) (see vignette for more
+#'   in-depth explanation).}
 #'   \item{`logNmax` is the maximum weight reached by each colony.  It is a
 #'   function of `tau`, `logN0` and `logLam`}
 #'   \item{Additional columns are
@@ -229,10 +231,12 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   When `augment = TRUE`, the original data are returned with these columns as
 #'   well as fitted values (`.fitted`) residuals (`.resid`) and standard error
 #'   (`.se.fit`)
+#'
 #' @references Crone EE, Williams NM (2016) Bumble bee colony dynamics:
 #'   quantifying the importance of land use and floral resources for colony
 #'   growth and queen production. Ecology Letters 19:460–468.
 #'   https://doi.org/10.1111/ele.12581
+#'
 #' @import tidyr
 #' @import rlang
 #' @import dplyr
@@ -268,6 +272,11 @@ bumbl <-
     formula <- formula(formula)
     fterms <- terms(formula)
 
+    # Check types of variables
+    if (!is.numeric(data[[!!tvar]])){
+      abort(paste0("Time variable,", tvar, "must be numeric."))
+    }
+
     #Check that time variable is in the formula
     if (!tvar %in% attr(fterms, "term.labels")) {
       abort(paste0("'", tvar, "' is missing from the model formula"))
@@ -277,6 +286,7 @@ bumbl <-
       df <- data
       dflist <- list("NA" = data)
       colonyID <- "colony"
+      #TODO: need to also add a column called "colony"?
 
     } else {
       df <-

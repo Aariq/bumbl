@@ -20,6 +20,7 @@ creating the plots.
 Plot observed and fitted results from bumbl()
 }
 \examples{
+set.seed(687)
 colonyID_subset <- sample(bombus$colony, 10)
 colony_subset <- bombus[bombus$colony \%in\% colonyID_subset, ]
 results <- bumbl(colony_subset, colonyID = colony, t = week,
