@@ -31,11 +31,11 @@ winning model
 }
 \description{
 Fits models using a range of taus and picks the best one using maximum
-liklihood
+liklihood. Typically only used internally by \code{bumbl}.
 }
 \section{Functions}{
 \itemize{
-\item \code{brkpt.nb}: passes arguments to \code{MASS::glm.nb()}
+\item \code{brkpt.nb}: fits model with a negative binomial family error distribution by passing arguments to \code{MASS::glm.nb()} instead of \code{glm()}
 }}
 
 \examples{

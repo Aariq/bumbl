@@ -97,7 +97,7 @@ the underlying math of the model.
 }
 \section{Functions}{
 \itemize{
-\item \code{bumbl.nb}: passes arguments to \code{MASS::glm.nb()} rather than \code{glm()}
+\item \code{bumbl.nb}: fits model with a negative binomial family error distribution by passing arguments to \code{MASS::glm.nb()} instead of \code{glm()}
 }}
 
 \examples{
