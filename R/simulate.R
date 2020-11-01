@@ -3,10 +3,11 @@
 #' This is the generative model assumed by the GLM implemented in `bumbl()` parameterized using estimates from the `bombus` dataset.
 #'
 #' @param seed numeric; passed to `set.seed()`. For reproducibility.
-#'
-#' @return a vector of colony growth.
+#' @noRd
+#' @return a vector of colony growth with parameters used as attributes.
 #'
 #' @examples
+#' sim_colony()
 sim_colony <- function(seed = NULL) {
   if(!is.null(seed)) {
     set.seed(seed)
@@ -15,7 +16,7 @@ sim_colony <- function(seed = NULL) {
   # tau = rnorm(1, 6.5, 1.87) * 7 #days
   n0 <- abs(round(exp(rnorm(1, 3.25, 1.22))))
   lambda <- exp(rnorm(1, 0.39, 0.28))
-  decay <- rnorm(1, -0.59, 0.29)
+  delta <- rnorm(1, 0.57, 0.17)
   tmax <- 20 #weeks
   # tmax = 20*7 #days
 
@@ -27,14 +28,14 @@ sim_colony <- function(seed = NULL) {
       n[t] <- lambda^t * n[1]
     } else {
       x <- t-tau
-      n[t] <- lambda^tau * n[1] * sign(decay) * abs(decay) ^ (t-tau)
+      n[t] <- lambda^tau * n[1] * delta ^ (t-tau)
     }
     n[n<0] <- 1 #no negative bees
   }
   attributes(n) <- list(tau = tau,
                         n0 = n0,
                         lambda = lambda,
-                        decay = decay,
+                        delta = delta,
                         tmax = tmax)
   return(n)
 }
