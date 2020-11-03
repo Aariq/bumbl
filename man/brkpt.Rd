@@ -2,12 +2,9 @@
 % Please edit documentation in R/colony-growth.R
 \name{brkpt}
 \alias{brkpt}
-\alias{brkpt.nb}
 \title{Fit breakpoint model to individual colony}
 \usage{
 brkpt(data, t, formula, family = gaussian(link = "log"), taus = NULL, ...)
-
-brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -17,13 +14,13 @@ brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 \item{formula}{a formula passed to \code{glm()} or \code{glm.nb()}.  This should
 include the time variable supplied to \code{t}}
 
-\item{family}{passed to \code{glm()}}
+\item{family}{a description of the error distribution and link function.
+This is passed to \code{glm()} except in the case of \code{family = "negbin"}, which
+causes \code{glm.nb()} to be used to fit a negative binomial GLM.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used}
 
 \item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}}
-
-\item{link}{passed to \code{glm.nb()}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the
@@ -33,11 +30,6 @@ winning model
 Fits models using a range of taus and picks the best one using maximum
 liklihood. Typically only used internally by \code{bumbl}.
 }
-\section{Functions}{
-\itemize{
-\item \code{brkpt.nb}: fits model with a negative binomial family error distribution by passing arguments to \code{MASS::glm.nb()} instead of \code{glm()}
-}}
-
 \examples{
 testbees <- bombus[bombus$colony == 9, ]
 # Using dates

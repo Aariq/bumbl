@@ -9,8 +9,10 @@ bombus_sub <-
 bombus_67 <- bombus %>% filter(colony == 67)
 
 noerrs <- bombus_sub %>% filter(colony != 67)
+
 detach("package:dplyr")
 library(lubridate)
+
 test_that("bumbl errors if time variable is missing from formula", {
   expect_error(
     bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ date),
@@ -78,20 +80,22 @@ test_that("bumbl works with poisson count data", {
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
 
-test_that("bumbl.nb works with overdispersed count data", {
+test_that("bumbl works with overdispersed count data", {
   count.out <-
-    suppressWarnings(bumbl.nb(
+    suppressWarnings(bumbl(
       noerrs,
       colonyID = colony,
       t = week,
-      formula = d.mass ~ week
+      formula = d.mass ~ week,
+      family = "negbin"
     ))
   count.out.aug <-
-    suppressWarnings(bumbl.nb(
+    suppressWarnings(bumbl(
       noerrs,
       colonyID = colony,
       t = week,
       formula = count ~ week,
+      family = "negbin",
       augment = TRUE
     ))
   expect_s3_class(count.out, "data.frame")

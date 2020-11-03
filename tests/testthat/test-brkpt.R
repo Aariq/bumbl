@@ -42,15 +42,15 @@ test_that("brkpt errors when multiple equivalent taus are found", {
   )
 })
 
-test_that("brkpt works with dates", {
-  date.model <- brkpt(testbees, t = date, formula = mass ~ date)
-  expect_s3_class(date.model, "data.frame")
-  expect_is(date.model$tau, "Date")
-
-  testbees2 <- testbees %>% mutate(date = as.POSIXct(date))
-  date.model2 <- brkpt(testbees2, t = date, formula = mass ~ date)
-  expect_is(date.model2$tau, "POSIXct")
-})
+# test_that("brkpt works with dates", {
+#   date.model <- brkpt(testbees, t = date, formula = mass ~ date)
+#   expect_s3_class(date.model, "data.frame")
+#   expect_is(date.model$tau, "Date")
+#
+#   testbees2 <- testbees %>% mutate(date = as.POSIXct(date))
+#   date.model2 <- brkpt(testbees2, t = date, formula = mass ~ date)
+#   expect_is(date.model2$tau, "POSIXct")
+# })
 
 test_that("brkpt works with poisson dist", {
   count.model <- brkpt(testcount, t = week, formula = count ~ week, family = "poisson")
@@ -58,8 +58,8 @@ test_that("brkpt works with poisson dist", {
   expect_is(count.model$model[[1]], "glm")
 })
 
-test_that("brkpt.nb works with overdispersed data", {
-  negbin.model <- brkpt.nb(testcount, t = week, formula = count ~ week)
+test_that("brkpt works with overdispersed data and family = 'negbin'", {
+  negbin.model <- brkpt(testcount, t = week, formula = count ~ week, family = "negbin")
   expect_s3_class(negbin.model, "data.frame")
   expect_is(negbin.model$model[[1]], "negbin")
 })

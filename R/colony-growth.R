@@ -7,7 +7,9 @@
 #' @param t the unquoted column name for the time variable in `data`
 #' @param formula a formula passed to `glm()` or `glm.nb()`.  This should
 #'   include the time variable supplied to `t`
-#' @param family passed to `glm()`
+#' @param family a description of the error distribution and link function.
+#'   This is passed to `glm()` except in the case of `family = "negbin"`, which
+#'   causes `glm.nb()` to be used to fit a negative binomial GLM.
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used
 #' @param ... additional arguments passed to `glm()` or `glm.nb()`
@@ -17,7 +19,7 @@
 #' @import dplyr
 #' @import rlang
 #' @importFrom stats update logLik terms glm poisson as.formula gaussian
-#'
+#' @importFrom MASS glm.nb
 #' @keywords internal
 #'
 #' @examples
@@ -68,7 +70,11 @@ brkpt <-
   for (i in 1:length(taus)) {
     usetau <- taus[i]
     data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-    m0 <- try(exec("glm", formula = f, family = family, data = data2, !!!more_args), silent = TRUE)
+    if (is.character(family) && family == "negbin") {
+      m0 <- try(exec("glm.nb", formula = f, data = data2, !!!more_args), silent = TRUE)
+    } else {
+      m0 <- try(exec("glm", formula = f, family = family, data = data2, !!!more_args), silent = TRUE)
+    }
     if (inherits(m0, "try-error")) {
       LLs[i] <- NA
     } else {
@@ -79,88 +85,7 @@ brkpt <-
   if (all(is.na(LLs))) {
     abort(
       "No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)"
-      )
-  }
-
-  tau_win <- taus[which(LLs == max(LLs, na.rm = TRUE))]
-
-  # if multiple equivalent taus are found, this should fail
-  if (length(tau_win) > 1) {
-    abort("More than one equivalent tau found")
-  }
-
-  #TODO: I don't really like that it re-fits the model.  I could have it save
-  #them all and only re-fit in the case of a tau tie.
-  data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
-
-  m_win <-
-    exec(
-      "glm",
-      formula = f,
-      family = family,
-      data = data_win,
-      !!!more_args
     )
-
-  return(tibble(tau = tau_win, model = list(m_win)))
-}
-
-
-#' @describeIn brkpt fits model with a negative binomial family error distribution by passing arguments to `MASS::glm.nb()` instead of `glm()`
-#' @param link passed to `glm.nb()`
-#'
-#' @import dplyr
-#' @import rlang
-#' @importFrom stats update logLik terms as.formula
-#' @importFrom MASS glm.nb
-#'
-#' @keywords internal
-#'
-brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
-  #TODO: make sure none of the variables are called '.post'?
-  t <- enquo(t)
-  tvar <- as_name(t)
-  more_args <- list2(...)
-
-  if (!is.null(taus) & !is.numeric(taus)) abort()
-  if (is.null(taus)) {
-    tvec <- data[[tvar]]
-    taus <- seq(min(tvec), max(tvec), length.out = 50)
-  }
-
-  #Check that at least some taus are in range of t
-  if (all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
-    abort(paste0("At least one tau must be in range of '", tvar, "'"))
-  }
-  #If some taus are out of range of t, drop them
-  if (any(taus > max(data[[tvar]])) |
-      any(taus < min(data[[tvar]]))) {
-    warning(paste0(
-      "Some taus were not used because they were outside of range of '",
-      tvar,
-      "'"
-    ))
-    taus <-
-      taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
-  }
-
-  # adds `.post` to formula.
-  f <- update(formula, ~. + .post)
-  LLs <- c()
-
-    for (i in 1:length(taus)) {
-      usetau <- taus[i]
-      data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
-      m0 <- try(exec("glm.nb", formula = f, data = data2, link = link, !!!more_args))
-      if (inherits(m0, "try-error")) {
-        LLs[i] <- NA
-      } else {
-        LLs[i] <- logLik(m0)
-      }
-    }
-
-  if (all(is.na(LLs))) {
-    abort("No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)")
   }
 
   tau_win <- taus[which(LLs == max(LLs, na.rm = TRUE))]
@@ -169,13 +94,21 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
   if (length(tau_win) > 1) {
     abort("More than one equivalent tau found")
   }
+
   #TODO: I don't really like that it re-fits the model.  I could have it save
   #them all and only re-fit in the case of a tau tie.
   data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
-  m_win <- exec("glm.nb", formula = f, data = data_win, !!!more_args)
+
+  if (is.character(family) && family == "negbin") {
+    m_win <-
+      exec("glm.nb", formula = f, data = data_win, !!!more_args)
+  } else {
+    m_win <-
+      exec("glm", formula = f, family = family, data = data_win, !!!more_args)
+  }
+
   return(tibble(tau = tau_win, model = list(m_win)))
 }
-
 
 
 #' Estimate colony growth, switch point, and decay parameters
@@ -193,7 +126,9 @@ brkpt.nb <- function(data, taus = NULL, t, formula, link = "log", ...) {
 #'   response is your measure of colony growth, time is whatever measure of time
 #'   you have (date, number of weeks, etc.) and covariates are any optional
 #'   co-variates you want to fit at the colony level.
-#' @param family passed to `glm()`.
+#' @param family a description of the error distribution and link function.
+#'   This is passed to `glm()` except in the case of `family = "negbin"`, which
+#'   causes `glm.nb()` to be used to fit a negative binomial GLM.
 #' @param colonyID the unquoted column name of the colony ID variable
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
@@ -281,6 +216,9 @@ bumbl <-
       abort(paste0("Time variable,", tvar, "must be numeric."))
     }
 
+    #Check for missing values in time variable
+    if (any(!is.finite(data[[tvar]]))) abort("There must not be missing or undefined values in the time variable")
+
     #Check that time variable is in the formula
     if (!tvar %in% attr(fterms, "term.labels")) {
       abort(paste0("'", tvar, "' is missing from the model formula"))
@@ -328,143 +266,6 @@ bumbl <-
                                         formula = formula,
                                         family = family,
                                         !!!more_args),
-                                  .y),
-                     .id = as_name(colonyID))
-
-    if (nrow(resultdf) == 0) {
-      abort("Model fitting failed for all colonies.")
-    }
-
-    predictdf <-
-      resultdf %>%
-      dplyr::select(-"tau") %>%
-      mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
-      tidyr::unnest(.data$aug) %>%
-      dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
-
-    modeldf <-
-      resultdf %>%
-      mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
-      tidyr::unnest(.data$coefs) %>%
-      dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
-      spread(key = "term", value = "estimate") %>%
-      mutate(logNmax = purrr::map_dbl(.data$model,
-                                      ~ max(predict(.)))) %>%
-      dplyr::select(-"model") %>%
-      dplyr::select(
-        !!colonyID,
-        "tau",
-        logN0 = "(Intercept)",
-        logLam = !!t,
-        decay = ".post",
-        "logNmax",
-        everything()
-      )
-
-    augmented_df <-
-      left_join(df, modeldf, by = as_name(colonyID))
-
-    full_df <-
-      left_join(augmented_df, predictdf, by = c(as_name(colonyID), as_name(t)))
-    if (augment == TRUE) {
-      out <- full_df
-    } else {
-      out <- modeldf
-      attr(out, "predict") <- full_df
-    }
-
-    attr(out, "colonyID") <- as_name(colonyID)
-    attr(out, "t") <- as_name(t)
-    attr(out, "formula") <- formula
-
-    class(out) <- c("bumbldf", class(out))
-    return(out)
-  }
-
-
-
-#' @describeIn bumbl fits model with a negative binomial family error distribution by passing arguments to `MASS::glm.nb()` instead of `glm()`
-#'
-#' @param link passed to `glm.nb()` from the `MASS` package
-#'
-#' @import tidyr
-#' @import rlang
-#' @import dplyr
-#' @importFrom purrr map map_dbl map2_df
-#' @import broom
-#' @importFrom glue glue
-#' @export
-#'
-bumbl.nb <-
-  function(data,
-           colonyID = NULL,
-           t,
-           formula,
-           link = "log",
-           augment = FALSE,
-           taus = NULL,
-           ...) {
-
-    if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
-    if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
-    colonyID <- enquo(colonyID)
-    t <- enquo(t)
-    tvar <- as_name(t)
-    more_args <- list2(...)
-    formula <- formula(formula)
-    fterms <- terms(formula)
-
-    # Check types of variables
-    if (!is.numeric(data[[tvar]])){
-      abort(paste0("Time variable,", tvar, "must be numeric."))
-    }
-
-    #Check that time variable is in the formula
-    if (!tvar %in% attr(fterms, "term.labels")) {
-      abort(paste0("'", tvar, "' is missing from the model formula"))
-    }
-
-    if (quo_is_null(colonyID)) {
-      df <- data
-      dflist <- list("NA" = data)
-      colonyID <- "colony"
-
-    } else {
-      df <-
-        data %>%
-        # make sure colonyID is a character vector
-        mutate(!!colonyID := as.character(!!colonyID)) %>%
-        group_by(!!colonyID)
-
-      dflist <- group_split(df)
-      names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
-    }
-
-    model_list <- vector("list", length(dflist))
-    names(model_list) <- names(dflist)
-
-    brkpt_w_err <- function(code, colonyID) {
-      tryCatch(
-        code,
-        error = function(c) {
-          message(
-            glue::glue(
-              "Warning: {c$message} for colonyID '{colonyID}'. Omitting from results."
-            )
-          )
-        }
-      )
-    }
-
-    resultdf <-
-      purrr::map2_df(dflist,
-                     names(dflist),
-                     ~brkpt_w_err(brkpt.nb(data = .x,
-                                           taus = {{taus}},
-                                           t = !!t,
-                                           formula = formula,
-                                           link = link,
-                                           !!!more_args),
                                   .y),
                      .id = as_name(colonyID))
 

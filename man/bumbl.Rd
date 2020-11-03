@@ -2,7 +2,6 @@
 % Please edit documentation in R/colony-growth.R
 \name{bumbl}
 \alias{bumbl}
-\alias{bumbl.nb}
 \title{Estimate colony growth, switch point, and decay parameters}
 \usage{
 bumbl(
@@ -11,17 +10,6 @@ bumbl(
   formula,
   family = gaussian(link = "log"),
   colonyID = NULL,
-  augment = FALSE,
-  taus = NULL,
-  ...
-)
-
-bumbl.nb(
-  data,
-  colonyID = NULL,
-  t,
-  formula,
-  link = "log",
   augment = FALSE,
   taus = NULL,
   ...
@@ -39,7 +27,9 @@ response is your measure of colony growth, time is whatever measure of time
 you have (date, number of weeks, etc.) and covariates are any optional
 co-variates you want to fit at the colony level.}
 
-\item{family}{passed to \code{glm()}.}
+\item{family}{a description of the error distribution and link function.
+This is passed to \code{glm()} except in the case of \code{family = "negbin"}, which
+causes \code{glm.nb()} to be used to fit a negative binomial GLM.}
 
 \item{colonyID}{the unquoted column name of the colony ID variable}
 
@@ -50,8 +40,6 @@ columns containing model coefficients.}
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 
 \item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}.}
-
-\item{link}{passed to \code{glm.nb()} from the \code{MASS} package}
 }
 \value{
 A \code{data.frame} with the additional class \code{bumbldf} containing a
@@ -95,11 +83,6 @@ assumptions for GLMs apply, namely independence and homogeneity of
 variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
 the underlying math of the model.
 }
-\section{Functions}{
-\itemize{
-\item \code{bumbl.nb}: fits model with a negative binomial family error distribution by passing arguments to \code{MASS::glm.nb()} instead of \code{glm()}
-}}
-
 \examples{
 # Colony 67 doesn't ever switch to reproduction and results in an error
 \dontrun{
