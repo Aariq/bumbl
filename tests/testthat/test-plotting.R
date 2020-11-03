@@ -8,7 +8,29 @@ bombus_sub <-
 
 detach("package:dplyr")
 
-test_that("plotting function displays something?", {
+test_that("plot() works and returns data invisibly", {
+  results <-
+    suppressWarnings(bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = d.mass ~ week
+    ))
+  expect_invisible(plot(results))
+})
+
+test_that("autoplot() works and returns data invisibly", {
+  results <-
+    suppressWarnings(bumbl(
+      bombus_sub,
+      colonyID = colony,
+      t = week,
+      formula = d.mass ~ week
+    ))
+  expect_invisible(ggplot2::autoplot(results))
+})
+
+test_that("plotting works with augment = TRUE", {
   results <-
     suppressWarnings(bumbl(
       bombus_sub,
@@ -17,28 +39,10 @@ test_that("plotting function displays something?", {
       formula = d.mass ~ week,
       augment = TRUE
     ))
-  expect_invisible(bumbl_plot(results))
+  expect_invisible(plot(results))
+  expect_invisible(autoplot(results))
 })
 
-test_that("plotting works with augment = FALSE", {
-  results <-
-    suppressWarnings(bumbl(
-      bombus_sub,
-      colonyID = colony,
-      t = week,
-      formula = d.mass ~ week,
-      augment = FALSE
-    ))
-  expect_invisible(bumbl_plot(results))
-})
-
-test_that("plotting function errors when not a bumbl object", {
-  expect_error(
-    bumbl_plot(mtcars),
-    "bumbl_plot() only works on dataframes output by bumbl()",
-    fixed = TRUE
-  )
-})
 
 test_that("plotting works with count data", {
   results_count <-
@@ -50,16 +54,8 @@ test_that("plotting works with count data", {
       family = "poisson",
       augment = TRUE
     )
-  expect_invisible(bumbl_plot(results_count))
+  expect_invisible(plot(results_count))
+  expect_invisible(autoplot(results_count))
 })
 
-test_that("plot() works", {
-  results <-
-    suppressWarnings(bumbl(
-      bombus_sub,
-      colonyID = colony,
-      t = week,
-      formula = d.mass ~ week
-    ))
-  expect_invisible(plot(results))
-})
+

@@ -11,16 +11,16 @@ brkpt(data, t, formula, family = gaussian(link = "log"), taus = NULL, ...)
 
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
-\item{formula}{a formula passed to \code{glm()} or \code{glm.nb()}.  This should
+\item{formula}{a formula passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}.  This should
 include the time variable supplied to \code{t}}
 
 \item{family}{a description of the error distribution and link function.
-This is passed to \code{glm()} except in the case of \code{family = "negbin"}, which
-causes \code{glm.nb()} to be used to fit a negative binomial GLM.}
+This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
+causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used}
 
-\item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}}
+\item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[=glm.nb]{glm.nb()}}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the
@@ -38,5 +38,8 @@ brkpt(testbees, t = date, formula = mass ~ date)
 # Using weeks
 brkpt(testbees, t = week, formula = mass ~ week)
 }
+}
+\seealso{
+\code{\link[=bumbl]{bumbl()}}
 }
 \keyword{internal}

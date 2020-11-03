@@ -7,7 +7,7 @@
 \method{plot}{bumbldf}(bumbldf)
 }
 \arguments{
-\item{bumbldf}{a dataframe produced by \code{bumbl()}}
+\item{bumbldf}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}.}
 }
 \value{
 invisibly returns a list of dataframes used for building the plots.
@@ -22,4 +22,7 @@ colony_subset <- bombus[bombus$colony \%in\% colonyID_subset, ]
 results <- bumbl(colony_subset, colonyID = colony, t = week,
                  formula = mass ~ week)
 plot(results)
+}
+\seealso{
+\code{\link[=bumbl]{bumbl()}} \code{\link[=autoplot.bumbldf]{autoplot.bumbldf()}}
 }
