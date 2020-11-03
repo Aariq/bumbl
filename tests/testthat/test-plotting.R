@@ -53,15 +53,13 @@ test_that("plotting works with count data", {
   expect_invisible(bumbl_plot(results_count))
 })
 
-test_that("plotting works with bumbl.nb", {
-  skip("This test will fail until I have a properly overdispersed dataset to test it on I think.")
-  results_overdisp <-
-    bumbl.nb(
+test_that("plot() works", {
+  results <-
+    suppressWarnings(bumbl(
       bombus_sub,
       colonyID = colony,
       t = week,
-      formula = count ~ week,
-      augment = TRUE
-    )
-  expect_invisible(bumbl_plot(results_overdisp))
+      formula = d.mass ~ week
+    ))
+  expect_invisible(plot(results))
 })

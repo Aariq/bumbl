@@ -28,8 +28,8 @@ you have (date, number of weeks, etc.) and covariates are any optional
 co-variates you want to fit at the colony level.}
 
 \item{family}{a description of the error distribution and link function.
-This is passed to \code{glm()} except in the case of \code{family = "negbin"}, which
-causes \code{glm.nb()} to be used to fit a negative binomial GLM.}
+This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
+causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
 
 \item{colonyID}{the unquoted column name of the colony ID variable}
 
@@ -39,7 +39,7 @@ columns containing model coefficients.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 
-\item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}.}
+\item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}.}
 }
 \value{
 A \code{data.frame} with the additional class \code{bumbldf} containing a
@@ -97,4 +97,7 @@ Crone EE, Williams NM (2016) Bumble bee colony dynamics:
 quantifying the importance of land use and floral resources for colony
 growth and queen production. Ecology Letters 19:460–468.
 https://doi.org/10.1111/ele.12581
+}
+\seealso{
+\code{\link[=plot.bumbldf]{plot.bumbldf()}}
 }

@@ -5,17 +5,17 @@
 #'
 #' @param data a dataframe or tibble
 #' @param t the unquoted column name for the time variable in `data`
-#' @param formula a formula passed to `glm()` or `glm.nb()`.  This should
+#' @param formula a formula passed to [glm()] or [MASS::glm.nb()].  This should
 #'   include the time variable supplied to `t`
 #' @param family a description of the error distribution and link function.
-#'   This is passed to `glm()` except in the case of `family = "negbin"`, which
-#'   causes `glm.nb()` to be used to fit a negative binomial GLM.
+#'   This is passed to [glm()] except in the case of `family = "negbin"`, which
+#'   causes [MASS::glm.nb()] to be used to fit a negative binomial GLM.
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used
-#' @param ... additional arguments passed to `glm()` or `glm.nb()`
+#' @param ... additional arguments passed to [glm()] or [glm.nb()]
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
-#'
+#' @seealso [bumbl()]
 #' @import dplyr
 #' @import rlang
 #' @importFrom stats update logLik terms glm poisson as.formula gaussian
@@ -127,15 +127,15 @@ brkpt <-
 #'   you have (date, number of weeks, etc.) and covariates are any optional
 #'   co-variates you want to fit at the colony level.
 #' @param family a description of the error distribution and link function.
-#'   This is passed to `glm()` except in the case of `family = "negbin"`, which
-#'   causes `glm.nb()` to be used to fit a negative binomial GLM.
+#'   This is passed to [glm()] except in the case of `family = "negbin"`, which
+#'   causes [MASS::glm.nb()] to be used to fit a negative binomial GLM.
 #' @param colonyID the unquoted column name of the colony ID variable
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
 #'   columns containing model coefficients.
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used.
-#' @param ... additional arguments passed to `glm()` or `glm.nb()`.
+#' @param ... additional arguments passed to [glm()] or [MASS::glm.nb()].
 #'
 #' @details Colony growth is modeled as increasing exponentially until the
 #'   colony switches to gyne production, at which time the workers die and gynes
@@ -145,6 +145,8 @@ brkpt <-
 #'   assumptions for GLMs apply, namely independence and homogeneity of
 #'   variance. See `vignette("bumbl", package = "bumbl")` for more details on
 #'   the underlying math of the model.
+#'
+#' @seealso [plot.bumbldf()]
 #'
 #' @return A `data.frame` with the additional class `bumbldf` containing a
 #'   summary of the data with a row for every colony and the following columns:
