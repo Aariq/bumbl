@@ -132,7 +132,12 @@ brkpt <-
 #' @param colonyID the unquoted column name of the colony ID variable
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
-#'   columns containing model coefficients.
+#'   columns containing model coefficients. Cannot be used in conjuction with
+#'   `keep.model = TRUE`.
+#' @param keep.model If TRUE, then the output will contain a list-column with
+#'   the models for each colony. This may be useful for extracting statistics
+#'   and performing model diagnostics not provided by `bumbl()`. Learn more
+#'   about working with list columns with `vignette("nest", package = "tidyr")`.
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
 #'   max(t), length.out = 50)` will be used.
 #' @param ... additional arguments passed to [glm()] or [MASS::glm.nb()].
@@ -201,6 +206,7 @@ bumbl <-
            family = gaussian(link = "log"),
            colonyID = NULL,
            augment = FALSE,
+           keep.model = FALSE,
            taus = NULL,
            ...) {
 
@@ -212,6 +218,11 @@ bumbl <-
     more_args <- list2(...)
     formula <- formula(formula)
     fterms <- terms(formula)
+
+    # Check that at most only one of augment and keep.model are TRUE
+    if (augment == TRUE & keep.model == TRUE){
+      abort("'augment' and 'keep.model' cannot both be TRUE.")
+    }
 
     # Check types of variables
     if (!is.numeric(data[[tvar]])){
@@ -290,9 +301,9 @@ bumbl <-
       spread(key = "term", value = "estimate") %>%
       mutate(logNmax = purrr::map_dbl(.data$model,
                                       ~ max(predict(.)))) %>%
-      dplyr::select(-"model") %>%
       dplyr::select(
         !!colonyID,
+        model,
         "tau",
         logN0 = "(Intercept)",
         logLam = !!t,
@@ -300,7 +311,9 @@ bumbl <-
         "logNmax",
         everything()
       )
-
+    if (keep.model == FALSE) {
+      modeldf <- select(modeldf, -model)
+    }
     augmented_df <-
       left_join(df, modeldf, by = as_name(colonyID))
 

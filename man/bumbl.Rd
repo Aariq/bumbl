@@ -11,6 +11,7 @@ bumbl(
   family = gaussian(link = "log"),
   colonyID = NULL,
   augment = FALSE,
+  keep.model = FALSE,
   taus = NULL,
   ...
 )
@@ -35,7 +36,13 @@ causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative bi
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional
-columns containing model coefficients.}
+columns containing model coefficients. Cannot be used in conjuction with
+\code{keep.model = TRUE}.}
+
+\item{keep.model}{If TRUE, then the output will contain a list-column with
+the models for each colony. This may be useful for extracting statistics
+and performing model diagnostics not provided by \code{bumbl()}. Learn more
+about working with list columns with \code{vignette("nest", package = "tidyr")}.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 

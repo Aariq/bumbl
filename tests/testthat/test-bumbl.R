@@ -154,3 +154,12 @@ test_that("results are not dependent on row order", {
   out2 <- suppressWarnings(bumbl(testcol2, t = week, mass ~ week, family = gaussian(link = "log")))
   expect_equivalent(out1, out2)
 })
+
+test_that("keep.model = TRUE works", {
+  out <- bumbl(noerrs, t = week, mass ~ week, keep.model = TRUE)
+  expect_is(out$model, "list")
+})
+
+test_that("Can't use both keep.model and augment", {
+  expect_error(bumbl(noerrs, t = week, mass ~ week, augment = TRUE, keep.model = TRUE))
+})
