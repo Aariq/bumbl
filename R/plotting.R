@@ -52,12 +52,19 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #' @param colony a character vector of colony IDs to plot
 #' @method autoplot bumbldf
 #'
-#' @importFrom ggplot2 autoplot
 #' @return invisibly returns a ggplot object
 #' @export
-#'
 #' @examples
+#' set.seed(687)
+#' colonyID_subset <- sample(bombus$colony, 10)
+#' colony_subset <- bombus[bombus$colony %in% colonyID_subset, ]
+#' results <- bumbl(colony_subset, colonyID = colony, t = week,
+#'                  formula = mass ~ week)
+#' autoplot(results)
 autoplot.bumbldf <- function(bumbldf, colony = NULL) {
+  if(!requireNamespace("ggplot2", quietly = TRUE)) {
+    abort("The ggplot2 package must be installed to use autoplot.bumbldf()")
+  }
   colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
   t <- attr(bumbldf, "t", exact = TRUE)
   formula <- attr(bumbldf, "formula", exact = TRUE)

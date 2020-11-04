@@ -17,3 +17,11 @@ invisibly returns a ggplot object
 \description{
 Plots observed (points) and fitted (red line) values from the model implemented by \code{bumbl()}, faceted by colony.
 }
+\examples{
+set.seed(687)
+colonyID_subset <- sample(bombus$colony, 10)
+colony_subset <- bombus[bombus$colony \%in\% colonyID_subset, ]
+results <- bumbl(colony_subset, colonyID = colony, t = week,
+                 formula = mass ~ week)
+autoplot(results)
+}
