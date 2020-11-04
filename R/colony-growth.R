@@ -71,9 +71,9 @@ brkpt <-
     usetau <- taus[i]
     data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
     if (is.character(family) && family == "negbin") {
-      m0 <- try(exec("glm.nb", formula = f, data = data2, !!!more_args), silent = TRUE)
+      m0 <- try(suppressWarnings(exec("glm.nb", formula = f, data = data2, !!!more_args)), silent = TRUE)
     } else {
-      m0 <- try(exec("glm", formula = f, family = family, data = data2, !!!more_args), silent = TRUE)
+      m0 <- try(suppressWarnings(exec("glm", formula = f, family = family, data = data2, !!!more_args)), silent = TRUE)
     }
     if (inherits(m0, "try-error")) {
       LLs[i] <- NA
@@ -143,12 +143,15 @@ brkpt <-
 #' @param ... additional arguments passed to [glm()] or [MASS::glm.nb()].
 #'
 #' @details Colony growth is modeled as increasing exponentially until the
-#'   colony switches to gyne production, at which time the workers die and gynes
+#'   colony switches from producing workers to producing reproductive
+#'   individuals (drones and gynes), at which time the workers die and gynes
 #'   leave the colony, causing the colony to decline. The switch point,
-#'   \eqn{\tau}, may vary among colonies. This function works by modifying the
-#'   data and fitting genearlized linear models (GLMs). Because of this, the
-#'   assumptions for GLMs apply, namely independence and homogeneity of
-#'   variance. See `vignette("bumbl", package = "bumbl")` for more details on
+#'   \eqn{\tau}, may vary among colonies. `bumbl()` finds the value of
+#'   \eqn{\tau} that maximizes likelihood and this "winning" model is used to
+#'   calculate statistics returned in the output. This function works by fitting
+#'   genearlized linear models (GLMs) to modified colony growth data. Because of
+#'   this, the assumptions for GLMs apply, namely independence and homogeneity
+#'   of variance. See `vignette("bumbl", package = "bumbl")` for more details on
 #'   the underlying math of the model.
 #'
 #' @seealso [plot.bumbldf()]
@@ -156,6 +159,7 @@ brkpt <-
 #' @return A `data.frame` with the additional class `bumbldf` containing a
 #'   summary of the data with a row for every colony and the following columns:
 #'   \itemize{
+#'   \item{`converged` indicates whether the winning model converged.}
 #'   \item{`tau` is the switchpoint, in the same units as `t`, for
 #'   each `colonyID`.  The colony grows for \eqn{\tau} weeks, then begins to
 #'   decline in week \eqn{\tau + 1}.}
@@ -176,7 +180,8 @@ brkpt <-
 #'   }
 #'   When `augment = TRUE`, the original data are returned with these columns as
 #'   well as fitted values (`.fitted`) residuals (`.resid`) and standard error
-#'   (`.se.fit`)
+#'   (`.se.fit`).  When `keep.model = TRUE` a list-column with the `glm` models
+#'   for each colony is returned as well.
 #'
 #' @references Crone EE, Williams NM (2016) Bumble bee colony dynamics:
 #'   quantifying the importance of land use and floral resources for colony
@@ -300,10 +305,12 @@ bumbl <-
       dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
       spread(key = "term", value = "estimate") %>%
       mutate(logNmax = purrr::map_dbl(.data$model,
-                                      ~ max(predict(.)))) %>%
+                                      ~ max(predict(.))),
+             converged = purrr::map_lgl(.data$model, ~.x$converged)) %>%
       dplyr::select(
         !!colonyID,
         model,
+        converged,
         "tau",
         logN0 = "(Intercept)",
         logLam = !!t,

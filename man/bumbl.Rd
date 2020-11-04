@@ -52,6 +52,7 @@ about working with list columns with \code{vignette("nest", package = "tidyr")}.
 A \code{data.frame} with the additional class \code{bumbldf} containing a
 summary of the data with a row for every colony and the following columns:
 \itemize{
+\item{\code{converged} indicates whether the winning model converged.}
 \item{\code{tau} is the switchpoint, in the same units as \code{t}, for
 each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to
 decline in week \eqn{\tau + 1}.}
@@ -72,7 +73,8 @@ coefficients for any covariates supplied in the \code{formula}}
 }
 When \code{augment = TRUE}, the original data are returned with these columns as
 well as fitted values (\code{.fitted}) residuals (\code{.resid}) and standard error
-(\code{.se.fit})
+(\code{.se.fit}).  When \code{keep.model = TRUE} a list-column with the \code{glm} models
+for each colony is returned as well.
 }
 \description{
 Fits generalized linear models that assume bumblebee colonies will switch
@@ -82,12 +84,15 @@ likelihood methods.
 }
 \details{
 Colony growth is modeled as increasing exponentially until the
-colony switches to gyne production, at which time the workers die and gynes
+colony switches from producing workers to producing reproductive
+individuals (drones and gynes), at which time the workers die and gynes
 leave the colony, causing the colony to decline. The switch point,
-\eqn{\tau}, may vary among colonies. This function works by modifying the
-data and fitting genearlized linear models (GLMs). Because of this, the
-assumptions for GLMs apply, namely independence and homogeneity of
-variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
+\eqn{\tau}, may vary among colonies. \code{bumbl()} finds the value of
+\eqn{\tau} that maximizes likelihood and this "winning" model is used to
+calculate statistics returned in the output. This function works by fitting
+genearlized linear models (GLMs) to modified colony growth data. Because of
+this, the assumptions for GLMs apply, namely independence and homogeneity
+of variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
 the underlying math of the model.
 }
 \examples{
