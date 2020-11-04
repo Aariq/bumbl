@@ -4,10 +4,12 @@
 \alias{plot.bumbldf}
 \title{Plot observed and fitted results from bumbl()}
 \usage{
-\method{plot}{bumbldf}(bumbldf)
+\method{plot}{bumbldf}(bumbldf, colony = NULL)
 }
 \arguments{
 \item{bumbldf}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}.}
+
+\item{colony}{Optional vector of colony ID's (character) or indexes (numeric) to plot.  If not supplied, all colonies will be plotted.}
 }
 \value{
 invisibly returns a list of dataframes used for building the plots.

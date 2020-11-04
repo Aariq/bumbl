@@ -3,6 +3,7 @@
 #' Creates one plot per level of colonyID showing the observed (points) and fitted (red line) values from the model implemented by `bumbl()`.
 #'
 #' @param bumbldf a dataframe produced by [bumbl()].
+#' @param colony Optional vector of colony ID's (character) or indexes (numeric) to plot.  If not supplied, all colonies will be plotted.
 #' @method plot bumbldf
 #' @return invisibly returns a list of dataframes used for building the plots.
 #' @export
@@ -14,7 +15,7 @@
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = mass ~ week)
 #' plot(results)
-plot.bumbldf <- function(bumbldf) {
+plot.bumbldf <- function(bumbldf, colony = NULL) {
   colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
   t <- attr(bumbldf, "t", exact = TRUE)
   formula <- attr(bumbldf, "formula", exact = TRUE)
@@ -28,6 +29,10 @@ plot.bumbldf <- function(bumbldf) {
   }
 
   plot_data <- split(x, x$colony)
+
+  if (!is.null(colony)) {
+    plot_data <- plot_data[colony]
+  }
 
   message(paste0("Creating plots for ", length(plot_data), " colonies..."))
   purrr::walk2(.x = plot_data, .y = names(plot_data), ~{
