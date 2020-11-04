@@ -48,7 +48,8 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #'
 #' Plots observed (points) and fitted (red line) values from the model implemented by `bumbl()`, faceted by colony.
 #'
-#' @param bumbldf a dataframe produced by [bumbl()].
+#' @param bumbldf a dataframe produced by [bumbl()]
+#' @param colony a character vector of colony IDs to plot
 #' @method autoplot bumbldf
 #'
 #' @importFrom ggplot2 autoplot
@@ -56,7 +57,7 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #' @export
 #'
 #' @examples
-autoplot.bumbldf <- function(bumbldf) {
+autoplot.bumbldf <- function(bumbldf, colony = NULL) {
   colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
   t <- attr(bumbldf, "t", exact = TRUE)
   formula <- attr(bumbldf, "formula", exact = TRUE)
@@ -69,7 +70,9 @@ autoplot.bumbldf <- function(bumbldf) {
     x <- predict
   }
 
-  plot_data <- split(x, x$colony)
+  if (!is.null(colony)) {
+    x <- x[x[[colonyID]] %in% colony, ]
+  }
 
   p <-
     ggplot2::ggplot(x, ggplot2::aes_string(x = t)) +
