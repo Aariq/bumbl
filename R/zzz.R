@@ -26,7 +26,7 @@
 #   )
 # }
 
-#' #' @import vctrs
-#' .onLoad <- function(libname, pkgname) {
-#'   vctrs::s3_register("ggplot2::autoplot", "bumbldf")
-#' }
+
+.onLoad <- function(libname, pkgname) {
+  vctrs::s3_register("ggplot2::autoplot", "bumbldf")
+}
