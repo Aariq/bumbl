@@ -85,8 +85,6 @@ out <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
 head(out)
 ```
 
-***TODO***: address convergence warnings from glm.fit
-
 For each colony, we get the maximum likelihood estimate for $\tau$ (`tau`), the estimated initial colony weight ($\ln({W_0})$, `logN0`) on a log scale, the average colony growth rate ($\ln(\lambda)$, `logLam`) on a log scale, the rate of decline after $\tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
 
 The supplied formula can also include covariates for colony growth. The model coefficients for any additional covariates are included in the output of `bumbl()`. Here, I've included cumulative floral resources as a covariate.
@@ -102,16 +100,16 @@ head(out2)
 As is the case with any GLM, some model diagnostics should be performed before interpreting the results. One way to check that results are sensible, is to plot them. The `plot()` method for data frames produced by `bumbl()` (`plot.bumbldf()`) plots each colony's observed and estimated growth trajectory as a separate plot. If you only want to display certain results, you can supply a vector of indices or colony ID's to the `colony` argument.
 
 ```{r}
-plot(out, colony = c("17", "104", "20"))
+plot(out, colony = c("17", "104", "20", "24"))
 ```
 
 Observed values for colony 20 don't follow a neat growth and decline shape, and the colony mass was consistently very low. Because of this, we might not trust the value for `tau` as representing a true switch from workers to reproductives.
 
 There is also an `autoplot()` method that can be used if you have the `ggplot2` package installed. It returns a `ggplot` object which can be modified.
 
-```{r}
+```{r fig.width=5, fig.height=5}
 library(ggplot2)
-p <- autoplot(out, colony = c("17", "104", "20"))
+p <- autoplot(out, colony = c("17", "104", "20", "24"))
 p + theme_bw()
 ```
 
@@ -127,6 +125,8 @@ head(out3)
 Say, for example, you want to compute an R^2^ value using the `rsq` package.
 
 ```{r}
+library(dplyr)
+library(purrr)
 library(rsq)
 #for a single colony
 # m <- out3$model[[1]]
@@ -137,10 +137,10 @@ out3.1 <-
   out3 %>% 
   mutate(r2 = purrr::map_dbl(model, rsq), .after = model)
 
-out3.1 %>% filter(colony %in% c("104", "17", "20"))
+out3.1 %>% filter(colony %in% c("104", "17", "20", "24"))
 ```
 
-We can see that colony 20 has a much lower R^2^ value than colonies 104 and 17, which matches our expectations from plotting the observed and fitted values.
+We can see that colony 20 has a much lower R^2^ value than colonies 104, 17, and 24 which matches our expectations from plotting the observed and fitted values.
 
 See `vignette("nest", package = "tidyr")` for more about working with list-columns containing models.
 
