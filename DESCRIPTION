@@ -28,7 +28,8 @@ Suggests:
     rmarkdown,
     covr,
     car,
-    ggplot2
+    ggplot2,
+    rsq
 Imports: 
     dplyr,
     rlang,
