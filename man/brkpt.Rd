@@ -2,28 +2,27 @@
 % Please edit documentation in R/colony-growth.R
 \name{brkpt}
 \alias{brkpt}
-\alias{brkpt.nb}
 \title{Fit breakpoint model to individual colony}
 \usage{
 brkpt(data, t, formula, family = gaussian(link = "log"), taus = NULL, ...)
-
-brkpt.nb(data, taus = NULL, t, formula, link = "log", ...)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
 
 \item{t}{the unquoted column name for the time variable in \code{data}}
 
-\item{formula}{a formula passed to \code{glm()} or \code{glm.nb()}.  This should
+\item{formula}{a formula passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}.  This should
 include the time variable supplied to \code{t}}
 
-\item{family}{passed to \code{glm()}}
+\item{family}{a description of the error distribution and link function.
+This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
+causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
 
-\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used}
+\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used. For longer time series or those
+with higher temporal resolution, the default may be too few values for tau
+to find the maximum likelihood estimate accurately.}
 
-\item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}}
-
-\item{link}{passed to \code{glm.nb()}}
+\item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[=glm.nb]{glm.nb()}}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the
@@ -31,13 +30,8 @@ winning model
 }
 \description{
 Fits models using a range of taus and picks the best one using maximum
-liklihood
+liklihood. Typically only used internally by \code{\link[=bumbl]{bumbl()}}.
 }
-\section{Functions}{
-\itemize{
-\item \code{brkpt.nb}: passes arguments to \code{MASS::glm.nb()}
-}}
-
 \examples{
 testbees <- bombus[bombus$colony == 9, ]
 # Using dates
@@ -46,5 +40,8 @@ brkpt(testbees, t = date, formula = mass ~ date)
 # Using weeks
 brkpt(testbees, t = week, formula = mass ~ week)
 }
+}
+\seealso{
+\code{\link[=bumbl]{bumbl()}}
 }
 \keyword{internal}

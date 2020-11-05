@@ -2,7 +2,6 @@
 % Please edit documentation in R/colony-growth.R
 \name{bumbl}
 \alias{bumbl}
-\alias{bumbl.nb}
 \title{Estimate colony growth, switch point, and decay parameters}
 \usage{
 bumbl(
@@ -12,48 +11,48 @@ bumbl(
   family = gaussian(link = "log"),
   colonyID = NULL,
   augment = FALSE,
-  taus = NULL,
-  ...
-)
-
-bumbl.nb(
-  data,
-  colonyID = NULL,
-  t,
-  formula,
-  link = "log",
-  augment = FALSE,
+  keep.model = FALSE,
   taus = NULL,
   ...
 )
 }
 \arguments{
-\item{data}{a dataframe or tibble}
+\item{data}{a dataframe or tibble with a column for colony ID (as a
+\code{character} or \code{factor}), a column for some measure of time (\code{numeric}),
+and a column for some measure of colony growth (\code{numeric}), at minimum.}
 
-\item{t}{the unquoted column name of the time variable in (units???)}
+\item{t}{the unquoted column name of the time variable.}
 
 \item{formula}{a formula with the form \code{response ~ time + covariates} where
 response is your measure of colony growth, time is whatever measure of time
 you have (date, number of weeks, etc.) and covariates are any optional
 co-variates you want to fit at the colony level.}
 
-\item{family}{passed to \code{glm()}.}
+\item{family}{a description of the error distribution and link function.
+This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
+causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
 
 \item{colonyID}{the unquoted column name of the colony ID variable}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional
-columns containing model coefficients.}
+columns containing model coefficients. Cannot be used in conjuction with
+\code{keep.model = TRUE}.}
+
+\item{keep.model}{If TRUE, then the output will contain a list-column with
+the models for each colony. This may be useful for extracting statistics
+and performing model diagnostics not provided by \code{bumbl()}. Learn more
+about working with list columns with \code{vignette("nest", package = "tidyr")}.}
 
 \item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 
-\item{...}{additional arguments passed to \code{glm()} or \code{glm.nb()}.}
-
-\item{link}{passed to \code{glm.nb()} from the \code{MASS} package}
+\item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}.}
 }
 \value{
-A summary of the data with a row for every colony and the following columns:
+A \code{data.frame} with the additional class \code{bumbldf} containing a
+summary of the data with a row for every colony and the following columns:
 \itemize{
+\item{\code{converged} indicates whether the winning model converged.}
 \item{\code{tau} is the switchpoint, in the same units as \code{t}, for
 each \code{colonyID}.  The colony grows for \eqn{\tau} weeks, then begins to
 decline in week \eqn{\tau + 1}.}
@@ -64,9 +63,9 @@ weeks lag before growth started in the field.}
 \item{\code{logLam} is the
 average (log-scale) colony growth rate (i.e., rate of weight gain per unit
 \code{t}) during the growth period.}
-\item{\code{decay} reflects the rate of decline
-during the decline period. In fact, the way this model is set up, the
-actual rate of decline per unit \code{t} is calculated as \code{decay} - \code{logLam}.}
+\item{\code{decay} reflects the rate of decline during the decline period.
+Equivalent to ln(\eqn{\delta}) - ln(\eqn{\lambda}) (see vignette for more
+in-depth explanation).}
 \item{\code{logNmax} is the maximum weight reached by each colony.  It is a
 function of \code{tau}, \code{logN0} and \code{logLam}}
 \item{Additional columns are
@@ -74,25 +73,28 @@ coefficients for any covariates supplied in the \code{formula}}
 }
 When \code{augment = TRUE}, the original data are returned with these columns as
 well as fitted values (\code{.fitted}) residuals (\code{.resid}) and standard error
-(\code{.se.fit})
+(\code{.se.fit}).  When \code{keep.model = TRUE} a list-column with the \code{glm} models
+for each colony is returned as well.
 }
 \description{
-Fits models that assume bumblebee colonies will switch from growth to gyne
-production at some point, \eqn{\tau}. This allows for a different
-switchpoint (\eqn{\tau}) for each colony, chosen by maximum liklihood
-methods.
+Fits generalized linear models that assume bumblebee colonies will switch
+from growth to gyne production at some point, \eqn{\tau}. This allows for a
+different switchpoint (\eqn{\tau}) for each colony, chosen by maximum
+likelihood methods.
 }
 \details{
-Colony growth is modeled as increasing exponentialy until the colony
-switches to gyne production, at which time the workers die and gynes leave
-the colony, causing the colony to decline. The switch point, \eqn{\tau},
-may vary among colonies.
+Colony growth is modeled as increasing exponentially until the
+colony switches from producing workers to producing reproductive
+individuals (drones and gynes), at which time the workers die and gynes
+leave the colony, causing the colony to decline. The switch point,
+\eqn{\tau}, may vary among colonies. \code{bumbl()} finds the value of
+\eqn{\tau} that maximizes likelihood and this "winning" model is used to
+calculate statistics returned in the output. This function works by fitting
+genearlized linear models (GLMs) to modified colony growth data. Because of
+this, the assumptions for GLMs apply, namely independence and homogeneity
+of variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
+the underlying math of the model.
 }
-\section{Functions}{
-\itemize{
-\item \code{bumbl.nb}: passes arguments to \code{MASS::glm.nb()} rather than \code{glm()}
-}}
-
 \examples{
 # Colony 67 doesn't ever switch to reproduction and results in an error
 \dontrun{
@@ -101,4 +103,13 @@ bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
 
 bombus2 <- bombus[bombus$colony != 67, ]
 bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
+}
+\references{
+Crone EE, Williams NM (2016) Bumble bee colony dynamics:
+quantifying the importance of land use and floral resources for colony
+growth and queen production. Ecology Letters 19:460–468.
+https://doi.org/10.1111/ele.12581
+}
+\seealso{
+\code{\link[=plot.bumbldf]{plot.bumbldf()}}
 }

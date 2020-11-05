@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Modeling bumblebee colony growth with a switch point}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: references.bib
 ---
 
 ```{r, include = FALSE}
@@ -21,20 +22,21 @@ library(car)
 
 ## Introduction to the bumbl() function
 
-The `bumbl()` function fits a model that allows for different growth rates before and after a switch point, $\tau$, and an added decay rate after $\tau$. This model is fit separately for each colony in a dataset.  In this example, we'll use the built-in `bombus` dataset.  For more information on this dataset see the help file with `?bombus`.
+Bumblebee colony growth is characterized by an initial exponential growth period when workers are being produced, followed by a switch to production of reproductive individuals (gynes and drones). Reproductive individuals leave the nest, resulting in a decline in colony size. The initial growth rate, the rate or decline, and the time to switching to reproduction may vary in response to envrionmental conditions [@croneBumbleBeeColony2016].
+
+The `bumbl()` function fits a model, described below and in Crone & Williams [-@croneBumbleBeeColony2016], that finds a growth rate ($\lambda$), a decline rate ($\delta$) , and a switchpoint ($\tau$. When supplied with a dataset with multiple colonies, a model is fit separately for each colony and these three parameters (as well as an estimated starting colony size and maximum colony size) are returned. In this example, we'll use the built-in `bombus` dataset. For more information on this dataset see the help file with `?bombus`.
 
 Before the switch point, growth (colony weight, $W_t$) is defined as:
 
 $$
 W_t = \lambda^tW_0
-$$
-After the switchpoint ($t > \tau$), it's defined as:
+$$ After the switchpoint ($t > \tau$), it's defined as:
 
 $$
 W_t = \lambda^{\tau}W_{0}\delta^{t-\tau}
 $$
 
-Where $\delta$ is a rate of decline.  Therefore:
+Where $\delta$ is a rate of decline. Therefore:
 
 $$
 W_t = 
@@ -44,8 +46,7 @@ W_t =
   \end{cases}
 $$
 
-
-After log-linearizing it it looks like this:
+After log-linearizing this model, it it looks like this:
 
 For $t<=\tau$:
 
@@ -53,30 +54,23 @@ $$
 \ln(W_t) = \ln(W_0) + t\ln(\lambda)
 $$
 
-
 For $t>\tau$
 
 $$
 \ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + (t-\tau)\ln(\delta)
 $$
 
-Turning that into a simple linter regression looks like:
+`bumbl()` works by treating this as a generalized linear model with a log-link after creating a new variable, `post` which is 0 before $\tau$ and $t-\tau$ after $\tau$. A range of values for $\tau$ are tested and the value that maximizes likelihood is used for the final model.
 
 $$
 ln(W_t) = \beta_0 + \beta_1*t + \beta_2*post
 $$
-`bumbl` actually treats this as a generalized linear model with a log-link function, rather than log transforming the response:
-
-$$
-
-$$
-Where *post* is $0$ before $\tau$ and $t-\tau$ after $\tau$
 
 To clarify, in the above equation:
 
-- $\beta_0 = \ln(W_0)$
-- $\beta_1 = \ln(\lambda)$
-- $\beta_2 = \ln(\delta-\lambda) = \frac{\ln(\delta)}{\ln(\lambda)}$
+-   $\beta_0 = \ln(W_0)$
+-   $\beta_1 = \ln(\lambda)$
+-   $\beta_2 = \ln(\delta-\lambda) = \frac{\ln(\delta)}{\ln(\lambda)}$
 
 ## Modeling Bombus colony growth
 
@@ -84,7 +78,7 @@ To clarify, in the above equation:
 head(bombus)
 ```
 
-The `bumbl()` function expects a tidy dataset with a single column for colony ID, a single column for some measure of time, and a single column for some measure of colony growth at minimum.
+The `bumbl()` function expects a tidy dataset with a column for some measure of time, and a column for some measure of colony size at minimum. A formula is required, which at minimum should have colony size on the left-hand side, and time on the right-hand side.
 
 ```{r}
 out <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
@@ -93,56 +87,61 @@ head(out)
 
 For each colony, we get the maximum likelihood estimate for $\tau$ (`tau`), the estimated initial colony weight ($\ln({W_0})$, `logN0`) on a log scale, the average colony growth rate ($\ln(\lambda)$, `logLam`) on a log scale, the rate of decline after $\tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
 
-You can also include co-variates 
-TODO:[why might you want to do this?]
+The supplied formula can also include covariates for colony growth. The model coefficients for any additional covariates are included in the output of `bumbl()`. Here, I've included cumulative floral resources as a covariate.
 
 ```{r}
-out2 <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week * cum_floral)
+out2 <- bumbl(bombus, colonyID = colony, t = week,
+              formula = d.mass ~ week + cum_floral)
 head(out2)
 ```
 
+## Checking Results
 
-## Plotting results
-
-To check that these results are sensible, you should plot them.
+As is the case with any GLM, some model diagnostics should be performed before interpreting the results. One way to check that results are sensible, is to plot them. The `plot()` method for data frames produced by `bumbl()` (`plot.bumbldf()`) plots each colony's observed and estimated growth trajectory as a separate plot. If you only want to display certain results, you can supply a vector of indices or colony ID's to the `colony` argument.
 
 ```{r}
-#using a subset of bomubs for this
-bombus2 <- bombus[bombus$colony %in% c(38, 82, 98, 35), ]
-
-aug_out <- bumbl(bombus2, colonyID = colony, t = week,
-                 formula = d.mass ~ week, 
-                 augment = TRUE)
-head(aug_out)
+plot(out, colony = c("17", "104", "20", "24"))
 ```
 
-Then you can plot this dataframe with `bumbl_plot()`.
+Observed values for colony 20 don't follow a neat growth and decline shape, and the colony mass was consistently very low. Because of this, we might not trust the value for `tau` as representing a true switch from workers to reproductives.
 
-```{r}
-bumbl_plot(aug_out)
+There is also an `autoplot()` method that can be used if you have the `ggplot2` package installed. It returns a `ggplot` object which can be modified.
+
+```{r fig.width=5, fig.height=5}
+library(ggplot2)
+p <- autoplot(out, colony = c("17", "104", "20", "24"))
+p + theme_bw()
 ```
 
-From this it's clear that for colony 38, the model is incorrect.
+If you'd rather get these data and produce your own plots, run `bumbl()` with `augment = TRUE` to get fitted values to plot.
 
-
-## Using results
-
-With `augment = TRUE`, `bumbl()` returns your original data with columns added for model coefficients.  This might be useful if you were interested in how habitat type effects the switch-time, $tau$.
+Other model diagnostics (plots or statistics) can be obtained from the GLMs fit to each colony. Running `bumbl()` with `keep.model = TRUE` produces an output with a list-column containing the GLMs.
 
 ```{r}
-out3 <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)
+out3 <- bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week, keep.model = TRUE)
 head(out3)
 ```
 
-We can now use that augmented dataset in another model
+Say, for example, you want to compute an R^2^ value using the `rsq` package.
 
 ```{r}
-m <- lm(tau ~ habitat, data = out3)
-summary(m)
-Anova(m)
+library(dplyr)
+library(purrr)
+library(rsq)
+#for a single colony
+# m <- out3$model[[1]]
+# rsq(m)
+
+#for all colonies
+out3.1 <-
+  out3 %>% 
+  mutate(r2 = purrr::map_dbl(model, rsq), .after = model)
+
+out3.1 %>% filter(colony %in% c("104", "17", "20", "24"))
 ```
 
-In this example, without accounting for any other covariates, habitat type has a highly significant effect on switch time with colonies in organic farms switching to decline about two weeks earlier than conventional agriculture and about a week earlier than wild landscapes. 
+We can see that colony 20 has a much lower R^2^ value than colonies 104, 17, and 24 which matches our expectations from plotting the observed and fitted values.
 
+See `vignette("nest", package = "tidyr")` for more about working with list-columns containing models.
 
-
+# References
