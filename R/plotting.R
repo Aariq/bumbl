@@ -54,12 +54,14 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #'
 #' @return invisibly returns a ggplot object
 #' @examples
+#' \dontrun{
 #' set.seed(687)
 #' colonyID_subset <- sample(bombus$colony, 10)
 #' colony_subset <- bombus[bombus$colony %in% colonyID_subset, ]
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = mass ~ week)
 #' autoplot(results)
+#' }
 autoplot.bumbldf <- function(bumbldf, colony = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE)) {
     abort("The ggplot2 package must be installed to use autoplot.bumbldf()")

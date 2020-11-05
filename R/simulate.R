@@ -3,6 +3,7 @@
 #' This is the generative model assumed by the GLM implemented in `bumbl()` parameterized using estimates from the `bombus` dataset.
 #'
 #' @param seed numeric; passed to `set.seed()`. For reproducibility.
+#' @importFrom stats rnorm
 #' @noRd
 #' @return a vector of colony growth with parameters used as attributes.
 #'
