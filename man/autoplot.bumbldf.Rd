@@ -4,10 +4,10 @@
 \alias{autoplot.bumbldf}
 \title{Plot observed and fitted results from bumbl()}
 \usage{
-\method{autoplot}{bumbldf}(bumbldf, colony = NULL)
+\method{autoplot}{bumbldf}(x, colony = NULL)
 }
 \arguments{
-\item{bumbldf}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}}
+\item{x}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}}
 
 \item{colony}{a character vector of colony IDs to plot}
 }

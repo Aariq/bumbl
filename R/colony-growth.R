@@ -311,8 +311,8 @@ bumbl <-
              converged = purrr::map_lgl(.data$model, ~.x$converged)) %>%
       dplyr::select(
         !!colonyID,
-        model,
-        converged,
+        "model",
+        "converged",
         "tau",
         logN0 = "(Intercept)",
         logLam = !!t,
@@ -321,7 +321,7 @@ bumbl <-
         everything()
       )
     if (keep.model == FALSE) {
-      modeldf <- select(modeldf, -model)
+      modeldf <- select(modeldf, -.data$model)
     }
     augmented_df <-
       left_join(df, modeldf, by = as_name(colonyID))

@@ -1,13 +1,14 @@
 #' Plot observed and fitted results from bumbl()
 #'
 #' Creates one plot per level of colonyID showing the observed (points) and fitted (red line) values from the model implemented by `bumbl()`.
-#'
-#' @param bumbldf a dataframe produced by [bumbl()].
-#' @param colony Optional vector of colony ID's (character) or indexes (numeric) to plot.  If not supplied, all colonies will be plotted.
+#' @rdname plot.bumbldf
+#' @param x a dataframe produced by [bumbl()].
+#' @param ... other arguments not used by this method.
+#' @param colony optional vector of colony ID's (character) or indexes (numeric) to plot.  If not supplied, all colonies will be plotted.
 #' @method plot bumbldf
 #' @return invisibly returns a list of dataframes used for building the plots.
 #' @export
-#' @seealso [bumbl()] [autoplot.bumbldf()]
+#' @seealso [bumbl()], [autoplot.bumbldf()]
 #' @examples
 #' set.seed(687)
 #' colonyID_subset <- sample(bombus$colony, 10)
@@ -15,15 +16,15 @@
 #' results <- bumbl(colony_subset, colonyID = colony, t = week,
 #'                  formula = mass ~ week)
 #' plot(results)
-plot.bumbldf <- function(bumbldf, colony = NULL) {
-  colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
-  t <- attr(bumbldf, "t", exact = TRUE)
-  formula <- attr(bumbldf, "formula", exact = TRUE)
-  predict <- attr(bumbldf, "predict", exact = TRUE)
+plot.bumbldf <- function(x, ..., colony = NULL) {
+  colonyID <- attr(x, "colonyID", exact = TRUE)
+  t <- attr(x, "t", exact = TRUE)
+  formula <- attr(x, "formula", exact = TRUE)
+  predict <- attr(x, "predict", exact = TRUE)
   yvar <- all.vars(formula)[1]
 
   if (is.null(predict)) {
-    x <- bumbldf
+    x <- x
   } else {
     x <- predict
   }
@@ -48,7 +49,7 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #'
 #' Plots observed (points) and fitted (red line) values from the model implemented by `bumbl()`, faceted by colony.
 #'
-#' @param bumbldf a dataframe produced by [bumbl()]
+#' @param x a dataframe produced by [bumbl()]
 #' @param colony a character vector of colony IDs to plot
 #' @method autoplot bumbldf
 #'
@@ -62,18 +63,18 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #'                  formula = mass ~ week)
 #' autoplot(results)
 #' }
-autoplot.bumbldf <- function(bumbldf, colony = NULL) {
+autoplot.bumbldf <- function(x, colony = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE)) {
     abort("The ggplot2 package must be installed to use autoplot.bumbldf()")
   }
-  colonyID <- attr(bumbldf, "colonyID", exact = TRUE)
-  t <- attr(bumbldf, "t", exact = TRUE)
-  formula <- attr(bumbldf, "formula", exact = TRUE)
-  predict <- attr(bumbldf, "predict", exact = TRUE)
+  colonyID <- attr(x, "colonyID", exact = TRUE)
+  t <- attr(x, "t", exact = TRUE)
+  formula <- attr(x, "formula", exact = TRUE)
+  predict <- attr(x, "predict", exact = TRUE)
   yvar <- all.vars(formula)[1]
 
   if (is.null(predict)) {
-    x <- bumbldf
+    x <- x
   } else {
     x <- predict
   }

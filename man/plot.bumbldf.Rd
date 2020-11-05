@@ -4,12 +4,14 @@
 \alias{plot.bumbldf}
 \title{Plot observed and fitted results from bumbl()}
 \usage{
-\method{plot}{bumbldf}(bumbldf, colony = NULL)
+\method{plot}{bumbldf}(x, ..., colony = NULL)
 }
 \arguments{
-\item{bumbldf}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}.}
+\item{x}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}.}
 
-\item{colony}{Optional vector of colony ID's (character) or indexes (numeric) to plot.  If not supplied, all colonies will be plotted.}
+\item{...}{other arguments not used by this method.}
+
+\item{colony}{optional vector of colony ID's (character) or indexes (numeric) to plot.  If not supplied, all colonies will be plotted.}
 }
 \value{
 invisibly returns a list of dataframes used for building the plots.
@@ -26,5 +28,5 @@ results <- bumbl(colony_subset, colonyID = colony, t = week,
 plot(results)
 }
 \seealso{
-\code{\link[=bumbl]{bumbl()}} \code{\link[=autoplot.bumbldf]{autoplot.bumbldf()}}
+\code{\link[=bumbl]{bumbl()}}, \code{\link[=autoplot.bumbldf]{autoplot.bumbldf()}}
 }
