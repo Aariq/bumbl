@@ -57,20 +57,6 @@ s3_register <- function(generic, class, method = NULL) {
   invisible()
 }
 
-knitr_defer <- function(expr, env = caller_env()) {
-  roxy_caller <- detect(sys.frames(), env_inherits, ns_env("knitr"))
-  if (is_null(roxy_caller)) {
-    abort("Internal error: can't find knitr on the stack.")
-  }
-
-  blast(
-    withr::defer(!!substitute(expr), !!roxy_caller),
-    env
-  )
-}
-blast <- function(expr, env = caller_env()) {
-  eval_bare(enexpr(expr), env)
-}
 
 # This exists to register the autoplot method for bumbldf without importing ggplot2.
 .onLoad <- function(libname, pkgname) {
