@@ -40,7 +40,7 @@ test_that("plotting works with augment = TRUE", {
       augment = TRUE
     ))
   expect_invisible(plot(results))
-  expect_invisible(autoplot(results))
+  expect_invisible(ggplot2::autoplot(results))
 })
 
 
@@ -55,7 +55,7 @@ test_that("plotting works with count data", {
       augment = TRUE
     )
   expect_invisible(plot(results_count))
-  expect_invisible(autoplot(results_count))
+  expect_invisible(ggplot2::autoplot(results_count))
 })
 
 

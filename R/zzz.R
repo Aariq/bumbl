@@ -1,32 +1,78 @@
-# .onLoad <- function(libname, pkgname) {
-#   register_s3_method("ggplot2", "autoplot", "bumbldf", gen_pkg = "ggplot2")
-# }
-#
-# register_s3_method <- function(pkg, generic, class, fun = NULL, gen_pkg = pkg) {
-#   stopifnot(is.character(pkg), length(pkg) == 1)
-#   stopifnot(is.character(generic), length(generic) == 1)
-#   stopifnot(is.character(class), length(class) == 1)
-#   if (is.null(fun)) {
-#     fun <- get(paste0(generic, ".", class), envir = parent.frame())
-#   }
-#   stopifnot(is.function(fun))
-#
-#   if (pkg %in% loadedNamespaces()) {
-#     envir <- asNamespace(gen_pkg)
-#     registerS3method(generic, class, fun, envir = envir)
-#   }
-#
-#   # Always register hook in case package is later unloaded & reloaded
-#   setHook(
-#     packageEvent(pkg, "onLoad"),
-#     function(...) {
-#       envir <- asNamespace(gen_pkg)
-#       registerS3method(generic, class, fun, envir = envir)
-#     }
-#   )
-# }
+#copied from vctrs, at their suggestion
+s3_register <- function(generic, class, method = NULL) {
+  stopifnot(is.character(generic), length(generic) == 1)
+  stopifnot(is.character(class), length(class) == 1)
 
+  pieces <- strsplit(generic, "::")[[1]]
+  stopifnot(length(pieces) == 2)
+  package <- pieces[[1]]
+  generic <- pieces[[2]]
 
+  caller <- parent.frame()
+
+  get_method_env <- function() {
+    top <- topenv(caller)
+    if (isNamespace(top)) {
+      asNamespace(environmentName(top))
+    } else {
+      caller
+    }
+  }
+  get_method <- function(method, env) {
+    if (is.null(method)) {
+      get(paste0(generic, ".", class), envir = get_method_env())
+    } else {
+      method
+    }
+  }
+
+  method_fn <- get_method(method)
+  stopifnot(is.function(method_fn))
+
+  # Always register hook in case package is later unloaded & reloaded
+  setHook(
+    packageEvent(package, "onLoad"),
+    function(...) {
+      ns <- asNamespace(package)
+
+      # Refresh the method, it might have been updated by `devtools::load_all()`
+      method_fn <- get_method(method)
+
+      registerS3method(generic, class, method_fn, envir = ns)
+    }
+  )
+
+  # Avoid registration failures during loading (pkgload or regular)
+  if (!isNamespaceLoaded(package)) {
+    return(invisible())
+  }
+
+  envir <- asNamespace(package)
+
+  # Only register if generic can be accessed
+  if (exists(generic, envir)) {
+    registerS3method(generic, class, method_fn, envir = envir)
+  }
+
+  invisible()
+}
+
+knitr_defer <- function(expr, env = caller_env()) {
+  roxy_caller <- detect(sys.frames(), env_inherits, ns_env("knitr"))
+  if (is_null(roxy_caller)) {
+    abort("Internal error: can't find knitr on the stack.")
+  }
+
+  blast(
+    withr::defer(!!substitute(expr), !!roxy_caller),
+    env
+  )
+}
+blast <- function(expr, env = caller_env()) {
+  eval_bare(enexpr(expr), env)
+}
+
+# This exists to register the autoplot method for bumbldf without importing ggplot2.
 .onLoad <- function(libname, pkgname) {
-  vctrs::s3_register("ggplot2::autoplot", "bumbldf")
+  s3_register("ggplot2::autoplot", "bumbldf")
 }

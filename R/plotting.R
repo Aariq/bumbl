@@ -53,7 +53,6 @@ plot.bumbldf <- function(bumbldf, colony = NULL) {
 #' @method autoplot bumbldf
 #'
 #' @return invisibly returns a ggplot object
-#' @export
 #' @examples
 #' set.seed(687)
 #' colonyID_subset <- sample(bombus$colony, 10)

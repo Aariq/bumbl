@@ -11,7 +11,6 @@ bombus_67 <- bombus %>% filter(colony == 67)
 noerrs <- bombus_sub %>% filter(colony != 67)
 
 detach("package:dplyr")
-library(lubridate)
 
 test_that("bumbl errors if time variable is missing from formula", {
   expect_error(
@@ -61,7 +60,7 @@ test_that("bumbl returns NAs for colonies that produce errors when augment = TRU
 
 test_that("bumbl works with co-variates", {
   out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week * cum_floral)
-  expect_identical(colnames(out), c("colony", "tau", "logN0", "logLam", "decay", "logNmax", "cum_floral", "week:cum_floral"))
+  expect_identical(colnames(out), c("colony", "converged", "tau", "logN0", "logLam", "decay", "logNmax", "cum_floral", "week:cum_floral"))
 })
 
 test_that("no unexpected warnings", {

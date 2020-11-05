@@ -1,7 +1,7 @@
 #' Fit breakpoint model to individual colony
 #'
 #' Fits models using a range of taus and picks the best one using maximum
-#' liklihood. Typically only used internally by `bumbl`.
+#' liklihood. Typically only used internally by [bumbl()].
 #'
 #' @param data a dataframe or tibble
 #' @param t the unquoted column name for the time variable in `data`
@@ -11,7 +11,9 @@
 #'   This is passed to [glm()] except in the case of `family = "negbin"`, which
 #'   causes [MASS::glm.nb()] to be used to fit a negative binomial GLM.
 #' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used
+#'   max(t), length.out = 50)` will be used. For longer time series or those
+#'   with higher temporal resolution, the default may be too few values for tau
+#'   to find the maximum likelihood estimate accurately.
 #' @param ... additional arguments passed to [glm()] or [glm.nb()]
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
