@@ -17,7 +17,7 @@ status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
-Crone and Williams 2019<sup>1</sup>. The `brkpt` function models colony
+Crone and Williams 2016<sup>1</sup>. The `brkpt` function models colony
 growth as having a change point at some time, *tau*, where the colony
 switches from growth and worker production to gyne production. The
 `bumbl` function applies this model to a data frame of data from
@@ -69,28 +69,23 @@ colonies switch to reproduction
 
 ``` r
 bombus2 <- bombus[bombus$colony %in% c(9, 82, 98, 35), ]
-bumbl(bombus2, colonyID = colony, t = week, formula = d.mass ~ week)
-#> Warning: glm.fit: algorithm did not converge
-
-#> Warning: glm.fit: algorithm did not converge
-#> # A tibble: 4 x 6
-#>   colony   tau logN0 logLam  decay logNmax
-#>   <chr>  <dbl> <dbl>  <dbl>  <dbl>   <dbl>
-#> 1 35      9.49  3.68  0.209 -0.295    5.61
-#> 2 82      7.43  2.97  0.394 -0.503    5.83
-#> 3 9       6.43  2.30  0.610 -0.690    6.18
-#> 4 98      6.37  1.27  0.570 -0.578    4.90
+results <- bumbl(bombus2, colonyID = colony, t = week, formula = d.mass ~ week)
+results
+#> # A tibble: 4 x 7
+#>   colony converged   tau logN0 logLam  decay logNmax
+#>   <chr>  <lgl>     <dbl> <dbl>  <dbl>  <dbl>   <dbl>
+#> 1 35     TRUE       9.49  3.68  0.209 -0.295    5.61
+#> 2 82     TRUE       7.43  2.97  0.394 -0.503    5.83
+#> 3 9      TRUE       6.43  2.30  0.610 -0.690    6.18
+#> 4 98     TRUE       6.37  1.27  0.570 -0.578    4.90
 ```
 
-Keep the original data and plot the results
+Plot the results
 
 ``` r
-results <- bumbl(bombus2, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)
-#> Warning: glm.fit: algorithm did not converge
-
-#> Warning: glm.fit: algorithm did not converge
 par(mfrow = c(2, 2))
-bumbl_plot(results)
+plot(results)
+#> Creating plots for 4 colonies...
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
