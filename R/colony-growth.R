@@ -131,7 +131,9 @@ brkpt <-
 #' @param family a description of the error distribution and link function.
 #'   This is passed to [glm()] except in the case of `family = "negbin"`, which
 #'   causes [MASS::glm.nb()] to be used to fit a negative binomial GLM.
-#' @param colonyID the unquoted column name of the colony ID variable
+#' @param colonyID the unquoted column name of the colony ID variable. This is
+#'   required, so to run `bumbl()` on a single colony, you must create a dummy
+#'   column with a colony ID.
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
 #'   columns containing model coefficients. Cannot be used in conjuction with
@@ -219,12 +221,18 @@ bumbl <-
 
     if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
     if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
-    colonyID <- enquo(colonyID)
+
     t <- enquo(t)
     tvar <- as_name(t)
     more_args <- list2(...)
     formula <- formula(formula)
     fterms <- terms(formula)
+
+    # Check that colonyID was input
+    if (is.null(colonyID) || !colonyID %in% colnames(data)) {
+      abort("The name of the colony ID column must be supplied to 'colonyID'.")
+    }
+    colonyID <- enquo(colonyID)
 
     # Check that at most only one of augment and keep.model are TRUE
     if (augment == TRUE & keep.model == TRUE){
@@ -243,23 +251,14 @@ bumbl <-
     if (!tvar %in% attr(fterms, "term.labels")) {
       abort(paste0("'", tvar, "' is missing from the model formula"))
     }
+    df <-
+      data %>%
+      # make sure colonyID is a character vector
+      mutate(!!colonyID := as.character(!!colonyID)) %>%
+      group_by(!!colonyID)
 
-    if (quo_is_null(colonyID)) {
-      df <- data
-      dflist <- list("NA" = data)
-      colonyID <- "colony"
-      #TODO: need to also add a column called "colony"?
-
-    } else {
-      df <-
-        data %>%
-        # make sure colonyID is a character vector
-        mutate(!!colonyID := as.character(!!colonyID)) %>%
-        group_by(!!colonyID)
-
-      dflist <- group_split(df)
-      names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
-    }
+    dflist <- group_split(df)
+    names(dflist) <- group_keys(group_by(data, !!colonyID))[[1]]
 
     model_list <- vector("list", length(dflist))
     names(model_list) <- names(dflist)
