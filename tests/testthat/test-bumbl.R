@@ -19,6 +19,17 @@ test_that("bumbl errors if time variable is missing from formula", {
   )
 })
 
+test_that("bumble errors if colony ID not specified correctly", {
+  expect_error(
+    bumbl(noerrs, colonyID = clooney, t = week, formula = mass ~ date),
+    "The name of the colony ID column must be supplied to 'colonyID'."
+  )
+  expect_error(
+    bumbl(noerrs, t = week, formula = mass ~ date),
+    "The name of the colony ID column must be supplied to 'colonyID'."
+  )
+})
+
 test_that("bumbl works", {
   expect_s3_class(
     bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week),
@@ -101,20 +112,10 @@ test_that("bumbl works with overdispersed count data", {
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
 })
 
-test_that("bumbl works when no Colony ID supplied", {
-  expect_s3_class(
-    bumbl(bombus_67, t = week, formula = d.mass ~ week),
-    "data.frame"
-  )
-  expect_s3_class(
-    bumbl(bombus_67, t = week, formula = d.mass ~ week, augment = TRUE),
-    "data.frame"
-  )
-})
 
 test_that("error handling", {
   expect_error(brkpt(bombus_67, t = week, formula = I(d.mass-1) ~ week), regexp = "No valid values for tau found.+")
-  expect_error(bumbl(bombus_sub, t = week, formula = I(d.mass - 1) ~ week), "Model fitting failed for all colonies.")
+  expect_error(bumbl(bombus_sub, colonyID = colony, t = week, formula = I(d.mass - 1) ~ week), "Model fitting failed for all colonies.")
 })
 
 test_that("results are correct", {
@@ -122,7 +123,7 @@ test_that("results are correct", {
   x <- sim_colony(seed = 846)
   params <- attributes(x)
   testcol <- tibble(week = 1:20, mass = x, colony = "a")
-  out <- suppressWarnings(bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log")))
+  out <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
   expect_equal(out$tau, params$tau, tolerance = 0.1)
   expect_equal(out$logN0, log(params$n0), tolerance = 0.1)
   expect_equal(out$logLam, log(params$lambda), tolerance = 0.05)
@@ -135,8 +136,8 @@ test_that("results are robust", {
   testcol <-
     tibble(week = 1:20, mass = x, colony = "a") %>%
     mutate(mass2 = jitter(mass))
-  out1 <- suppressWarnings(bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log")))
-  out2 <- suppressWarnings(bumbl(testcol, t = week, mass2 ~ week, family = gaussian(link = "log")))
+  out1 <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
+  out2 <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass2 ~ week, family = gaussian(link = "log")))
   expect_equal(out1$tau, out2$tau, tolerance = 0.0001)
   expect_equal(out1$logN0, out2$logN0, tolerance = 0.0001)
   expect_equal(out1$logLam, out2$logLam, tolerance = 0.0001)
@@ -149,16 +150,16 @@ test_that("results are not dependent on row order", {
     tibble(week = 1:20, mass = x, colony = "a")
   testcol2 <-
     sample_n(testcol, nrow(testcol))
-  out1 <- suppressWarnings(bumbl(testcol, t = week, mass ~ week, family = gaussian(link = "log")))
-  out2 <- suppressWarnings(bumbl(testcol2, t = week, mass ~ week, family = gaussian(link = "log")))
+  out1 <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
+  out2 <- suppressWarnings(bumbl(testcol2, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
   expect_equivalent(out1, out2)
 })
 
 test_that("keep.model = TRUE works", {
-  out <- bumbl(noerrs, t = week, mass ~ week, keep.model = TRUE)
+  out <- bumbl(noerrs, colonyID = colony, t = week, mass ~ week, keep.model = TRUE)
   expect_is(out$model, "list")
 })
 
 test_that("Can't use both keep.model and augment", {
-  expect_error(bumbl(noerrs, t = week, mass ~ week, augment = TRUE, keep.model = TRUE))
+  expect_error(bumbl(noerrs, colonyID = colony, t = week, mass ~ week, augment = TRUE, keep.model = TRUE))
 })

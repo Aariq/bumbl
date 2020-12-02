@@ -32,7 +32,9 @@ co-variates you want to fit at the colony level.}
 This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
 causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
 
-\item{colonyID}{the unquoted column name of the colony ID variable}
+\item{colonyID}{the unquoted column name of the colony ID variable. This is
+required, so to run \code{bumbl()} on a single colony, you must create a dummy
+column with a colony ID.}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional

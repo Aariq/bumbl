@@ -221,7 +221,7 @@ bumbl <-
 
     if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
     if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
-
+    colonyID <- enquo(colonyID)
     t <- enquo(t)
     tvar <- as_name(t)
     more_args <- list2(...)
@@ -229,10 +229,10 @@ bumbl <-
     fterms <- terms(formula)
 
     # Check that colonyID was input
-    if (is.null(colonyID) || !colonyID %in% colnames(data)) {
+    if (quo_is_null(colonyID) || !as_name(colonyID) %in% colnames(data)) {
       abort("The name of the colony ID column must be supplied to 'colonyID'.")
     }
-    colonyID <- enquo(colonyID)
+
 
     # Check that at most only one of augment and keep.model are TRUE
     if (augment == TRUE & keep.model == TRUE){
