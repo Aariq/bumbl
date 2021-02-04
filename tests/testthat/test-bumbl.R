@@ -163,3 +163,17 @@ test_that("keep.model = TRUE works", {
 test_that("Can't use both keep.model and augment", {
   expect_error(bumbl(noerrs, colonyID = colony, t = week, mass ~ week, augment = TRUE, keep.model = TRUE))
 })
+
+test_that("User can pass arguments to glm() with ...", {
+  #I think the simplest test is with model = FALSE
+  m2 <- bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week, keep.model = TRUE, model = FALSE)
+  expect_false("model" %in% names(m2$model[[1]]))
+
+  #Arguments where environment matters (e.g. unquoted variable names)
+  #make fake offset column
+  test_col <- noerrs %>% mutate(effort = runif(n(), 1, 2)) %>% filter(colony == first(colony))
+  expect_s3_class(
+    brkpt(test_col, t=week, formula = count ~ week, family = poisson(link = "log"), offset = log(effort)),
+    "tbl_df"
+  )
+})
