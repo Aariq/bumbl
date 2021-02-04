@@ -31,8 +31,9 @@ This is still in very early development, so use at your own risk.
 
   - [x] Write `bumbl()` function to model colony growth with switchpoint
   - [x] Finish documentation and vignette(s)
-  - [ ] [rOpenSci
+  - [x] [rOpenSci
     review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
+  - [ ] Regroup with Elizabeth Crone to discuss current behavior of `bumbl()`
   - [ ] Initial CRAN submission
   - [ ] Add integral projection model functions (in development on [ipm
     branch](https://github.com/Aariq/bumbl/tree/ipm))
