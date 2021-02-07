@@ -1,7 +1,7 @@
 library(dplyr)
 bombus_sub <-
   bombus %>%
-  filter(colony %in% c(67, 9, 14, 82, 83, 46, 92)) %>%
+  filter(colony %in% c(67, 9, 14, 82, 83, 46, 92, 71)) %>%
   group_by(colony) %>%
   mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
   ungroup()
@@ -41,31 +41,19 @@ test_that("bumbl works", {
   )
 })
 
-test_that("bumbl works with custom taus", {
-  expect_s3_class(
-    suppressWarnings(bumbl(noerrs, colonyID = colony, taus = seq(3, 18, 0.5), t = week,
-                           formula = mass ~ week)),
-    "data.frame"
-  )
-})
-
-test_that("bumbl errors with custom taus outside or range of data", {
-  expect_warning(bumbl(noerrs, colonyID = colony, taus = seq(3, 50, 1), t = week,
-                           formula = mass ~ week))
-})
 
 test_that("bumbl drops colonies that produce errors", {
   expect_message({
-    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week)
-  }, "Warning: More than one equivalent tau found for colonyID '67'. Omitting from results.")
+    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)
+  }, "Warning: Search for optimal switchpoint did not converge for colonyID '71'. Omitting from results.")
   expect_equal(nrow(out), length(unique(bombus_sub$colony)) - 1)
 })
 
 test_that("bumbl returns NAs for colonies that produce errors when augment = TRUE", {
   expect_message({
-    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week,
+    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week,
                  augment = TRUE)
-  }, "Warning: More than one equivalent tau found for colonyID '67'. Omitting from results.")
+  })
   expect_equal(nrow(bombus_sub), nrow(out))
 })
 
@@ -114,7 +102,6 @@ test_that("bumbl works with overdispersed count data", {
 
 
 test_that("error handling", {
-  expect_error(brkpt(bombus_67, t = week, formula = I(d.mass-1) ~ week), regexp = "No valid values for tau found.+")
   expect_error(bumbl(bombus_sub, colonyID = colony, t = week, formula = I(d.mass - 1) ~ week), "Model fitting failed for all colonies.")
 })
 
