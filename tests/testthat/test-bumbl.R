@@ -8,35 +8,35 @@ bombus_sub <-
 
 bombus_67 <- bombus %>% filter(colony == 67)
 
-noerrs <- bombus_sub %>% filter(colony != 67)
+noerrs <- bombus_sub %>% filter(!colony %in% c(67, 71))
 
 detach("package:dplyr")
 
 test_that("bumbl errors if time variable is missing from formula", {
   expect_error(
-    bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ date),
+    bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ date),
     "'week' is missing from the model formula"
   )
 })
 
 test_that("bumble errors if colony ID not specified correctly", {
   expect_error(
-    bumbl(noerrs, colonyID = clooney, t = week, formula = mass ~ date),
+    bumbl(noerrs, colonyID = clooney, t = week, formula = d.mass ~ date),
     "The name of the colony ID column must be supplied to 'colonyID'."
   )
   expect_error(
-    bumbl(noerrs, t = week, formula = mass ~ date),
+    bumbl(noerrs, t = week, formula = d.mass ~ date),
     "The name of the colony ID column must be supplied to 'colonyID'."
   )
 })
 
 test_that("bumbl works", {
   expect_s3_class(
-    bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week),
+    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ week)),
     "data.frame"
   )
   expect_s3_class(
-    bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week, augment = TRUE),
+    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)),
     "data.frame"
   )
 })
@@ -125,10 +125,11 @@ test_that("results are robust", {
     mutate(mass2 = jitter(mass))
   out1 <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
   out2 <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass2 ~ week, family = gaussian(link = "log")))
-  expect_equal(out1$tau, out2$tau, tolerance = 0.0001)
-  expect_equal(out1$logN0, out2$logN0, tolerance = 0.0001)
-  expect_equal(out1$logLam, out2$logLam, tolerance = 0.0001)
-  expect_equal(out1$decay, out2$decay, tolerance = 0.0001)
+  local_edition(3)
+  expect_equal(out1$tau, out2$tau, tolerance = 0.001)
+  expect_equal(out1$logN0, out2$logN0, tolerance = 0.001)
+  expect_equal(out1$logLam, out2$logLam, tolerance = 0.001)
+  expect_equal(out1$decay, out2$decay, tolerance = 0.001)
 })
 
 test_that("results are not dependent on row order", {
