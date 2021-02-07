@@ -1,16 +1,13 @@
-library(dplyr)
 bombus_sub <-
   bombus %>%
-  filter(colony %in% c(67, 9, 14, 82, 83, 46, 92, 71)) %>%
-  group_by(colony) %>%
-  mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
-  ungroup()
+  dplyr::filter(colony %in% c(67, 9, 14, 82, 83, 46, 92, 71)) %>%
+  dplyr::group_by(colony) %>%
+  dplyr::mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
+  dplyr::ungroup()
 
-bombus_67 <- bombus %>% filter(colony == 67)
+bombus_67 <- bombus %>% dplyr::filter(colony == 67)
 
-noerrs <- bombus_sub %>% filter(!colony %in% c(67, 71))
-
-detach("package:dplyr")
+noerrs <- bombus_sub %>% dplyr::filter(!colony %in% c(67, 71))
 
 test_that("bumbl errors if time variable is missing from formula", {
   expect_error(
@@ -107,6 +104,7 @@ test_that("error handling", {
 
 test_that("results are correct", {
   # runif(1, 1, 1000)
+  local_edition(2) #something not working right with 3e and expect_equal()
   x <- sim_colony(seed = 846)
   params <- attributes(x)
   testcol <- tibble(week = 1:20, mass = x, colony = "a")
@@ -133,6 +131,7 @@ test_that("results are robust", {
 })
 
 test_that("results are not dependent on row order", {
+  local_edition(2)
   x <- sim_colony(seed = 846)
   testcol <-
     tibble(week = 1:20, mass = x, colony = "a")
@@ -140,12 +139,12 @@ test_that("results are not dependent on row order", {
     sample_n(testcol, nrow(testcol))
   out1 <- suppressWarnings(bumbl(testcol, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
   out2 <- suppressWarnings(bumbl(testcol2, colonyID = colony, t = week, mass ~ week, family = gaussian(link = "log")))
-  expect_equivalent(out1, out2)
+  expect_equal(out1, out2, check.attributes = FALSE)
 })
 
 test_that("keep.model = TRUE works", {
   out <- bumbl(noerrs, colonyID = colony, t = week, mass ~ week, keep.model = TRUE)
-  expect_is(out$model, "list")
+  expect_type(out$model, "list")
 })
 
 test_that("Can't use both keep.model and augment", {
