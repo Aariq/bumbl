@@ -12,7 +12,6 @@ bumbl(
   colonyID = NULL,
   augment = FALSE,
   keep.model = FALSE,
-  taus = NULL,
   ...
 )
 }
@@ -45,8 +44,6 @@ columns containing model coefficients. Cannot be used in conjuction with
 the models for each colony. This may be useful for extracting statistics
 and performing model diagnostics not provided by \code{bumbl()}. Learn more
 about working with list columns with \code{vignette("nest", package = "tidyr")}.}
-
-\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used.}
 
 \item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}.}
 }

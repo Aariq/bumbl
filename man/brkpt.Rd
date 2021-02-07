@@ -4,7 +4,7 @@
 \alias{brkpt}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, t, formula, family = gaussian(link = "log"), taus = NULL, ...)
+brkpt(data, t, formula, family = gaussian(link = "log"), ...)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -17,10 +17,6 @@ include the time variable supplied to \code{t}}
 \item{family}{a description of the error distribution and link function.
 This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
 causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
-
-\item{taus}{an optional vector of taus to test. If not supplied, \code{seq(min(t), max(t), length.out = 50)} will be used. For longer time series or those
-with higher temporal resolution, the default may be too few values for tau
-to find the maximum likelihood estimate accurately.}
 
 \item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[=glm.nb]{glm.nb()}}}
 }
