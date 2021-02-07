@@ -42,6 +42,7 @@ brkpt <-
       #create new call in order to pass ... to glm()
       new_call <- as.call(c(list(sym("glm"), formula = f, family = family, data = data2), exprs(...)))
       m <- eval(new_call)
+      #TODO: capture warnings from eval(new_call)
       return(m)
     }
 
@@ -54,9 +55,9 @@ brkpt <-
       return(m)
     }
 
-    #wrap so optimize() can work on it.
+    #wrap so optimi() can work on it.
     brkpt_wrap <- function(tau, data, formula, t, family, ...) {
-      m <- brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau, family = family, ...)
+      m <- suppressWarnings(brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau, family = family, ...))
       return(logLik(m))
     }
 
@@ -65,7 +66,7 @@ brkpt <-
       return(logLik(m))
     }
     if (is.character(family) && family == "negbin") {
-      m_optim <- optim(
+      m_optim <- stats::optim(
         par = mean(pull(data, {{t}})),
         fn = brkpt_wrap_nb,
         data = data,
@@ -84,7 +85,7 @@ brkpt <-
         brkpt_glm_nb(data = data, formula = formula, t = {{t}}, tau = tau_win, ...)
 
     } else {
-      m_optim <- optim(
+      m_optim <- stats::optim(
         par = mean(pull(data, {{t}})),
         fn = brkpt_wrap,
         data = data,
