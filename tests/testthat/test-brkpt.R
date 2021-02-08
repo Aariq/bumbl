@@ -1,25 +1,12 @@
-library(dplyr)
-testbees <- bombus %>% filter(colony == 9)
-noswitch <- bombus %>% filter(colony == 67)
+
+testbees <- bombus %>% dplyr::filter(colony == 9)
+noswitch <- bombus %>% dplyr::filter(colony == 71)
 testcount <-
   testbees %>%
   #fake count data
-  mutate(count = as.integer(mass) - min(as.integer(mass)))
+  dplyr::mutate(count = as.integer(mass) - min(as.integer(mass)))
 
 
-test_that("brkpt errors if taus don't match t", {
-  expect_error(
-    brkpt(testbees, taus = seq(16, 20, 0.1), t = week, formula = mass ~ week),
-    "At least one tau must be in range of 'week'"
-  )
-})
-
-test_that("brkpt uses only taus in range of t", {
-  expect_warning(
-    brkpt(testbees, taus = seq(2, 20, 0.1), t = week, formula = mass ~ week),
-    "Some taus were not used because they were outside of range of 'week'"
-  )
-})
 
 test_that("brkpt works", {
   expect_s3_class(
@@ -35,10 +22,10 @@ test_that("brkpt works with more complicated formulas", {
   )
 })
 
-test_that("brkpt errors when multiple equivalent taus are found", {
+test_that("brkpt errors when tau optimization does not converge", {
   expect_error({
-    brkpt(noswitch, t = week, formula = mass ~ week)},
-    "More than one equivalent tau found"
+    brkpt(noswitch, t = week, formula = d.mass ~ week)},
+    "Search for optimal switchpoint did not converge"
   )
 })
 
@@ -55,13 +42,13 @@ test_that("brkpt errors when multiple equivalent taus are found", {
 test_that("brkpt works with poisson dist", {
   count.model <- brkpt(testcount, t = week, formula = count ~ week, family = "poisson")
   expect_s3_class(count.model, "data.frame")
-  expect_is(count.model$model[[1]], "glm")
+  expect_s3_class(count.model$model[[1]], "glm")
 })
 
 test_that("brkpt works with overdispersed data and family = 'negbin'", {
   negbin.model <- brkpt(testcount, t = week, formula = count ~ week, family = "negbin")
   expect_s3_class(negbin.model, "data.frame")
-  expect_is(negbin.model$model[[1]], "negbin")
+  expect_s3_class(negbin.model$model[[1]], "negbin")
 })
 
 test_that("dots pass arguments to glm()", {

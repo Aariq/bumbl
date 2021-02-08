@@ -29,15 +29,16 @@ This is still in very early development, so use at your own risk.
 
 ## Roadmap
 
-  - [x] Write `bumbl()` function to model colony growth with switchpoint
-  - [x] Finish documentation and vignette(s)
-  - [x] [rOpenSci
+-   [x] Write `bumbl()` function to model colony growth with switchpoint
+-   [x] Finish documentation and vignette(s)
+-   [x] [rOpenSci
     review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
-  - [ ] Regroup with Elizabeth Crone to discuss current behavior of `bumbl()`
-  - [ ] Initial CRAN submission
-  - [ ] Add integral projection model functions (in development on [ipm
+-   [ ] Regroup with Elizabeth Crone to discuss current behavior of
+    `bumbl()`
+-   [ ] Initial CRAN submission
+-   [ ] Add integral projection model functions (in development on [ipm
     branch](https://github.com/Aariq/bumbl/tree/ipm))
-  - [ ] Submit new major verson to CRAN
+-   [ ] Submit new major verson to CRAN
 
 After this, I’m probably going to be looking for someone else to take
 over maintenance and development. In the meantime, I welcome
@@ -47,8 +48,8 @@ demography.
 
 Possible areas of improvement that I don’t personally have time for:
 
-  - Extend `bumbl()` to work with GLMMs
-  - Better optimization function for finding the switchpoint in
+-   Extend `bumbl()` to work with GLMMs
+-   Better optimization function for finding the switchpoint in
     `bumbl()` (for inspiration, see
     [changepoint](https://github.com/rkillick/changepoint/))
 
@@ -124,7 +125,7 @@ dynamics: quantifying the importance of land use and floral resources
 for colony growth and queen production. Ecol. Lett. 19, 460–468.
 <https://doi.org/10.1111/ele.12581>
 
------
+------------------------------------------------------------------------
 
 Please note that the bumbl project is released with a [Contributor Code
 of Conduct](CODE_OF_CONDUCT.md). By contributing to this project you

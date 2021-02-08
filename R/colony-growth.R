@@ -10,10 +10,6 @@
 #' @param family a description of the error distribution and link function.
 #'   This is passed to [glm()] except in the case of `family = "negbin"`, which
 #'   causes [MASS::glm.nb()] to be used to fit a negative binomial GLM.
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used. For longer time series or those
-#'   with higher temporal resolution, the default may be too few values for tau
-#'   to find the maximum likelihood estimate accurately.
 #' @param ... additional arguments passed to [glm()] or [glm.nb()]
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
@@ -37,80 +33,79 @@ brkpt <-
            t,
            formula,
            family = gaussian(link = "log"),
-           taus = NULL,
            ...) {
-    #TODO: make sure none of the variables are called '.post'?
-  t <- enquo(t)
-  tvar <- as_name(t)
-  more_args <- list2(...)
-  if (!is.null(taus) & !is.numeric(taus)) abort()
-  if (is.null(taus)) {
-    tvec <- data[[tvar]]
-    taus <- seq(min(tvec), max(tvec), length.out = 50)
-  }
 
-  #Check that at least some taus are in range of t
-  if (all(taus > max(data[[tvar]])) | all(taus < min(data[[tvar]]))) {
-    abort(paste0("At least one tau must be in range of '", tvar, "'"))
-  }
-  #If some taus are out of range of t, drop them
-  if (any(taus > max(data[[tvar]])) |
-      any(taus < min(data[[tvar]]))) {
-    warning(paste0(
-      "Some taus were not used because they were outside of range of '",
-      tvar,
-      "'"
-    ))
-    taus <-
-      taus[taus <= max(data[[tvar]]) & taus >= min(data[[tvar]])]
-  }
+    #low-level function to modify data and formula and fit breakpoint model
+    brkpt_glm <- function(data, formula, t, tau, family, ...) {
+      data2 <- mutate(data, .post = ifelse({{t}} <= tau, 0, {{t}} - tau))
+      f <- update(formula, ~. + .post)
+      #create new call in order to pass ... to glm()
+      new_call <- as.call(c(list(sym("glm"), formula = f, family = family, data = data2), exprs(...)))
+      m <- eval(new_call)
+      #TODO: capture warnings from eval(new_call)
+      return(m)
+    }
 
-  # adds `.post` to formula.
-  f <- update(formula, ~. + .post)
-  LLs <- numeric()
+    brkpt_glm_nb <- function(data, formula, t, tau, ...) {
+      data2 <- mutate(data, .post = ifelse({{t}} <= tau, 0, {{t}} - tau))
+      f <- update(formula, ~. + .post)
+      #create new call in order to pass ... to glm()
+      new_call <- as.call(c(list(sym("glm.nb"), formula = f, data = data2), exprs(...)))
+      m <- eval(new_call)
+      return(m)
+    }
 
-  for (i in 1:length(taus)) {
-    usetau <- taus[i]
-    data2 <- mutate(data, .post = ifelse(!!t <= usetau, 0, !!t - usetau))
+    #wrap so optimi() can work on it.
+    brkpt_wrap <- function(tau, data, formula, t, family, ...) {
+      m <- suppressWarnings(brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau, family = family, ...))
+      return(logLik(m))
+    }
+
+    brkpt_wrap_nb <- function(tau, data, formula, t, ...) {
+      m <- brkpt_glm_nb(data = data, formula = formula, t = {{t}}, tau = tau, ...)
+      return(logLik(m))
+    }
     if (is.character(family) && family == "negbin") {
-      m0 <- try(suppressWarnings(exec("glm.nb", formula = f, data = data2, !!!more_args)), silent = TRUE)
+      m_optim <- stats::optim(
+        par = mean(pull(data, {{t}})),
+        fn = brkpt_wrap_nb,
+        data = data,
+        formula = formula,
+        t = {{t}},
+        method = "L-BFGS-B",
+        lower = min(pull(data, {{t}})),
+        upper = max(pull(data, {{t}})),
+        control = list(fnscale = -1)
+      )
+      if (m_optim$convergence != 0) {
+        abort(message = "Search for optimal switchpoint did not converge")
+      }
+      tau_win <- m_optim$par
+      m_win <-
+        brkpt_glm_nb(data = data, formula = formula, t = {{t}}, tau = tau_win, ...)
+
     } else {
-      m0 <- try(suppressWarnings(exec("glm", formula = f, family = family, data = data2, !!!more_args)), silent = TRUE)
+      m_optim <- stats::optim(
+        par = mean(pull(data, {{t}})),
+        fn = brkpt_wrap,
+        data = data,
+        formula = formula,
+        t = {{t}},
+        family = family,
+        method = "L-BFGS-B",
+        lower = min(pull(data, {{t}})),
+        upper = max(pull(data, {{t}})),
+        control = list(fnscale = -1)
+      )
+      if (m_optim$convergence != 0) {
+        abort(message = "Search for optimal switchpoint did not converge")
+      }
+      tau_win <- m_optim$par
+      m_win <-
+        brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau_win, family = family, ...)
     }
-    if (inherits(m0, "try-error")) {
-      LLs[i] <- NA
-    } else {
-      LLs[i] <- logLik(m0)
-    }
+    return(tibble(tau = tau_win, model = list(m_win)))
   }
-
-  if (all(is.na(LLs))) {
-    abort(
-      "No valid values for tau found. \n Check for problems with the GLM specification or underlying data (e.g. impossible negative values)"
-    )
-  }
-
-  tau_win <- taus[which(LLs == max(LLs, na.rm = TRUE))]
-
-  # if multiple equivalent taus are found, this should fail
-  if (length(tau_win) > 1) {
-    abort("More than one equivalent tau found")
-  }
-
-  #TODO: I don't really like that it re-fits the model.  I could have it save
-  #them all and only re-fit in the case of a tau tie.
-  data_win <- mutate(data, .post = ifelse(!!t <= tau_win, 0, !!t - tau_win))
-
-  if (is.character(family) && family == "negbin") {
-    m_win <-
-      exec("glm.nb", formula = f, data = data_win, !!!more_args)
-  } else {
-    m_win <-
-      exec("glm", formula = f, family = family, data = data_win, !!!more_args)
-  }
-
-  return(tibble(tau = tau_win, model = list(m_win)))
-}
 
 
 #' Estimate colony growth, switch point, and decay parameters
@@ -142,8 +137,6 @@ brkpt <-
 #'   the models for each colony. This may be useful for extracting statistics
 #'   and performing model diagnostics not provided by `bumbl()`. Learn more
 #'   about working with list columns with `vignette("nest", package = "tidyr")`.
-#' @param taus an optional vector of taus to test. If not supplied, `seq(min(t),
-#'   max(t), length.out = 50)` will be used.
 #' @param ... additional arguments passed to [glm()] or [MASS::glm.nb()].
 #'
 #' @details Colony growth is modeled as increasing exponentially until the
@@ -216,7 +209,6 @@ bumbl <-
            colonyID = NULL,
            augment = FALSE,
            keep.model = FALSE,
-           taus = NULL,
            ...) {
 
     if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
@@ -280,7 +272,6 @@ bumbl <-
       purrr::map2_df(dflist,
                      names(dflist),
                      ~brkpt_w_err(brkpt(data = .x,
-                                        taus = {{taus}},
                                         t = !!t,
                                         formula = formula,
                                         family = family,

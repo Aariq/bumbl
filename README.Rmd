@@ -28,12 +28,15 @@ This is still in very early development, so use at your own risk.
 
 ## Roadmap
 
-- [x] Write `bumbl()` function to model colony growth with switchpoint
-- [x] Finish documentation and vignette(s)
-- [ ] [rOpenSci review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
-- [ ] Initial CRAN submission
-- [ ] Add integral projection model functions (in development on [ipm branch](https://github.com/Aariq/bumbl/tree/ipm))
-- [ ] Submit new major verson to CRAN
+  - [x] Write `bumbl()` function to model colony growth with switchpoint
+  - [x] Finish documentation and vignette(s)
+  - [x] [rOpenSci
+    review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
+  - [ ] Regroup with Elizabeth Crone to discuss current behavior of `bumbl()`
+  - [ ] Initial CRAN submission
+  - [ ] Add integral projection model functions (in development on [ipm
+    branch](https://github.com/Aariq/bumbl/tree/ipm))
+  - [ ] Submit new major verson to CRAN
 
 After this, I'm probably going to be looking for someone else to take over maintenance and development.  In the meantime, I welcome contributions including bug-fixes, improvement of documentation, additional features, or new functions relating to bumblebee ecology and demography.
 
