@@ -6,7 +6,7 @@
 * added change in mass to `bombus` data
 * removed `bumbl_plot()` and instead added a `plot()` method for base R plots and an `autoplot()` method for `ggplot2`
 * now requires tidyr version 1.0.0 or greater
-* optimization of switchpoint now done with `optim()`.  Removed `tau` argument to `bumbl()` and `brkpt()` as it is no longer applicable.
+* optimization of switchpoint now done with `optim()`.  Removed `tau` argument to `bumbl()` and `brkpt()` as it is no longer applicable (may be added again in the future, but with different behavior).
 
 
 # bumbl 0.0.1
