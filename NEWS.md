@@ -1,4 +1,5 @@
-# bumbl (development version)
+# bumbl 0.1.0
+* bumbl was [peer-reviewed through rOpenSci](https://github.com/ropenscilabs/statistical-software-review/issues/2)
 * changed `bumbl()` to use `glm()` instead of `lm()` to fit models.  Uses log-link gaussian error by default.
 * `family` argument in `bumbl()` now passed directly to `glm()` unless `"negbin"`, in which case `MASS::glm.nb()` is used.
 * Added `...` argument to `bumbl()` to pass additional arguments (e.g. offset) to `glm()` or `glm.nb()`
