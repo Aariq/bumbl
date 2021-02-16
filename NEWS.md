@@ -1,4 +1,5 @@
-# bumbl (development version)
+# bumbl 0.1.0
+* bumbl was [peer-reviewed through rOpenSci](https://github.com/ropenscilabs/statistical-software-review/issues/2)
 * changed `bumbl()` to use `glm()` instead of `lm()` to fit models.  Uses log-link gaussian error by default.
 * `family` argument in `bumbl()` now passed directly to `glm()` unless `"negbin"`, in which case `MASS::glm.nb()` is used.
 * Added `...` argument to `bumbl()` to pass additional arguments (e.g. offset) to `glm()` or `glm.nb()`
@@ -6,7 +7,7 @@
 * added change in mass to `bombus` data
 * removed `bumbl_plot()` and instead added a `plot()` method for base R plots and an `autoplot()` method for `ggplot2`
 * now requires tidyr version 1.0.0 or greater
-* optimization of switchpoint now done with `optim()`.  Removed `tau` argument to `bumbl()` and `brkpt()` as it is no longer applicable.
+* optimization of switchpoint now done with `optim()`.  Removed `tau` argument to `bumbl()` and `brkpt()` as it is no longer applicable (may be added again in the future, but with different behavior).
 
 
 # bumbl 0.0.1

@@ -17,41 +17,52 @@ status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
-Crone and Williams 2016<sup>1</sup>. The `brkpt` function models colony
-growth as having a change point at some time, *tau*, where the colony
-switches from growth and worker production to gyne production. The
-`bumbl` function applies this model to a data frame of data from
-multiple colonies, allowing for each colony to have it’s own *tau* and
-returns the original data augmented with coefficients from the
-changepoint model.
+Crone and Williams 2016<sup>1</sup>. It models colony growth as having a
+change point at some time, *tau*, where the colony switches from growth
+and worker production to gyne production and decline. Currently
+`bumbl()` works by fitting a separate changepoint model to each colony,
+optimizing the switchpoint, *tau*. It returns the optimal switchpoint,
+growth, and decline rates for each colony. Becuase the current version
+of `bumbl()` works by fitting a separate GLM to each colony, if
+covariates are included, their estimates could vary significantly among
+colonies. Stay tuned for future developments that may allow estimating a
+single value of a covariate but different values of growth and decline
+rates and *tau* for each colony.
 
-This is still in very early development, so use at your own risk.
+This is still in early development, so use at your own risk.
 
-## Roadmap
+## Collaboration
+
+I’m looking for collaborators who know (or are willing to let me teach
+them) how to use git and GitHub and who have an interest in helping to
+develop and maintain this package long-term. I’m not a bumblebee
+biologist, so I would especially love a collaborator who works on
+bumblebees or other organisms with a similar growth, switch, decline
+lifecycle.
+
+I also welcome contributions including bug-fixes, improvement of
+documentation, additional features, or new functions relating to
+bumblebee ecology and demography from anyone!
+
+### Roadmap
 
 -   [x] Write `bumbl()` function to model colony growth with switchpoint
 -   [x] Finish documentation and vignette(s)
 -   [x] [rOpenSci
     review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
--   [ ] Regroup with Elizabeth Crone to discuss current behavior of
+-   [x] Regroup with Elizabeth Crone to discuss current behavior of
     `bumbl()`
--   [ ] Initial CRAN submission
--   [ ] Add integral projection model functions (in development on [ipm
-    branch](https://github.com/Aariq/bumbl/tree/ipm))
--   [ ] Submit new major verson to CRAN
-
-After this, I’m probably going to be looking for someone else to take
-over maintenance and development. In the meantime, I welcome
-contributions including bug-fixes, improvement of documentation,
-additional features, or new functions relating to bumblebee ecology and
-demography.
+-   [ ] Release v0.2.0
+-   [ ] Possibly re-work internals of `bumbl()`? (see
+    [\#58](https://github.com/Aariq/bumbl/issues/58))
+-   [ ] Polish user interface in regards to specifying formula and
+    covariates.
+-   [ ] Submit package to CRAN
+-   [ ] Write a manuscript
 
 Possible areas of improvement that I don’t personally have time for:
 
 -   Extend `bumbl()` to work with GLMMs
--   Better optimization function for finding the switchpoint in
-    `bumbl()` (for inspiration, see
-    [changepoint](https://github.com/rkillick/changepoint/))
 
 ## Installation
 
@@ -98,9 +109,9 @@ results
 #> # A tibble: 4 x 7
 #>   colony converged   tau logN0 logLam  decay logNmax
 #>   <chr>  <lgl>     <dbl> <dbl>  <dbl>  <dbl>   <dbl>
-#> 1 35     TRUE       9.49  3.68  0.209 -0.295    5.61
-#> 2 82     TRUE       7.43  2.97  0.394 -0.503    5.83
-#> 3 9      TRUE       6.43  2.30  0.610 -0.690    6.18
+#> 1 35     TRUE       9.37  3.65  0.214 -0.296    5.60
+#> 2 82     TRUE       7.34  2.91  0.407 -0.512    5.82
+#> 3 9      TRUE       6.52  2.45  0.579 -0.660    6.19
 #> 4 98     TRUE       6.37  1.27  0.570 -0.578    4.90
 ```
 

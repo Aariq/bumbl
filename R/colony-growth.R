@@ -38,72 +38,44 @@ brkpt <-
     #low-level function to modify data and formula and fit breakpoint model
     brkpt_glm <- function(data, formula, t, tau, family, ...) {
       data2 <- mutate(data, .post = ifelse({{t}} <= tau, 0, {{t}} - tau))
-      f <- update(formula, ~. + .post)
-      #create new call in order to pass ... to glm()
-      new_call <- as.call(c(list(sym("glm"), formula = f, family = family, data = data2), exprs(...)))
+      f <- update(formula, ~ . + .post)
+
+      if(is.character(family) && family == "negbin") {
+        #create new call in order to pass ... to glm()
+        new_call <- as.call(c(list(sym("glm.nb"), formula = f, data = data2), exprs(...)))
+      } else {
+        #create new call in order to pass ... to glm()
+        new_call <- as.call(c(list(sym("glm"), formula = f, family = family, data = data2), exprs(...)))
+      }
       m <- eval(new_call)
       #TODO: capture warnings from eval(new_call)
       return(m)
     }
 
-    brkpt_glm_nb <- function(data, formula, t, tau, ...) {
-      data2 <- mutate(data, .post = ifelse({{t}} <= tau, 0, {{t}} - tau))
-      f <- update(formula, ~. + .post)
-      #create new call in order to pass ... to glm()
-      new_call <- as.call(c(list(sym("glm.nb"), formula = f, data = data2), exprs(...)))
-      m <- eval(new_call)
-      return(m)
-    }
-
-    #wrap so optimi() can work on it.
+    #wrap so optim() can work on it.
     brkpt_wrap <- function(tau, data, formula, t, family, ...) {
       m <- suppressWarnings(brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau, family = family, ...))
       return(logLik(m))
     }
 
-    brkpt_wrap_nb <- function(tau, data, formula, t, ...) {
-      m <- brkpt_glm_nb(data = data, formula = formula, t = {{t}}, tau = tau, ...)
-      return(logLik(m))
+    m_optim <- stats::optim(
+      par = mean(pull(data, {{t}})),
+      fn = brkpt_wrap,
+      data = data,
+      formula = formula,
+      t = {{t}},
+      family = family,
+      method = "L-BFGS-B",
+      lower = min(pull(data, {{t}})),
+      upper = max(pull(data, {{t}})),
+      control = list(fnscale = -1)
+    )
+    if (m_optim$convergence != 0) {
+      abort(message = "Search for optimal switchpoint did not converge")
     }
-    if (is.character(family) && family == "negbin") {
-      m_optim <- stats::optim(
-        par = mean(pull(data, {{t}})),
-        fn = brkpt_wrap_nb,
-        data = data,
-        formula = formula,
-        t = {{t}},
-        method = "L-BFGS-B",
-        lower = min(pull(data, {{t}})),
-        upper = max(pull(data, {{t}})),
-        control = list(fnscale = -1)
-      )
-      if (m_optim$convergence != 0) {
-        abort(message = "Search for optimal switchpoint did not converge")
-      }
-      tau_win <- m_optim$par
-      m_win <-
-        brkpt_glm_nb(data = data, formula = formula, t = {{t}}, tau = tau_win, ...)
-
-    } else {
-      m_optim <- stats::optim(
-        par = mean(pull(data, {{t}})),
-        fn = brkpt_wrap,
-        data = data,
-        formula = formula,
-        t = {{t}},
-        family = family,
-        method = "L-BFGS-B",
-        lower = min(pull(data, {{t}})),
-        upper = max(pull(data, {{t}})),
-        control = list(fnscale = -1)
-      )
-      if (m_optim$convergence != 0) {
-        abort(message = "Search for optimal switchpoint did not converge")
-      }
-      tau_win <- m_optim$par
-      m_win <-
-        brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau_win, family = family, ...)
-    }
+    tau_win <- m_optim$par
+    m_win <-
+      brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau_win, family = family, ...)
     return(tibble(tau = tau_win, model = list(m_win)))
   }
 
