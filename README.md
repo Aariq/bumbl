@@ -13,7 +13,7 @@ coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](http
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
-
+[![DOI](https://zenodo.org/badge/200284602.svg)](https://zenodo.org/badge/latestdoi/200284602)
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
@@ -52,7 +52,7 @@ bumblebee ecology and demography from anyone!
     review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
 -   [x] Regroup with Elizabeth Crone to discuss current behavior of
     `bumbl()`
--   [ ] Release v0.2.0
+-   [x] Release v0.1.0 and archive on Zenodo
 -   [ ] Possibly re-work internals of `bumbl()`? (see
     [\#58](https://github.com/Aariq/bumbl/issues/58))
 -   [ ] Polish user interface in regards to specifying formula and
