@@ -65,11 +65,11 @@ $$
 \ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + (t-\tau)\ln(\delta)
 $$
 
-`bumbl()` works by treating this as a generalized linear model with a log-link after creating a new variable, `post` which is 0 before $\tau$ and $t-\tau$ after $\tau$.
-A range of values for $\tau$ are tested and the value that maximizes likelihood is used for the final model.
+`bumbl()` works by treating this as a generalized linear model with a log-link after creating a new variable, `.post` which is 0 before $\tau$ and $t-\tau$ after $\tau$.
+Then the value of $\tau$ that maximizes likelihood is found and used to fit a final model.
 
 $$
-ln(W_t) = \beta_0 + \beta_1t + \beta_2post
+ln(W_t) = \beta_0 + \beta_1t + \beta_2 \textrm{ .post}
 $$
 
 To clarify, in the above equation:
