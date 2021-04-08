@@ -42,10 +42,19 @@ brkpt <-
 
       if(is.character(family) && family == "negbin") {
         #create new call in order to pass ... to glm()
-        new_call <- as.call(c(list(sym("glm.nb"), formula = f, data = data2), exprs(...)))
+        new_call <-
+          as.call(c(list(
+            sym("glm.nb"), formula = f, data = data2
+          ), exprs(...)))
       } else {
         #create new call in order to pass ... to glm()
-        new_call <- as.call(c(list(sym("glm"), formula = f, family = family, data = data2), exprs(...)))
+        new_call <-
+          as.call(c(list(
+            sym("glm"),
+            formula = f,
+            family = family,
+            data = data2
+          ), exprs(...)))
       }
       m <- eval(new_call)
       #TODO: capture warnings from eval(new_call)
@@ -54,7 +63,14 @@ brkpt <-
 
     #wrap so optim() can work on it.
     brkpt_wrap <- function(tau, data, formula, t, family, ...) {
-      m <- suppressWarnings(brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau, family = family, ...))
+      m <- suppressWarnings(brkpt_glm(
+        data = data,
+        formula = formula,
+        t = {{t}},
+        tau = tau,
+        family = family,
+        ...
+      ))
       return(logLik(m))
     }
 
@@ -75,7 +91,14 @@ brkpt <-
     }
     tau_win <- m_optim$par
     m_win <-
-      brkpt_glm(data = data, formula = formula, t = {{t}}, tau = tau_win, family = family, ...)
+      brkpt_glm(
+        data = data,
+        formula = formula,
+        t = {{t}},
+        tau = tau_win,
+        family = family,
+        ...
+      )
     return(tibble(tau = tau_win, model = list(m_win)))
   }
 
@@ -166,13 +189,9 @@ brkpt <-
 #' @export
 #'
 #' @examples
-#' # Colony 67 doesn't ever switch to reproduction and results in an error
 #' \dontrun{
-#' bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
-#'}
-#'
-#' bombus2 <- bombus[bombus$colony != 67, ]
-#' bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
+#' bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
+#' }
 bumbl <-
   function(data,
            t,
@@ -183,8 +202,12 @@ bumbl <-
            keep.model = FALSE,
            ...) {
 
-    if (!inherits(data, "data.frame")) abort("`data` must be a data frame or tibble.")
-    if (!is.logical(augment) | length(augment) > 1) abort("`augment` must be logical (TRUE or FALSE).")
+    if (!inherits(data, "data.frame")) {
+      abort("`data` must be a data frame or tibble.")
+    }
+    if (!is.logical(augment) | length(augment) > 1) {
+      abort("`augment` must be logical (TRUE or FALSE).")
+    }
     colonyID <- enquo(colonyID)
     t <- enquo(t)
     tvar <- as_name(t)
@@ -209,7 +232,9 @@ bumbl <-
     }
 
     #Check for missing values in time variable
-    if (any(!is.finite(data[[tvar]]))) abort("There must not be missing or undefined values in the time variable")
+    if (any(!is.finite(data[[tvar]]))) {
+      abort("There must not be missing or undefined values in the time variable")
+    }
 
     #Check that time variable is in the formula
     if (!tvar %in% attr(fterms, "term.labels")) {
@@ -268,7 +293,7 @@ bumbl <-
       tidyr::unnest(.data$coefs) %>%
       # prepend coefs with "beta_" so colnames aren't duplicated if joined to original data.
       mutate(term = ifelse(
-        !term %in% c("(Intercept)", ".post", tvar),
+        !.data$term %in% c("(Intercept)", ".post", tvar),
         paste0("beta_", term),
         term
       ))
