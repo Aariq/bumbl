@@ -262,10 +262,19 @@ bumbl <-
       tidyr::unnest(.data$aug) %>%
       dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
-    modeldf <-
+    modeldf_long <-
       resultdf %>%
       mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
       tidyr::unnest(.data$coefs) %>%
+      # prepend coefs with "beta_" so colnames aren't duplicated if joined to original data.
+      mutate(term = ifelse(
+        !term %in% c("(Intercept)", ".post", tvar),
+        paste0("beta_", term),
+        term
+      ))
+
+    modeldf <-
+      modeldf_long %>%
       dplyr::select(!!colonyID, "tau", "model", "term", "estimate") %>%
       spread(key = "term", value = "estimate") %>%
       mutate(logNmax = purrr::map_dbl(.data$model,
@@ -282,6 +291,7 @@ bumbl <-
         "logNmax",
         everything()
       )
+
     if (keep.model == FALSE) {
       modeldf <- select(modeldf, -.data$model)
     }

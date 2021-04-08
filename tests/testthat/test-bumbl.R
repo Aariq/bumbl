@@ -1,3 +1,4 @@
+library(bumbl)
 bombus_sub <-
   bombus %>%
   dplyr::filter(colony %in% c(67, 9, 14, 82, 83, 46, 92, 71)) %>%
@@ -56,7 +57,7 @@ test_that("bumbl returns NAs for colonies that produce errors when augment = TRU
 
 test_that("bumbl works with co-variates", {
   out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week * cum_floral)
-  expect_identical(colnames(out), c("colony", "converged", "tau", "logN0", "logLam", "decay", "logNmax", "cum_floral", "week:cum_floral"))
+  expect_identical(colnames(out), c("colony", "converged", "tau", "logN0", "logLam", "decay", "logNmax", "beta_cum_floral", "beta_week:cum_floral"))
 })
 
 test_that("no unexpected warnings", {
@@ -163,4 +164,9 @@ test_that("User can pass arguments to glm() with ...", {
     brkpt(test_col, t=week, formula = count ~ week, family = poisson(link = "log"), offset = log(effort)),
     "tbl_df"
   )
+})
+
+test_that("Column names aren't duplicated in output when augment = TRUE", {
+  out <- bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week + cum_floral, augment = TRUE)
+  expect_false("cum_floral.y" %in% colnames(out))
 })
