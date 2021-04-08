@@ -145,7 +145,13 @@ brkpt <-
 #'   this, the assumptions for GLMs apply, namely independence and homogeneity
 #'   of variance. See `vignette("bumbl", package = "bumbl")` for more details on
 #'   the underlying math of the model.
-#'
+#' @note This function *assumes* there is a switchpoint and does not test
+#'   whether the switchpoint model is significantly better than a log-linear
+#'   model. As a result, it may estimate a switchpoint even if the data do not
+#'   represent a true switchpoint. See the vignette for an example of how to
+#'   extract the GLMs---you could compare them to a simpler log-linear model
+#'   without the switchpoint by AIC or a likelihood ratio test to test the
+#'   significance of the switchpoint.
 #' @seealso [plot.bumbldf()]
 #'
 #' @return A `data.frame` with the additional class `bumbldf` containing a

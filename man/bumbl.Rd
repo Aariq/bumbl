@@ -94,14 +94,19 @@ this, the assumptions for GLMs apply, namely independence and homogeneity
 of variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
 the underlying math of the model.
 }
-\examples{
-# Colony 67 doesn't ever switch to reproduction and results in an error
-\dontrun{
-bumbl(bombus, colonyID = colony, t = week, formula = mass ~ week)
+\note{
+This function \emph{assumes} there is a switchpoint and does not test
+whether the switchpoint model is significantly better than a log-linear
+model. As a result, it may estimate a switchpoint even if the data do not
+represent a true switchpoint. See the vignette for an example of how to
+extract the GLMs---you could compare them to a simpler log-linear model
+without the switchpoint by AIC or a likelihood ratio test to test the
+significance of the switchpoint.
 }
-
-bombus2 <- bombus[bombus$colony != 67, ]
-bumbl(bombus2, colonyID = colony, t = week, formula = mass ~ week)
+\examples{
+\dontrun{
+bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
+}
 }
 \references{
 Crone EE, Williams NM (2016) Bumble bee colony dynamics:
