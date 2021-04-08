@@ -1,40 +1,42 @@
 library(bumbl)
 bombus_sub <-
   bombus %>%
-  dplyr::filter(colony %in% c(67, 9, 14, 82, 83, 46, 92, 71)) %>%
+  dplyr::filter(colony %in% c("17", "104", "20", "24")) %>%
   dplyr::group_by(colony) %>%
-  dplyr::mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
+  # dplyr::mutate(count = as.integer(mass) - min(as.integer(mass))) %>%
+  dplyr::mutate(count = floor(mass)) %>%
   dplyr::ungroup()
 
-bombus_67 <- bombus %>% dplyr::filter(colony == 67)
+err_df <-
+  bombus_sub %>%
+  mutate(week = if_else(colony == "17", week*100000000.0, as.double(week)))
 
-noerrs <- bombus_sub %>% dplyr::filter(!colony %in% c(67, 71))
 
 test_that("bumbl errors if time variable is missing from formula", {
   expect_error(
-    bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ date),
+    bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ date),
     "'week' is missing from the model formula"
   )
 })
 
 test_that("bumble errors if colony ID not specified correctly", {
   expect_error(
-    bumbl(noerrs, colonyID = clooney, t = week, formula = d.mass ~ date),
+    bumbl(bombus_sub, colonyID = clooney, t = week, formula = d.mass ~ date),
     "The name of the colony ID column must be supplied to 'colonyID'."
   )
   expect_error(
-    bumbl(noerrs, t = week, formula = d.mass ~ date),
+    bumbl(bombus_sub, t = week, formula = d.mass ~ date),
     "The name of the colony ID column must be supplied to 'colonyID'."
   )
 })
 
 test_that("bumbl works", {
   expect_s3_class(
-    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ week)),
+    suppressWarnings(bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)),
     "data.frame"
   )
   expect_s3_class(
-    suppressWarnings(bumbl(noerrs, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)),
+    suppressWarnings(bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week, augment = TRUE)),
     "data.frame"
   )
 })
@@ -42,17 +44,17 @@ test_that("bumbl works", {
 
 test_that("bumbl drops colonies that produce errors", {
   expect_message({
-    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)
-  }, "Warning: Search for optimal switchpoint did not converge for colonyID '71'. Omitting from results.")
-  expect_equal(nrow(out), length(unique(bombus_sub$colony)) - 1)
+    out <- bumbl(err_df, colonyID = colony, t = week, formula = d.mass ~ week)
+  }, "Warning: Search for optimal switchpoint did not converge for colonyID '17'. Omitting from results.")
+  expect_equal(nrow(out), length(unique(err_df$colony)) - 1)
 })
 
 test_that("bumbl returns NAs for colonies that produce errors when augment = TRUE", {
   expect_message({
-    out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week,
+    out <- bumbl(err_df, colonyID = colony, t = week, formula = d.mass ~ week,
                  augment = TRUE)
   })
-  expect_equal(nrow(bombus_sub), nrow(out))
+  expect_equal(nrow(err_df), nrow(out))
 })
 
 test_that("bumbl works with co-variates", {
@@ -61,16 +63,16 @@ test_that("bumbl works with co-variates", {
 })
 
 test_that("no unexpected warnings", {
-  expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week))
-  expect_silent(bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week, augment = TRUE))
+  expect_silent(bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week))
+  expect_silent(bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week, augment = TRUE))
 })
 
 test_that("bumbl works with poisson count data", {
   count.out <-
-    bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
+    bumbl(bombus_sub, colonyID = colony, t = week, formula = count ~ week,
           family = poisson(link = "log"))
   count.out.aug <-
-    bumbl(noerrs, colonyID = colony, t = week, formula = count ~ week,
+    bumbl(bombus_sub, colonyID = colony, t = week, formula = count ~ week,
           family = poisson(link = "log"), augment = TRUE)
   expect_s3_class(count.out, "data.frame")
   expect_s3_class(count.out.aug, c("data.frame", "bumbldf"))
@@ -79,15 +81,15 @@ test_that("bumbl works with poisson count data", {
 test_that("bumbl works with overdispersed count data", {
   count.out <-
     suppressWarnings(bumbl(
-      noerrs,
+      bombus_sub,
       colonyID = colony,
       t = week,
-      formula = d.mass ~ week,
+      formula = count ~ week,
       family = "negbin"
     ))
   count.out.aug <-
     suppressWarnings(bumbl(
-      noerrs,
+      bombus_sub,
       colonyID = colony,
       t = week,
       formula = count ~ week,
@@ -144,22 +146,22 @@ test_that("results are not dependent on row order", {
 })
 
 test_that("keep.model = TRUE works", {
-  out <- bumbl(noerrs, colonyID = colony, t = week, mass ~ week, keep.model = TRUE)
+  out <- bumbl(bombus_sub, colonyID = colony, t = week, mass ~ week, keep.model = TRUE)
   expect_type(out$model, "list")
 })
 
 test_that("Can't use both keep.model and augment", {
-  expect_error(bumbl(noerrs, colonyID = colony, t = week, mass ~ week, augment = TRUE, keep.model = TRUE))
+  expect_error(bumbl(bombus_sub, colonyID = colony, t = week, mass ~ week, augment = TRUE, keep.model = TRUE))
 })
 
 test_that("User can pass arguments to glm() with ...", {
   #I think the simplest test is with model = FALSE
-  m2 <- bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week, keep.model = TRUE, model = FALSE)
+  m2 <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week, keep.model = TRUE, model = FALSE)
   expect_false("model" %in% names(m2$model[[1]]))
 
   #Arguments where environment matters (e.g. unquoted variable names)
   #make fake offset column
-  test_col <- noerrs %>% mutate(effort = runif(n(), 1, 2)) %>% filter(colony == first(colony))
+  test_col <- bombus_sub %>% mutate(effort = runif(n(), 1, 2)) %>% filter(colony == first(colony))
   expect_s3_class(
     brkpt(test_col, t=week, formula = count ~ week, family = poisson(link = "log"), offset = log(effort)),
     "tbl_df"
@@ -167,6 +169,6 @@ test_that("User can pass arguments to glm() with ...", {
 })
 
 test_that("Column names aren't duplicated in output when augment = TRUE", {
-  out <- bumbl(noerrs, colonyID = colony, t = week, formula = mass ~ week + cum_floral, augment = TRUE)
+  out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = mass ~ week + cum_floral, augment = TRUE)
   expect_false("cum_floral.y" %in% colnames(out))
 })
