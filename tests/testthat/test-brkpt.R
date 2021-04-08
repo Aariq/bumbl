@@ -1,12 +1,16 @@
 
 testbees <- bombus %>% dplyr::filter(colony == 9)
-noswitch <- bombus %>% dplyr::filter(colony == 71)
+
+noswitch <-
+  bombus %>%
+  filter(colony == 9) %>%
+  #do something to get reliable convergence error
+  mutate(week = week * 1000000000)
+
 testcount <-
   testbees %>%
   #fake count data
   dplyr::mutate(count = as.integer(mass) - min(as.integer(mass)))
-
-
 
 test_that("brkpt works", {
   expect_s3_class(
@@ -24,7 +28,8 @@ test_that("brkpt works with more complicated formulas", {
 
 test_that("brkpt errors when tau optimization does not converge", {
   expect_error({
-    brkpt(noswitch, t = week, formula = d.mass ~ week)},
+    brkpt(noswitch, t = week, formula = d.mass ~ week)
+    },
     "Search for optimal switchpoint did not converge"
   )
 })
@@ -58,3 +63,4 @@ test_that("dots pass arguments to glm()", {
     "data.frame"
   )
 })
+
