@@ -300,8 +300,8 @@ bumbl <-
       # prepend coefs with "beta_" so colnames aren't duplicated if joined to original data.
       mutate(term = ifelse(
         !.data$term %in% c("(Intercept)", ".post", tvar),
-        paste0("beta_", term),
-        term
+        paste0("beta_", .data$term),
+        .data$term
       ))
 
     modeldf <-
