@@ -37,7 +37,7 @@ column with a colony ID.}
 
 \item{augment}{when FALSE, \code{bumbl} returns a summary dataframe with one row
 for each colonyID.  When TRUE, it returns the original data with additional
-columns containing model coefficients. Cannot be used in conjuction with
+columns containing model coefficients. Cannot be used in conjunction with
 \code{keep.model = TRUE}.}
 
 \item{keep.model}{If TRUE, then the output will contain a list-column with
@@ -89,7 +89,7 @@ leave the colony, causing the colony to decline. The switch point,
 \eqn{\tau}, may vary among colonies. \code{bumbl()} finds the value of
 \eqn{\tau} that maximizes likelihood and this "winning" model is used to
 calculate statistics returned in the output. This function works by fitting
-genearlized linear models (GLMs) to modified colony growth data. Because of
+generalized linear models (GLMs) to modified colony growth data. Because of
 this, the assumptions for GLMs apply, namely independence and homogeneity
 of variance. See \code{vignette("bumbl", package = "bumbl")} for more details on
 the underlying math of the model.

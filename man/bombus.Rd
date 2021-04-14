@@ -3,7 +3,7 @@
 \docType{data}
 \name{bombus}
 \alias{bombus}
-\title{\emph{Bombus vosnesenskii} colony growth and estimated floral resrouces}
+\title{\emph{Bombus vosnesenskii} colony growth and estimated floral resources}
 \format{
 A data frame with 178 rows and 10 columns
 \describe{

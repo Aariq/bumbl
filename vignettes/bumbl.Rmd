@@ -24,7 +24,7 @@ library(car)
 
 Bumblebee colony growth is characterized by an initial exponential growth period when workers are being produced, followed by a switch to production of reproductive individuals (gynes and drones).
 Reproductive individuals leave the nest, resulting in a decline in colony size.
-The initial growth rate, the rate or decline, and the time to switching to reproduction may vary in response to envrionmental conditions [@croneBumbleBeeColony2016].
+The initial growth rate, the rate or decline, and the time to switching to reproduction may vary in response to environmental conditions [@croneBumbleBeeColony2016].
 
 The `bumbl()` function fits a model, described below and in Crone & Williams [-@croneBumbleBeeColony2016], that finds a growth rate ($\lambda$), a decline rate ($\delta$) , and a switchpoint ($\tau$. When supplied with a dataset with multiple colonies, a model is fit separately for each colony and these three parameters (as well as an estimated starting colony size and maximum colony size) are returned.
 In this example, we'll use the built-in `bombus` dataset.

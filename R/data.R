@@ -1,4 +1,4 @@
-#' *Bombus vosnesenskii* colony growth and estimated floral resrouces
+#' *Bombus vosnesenskii* colony growth and estimated floral resources
 #'
 #' This is a subset of the data from Crone and Williams, 2016.  *Bombus vosnesenskii* colonies were placed in sites in a mixed agricultural--natural area in California, USA and weighed weekly.
 #'

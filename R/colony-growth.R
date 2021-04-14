@@ -1,7 +1,7 @@
 #' Fit breakpoint model to individual colony
 #'
 #' Fits models using a range of taus and picks the best one using maximum
-#' liklihood. Typically only used internally by [bumbl()].
+#' likelihood. Typically only used internally by [bumbl()].
 #'
 #' @param data a dataframe or tibble
 #' @param t the unquoted column name for the time variable in `data`
@@ -126,7 +126,7 @@ brkpt <-
 #'   column with a colony ID.
 #' @param augment when FALSE, `bumbl` returns a summary dataframe with one row
 #'   for each colonyID.  When TRUE, it returns the original data with additional
-#'   columns containing model coefficients. Cannot be used in conjuction with
+#'   columns containing model coefficients. Cannot be used in conjunction with
 #'   `keep.model = TRUE`.
 #' @param keep.model If TRUE, then the output will contain a list-column with
 #'   the models for each colony. This may be useful for extracting statistics
@@ -141,7 +141,7 @@ brkpt <-
 #'   \eqn{\tau}, may vary among colonies. `bumbl()` finds the value of
 #'   \eqn{\tau} that maximizes likelihood and this "winning" model is used to
 #'   calculate statistics returned in the output. This function works by fitting
-#'   genearlized linear models (GLMs) to modified colony growth data. Because of
+#'   generalized linear models (GLMs) to modified colony growth data. Because of
 #'   this, the assumptions for GLMs apply, namely independence and homogeneity
 #'   of variance. See `vignette("bumbl", package = "bumbl")` for more details on
 #'   the underlying math of the model.

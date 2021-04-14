@@ -26,7 +26,7 @@ winning model
 }
 \description{
 Fits models using a range of taus and picks the best one using maximum
-liklihood. Typically only used internally by \code{\link[=bumbl]{bumbl()}}.
+likelihood. Typically only used internally by \code{\link[=bumbl]{bumbl()}}.
 }
 \examples{
 testbees <- bombus[bombus$colony == 9, ]
