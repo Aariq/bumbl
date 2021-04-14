@@ -1,5 +1,5 @@
 Package: bumbl
-Title: Tools for modeling bumblebee colony growth and decline
+Title: Tools for Modeling Bumblebee Colony Growth and Decline
 Version: 1.0.0
 Authors@R: c(
     person(given = c("Eric", "R."),
@@ -13,7 +13,7 @@ Authors@R: c(
            email = "elizabeth.crone@tufts.edu",
            comment = c(ORCID = "0000-0002-5287-221X"))
            )
-Description: Bumblebee colonies grow during worker production, then decline after switching to gyne (reproductive males and females) production.  This package provides tools for modeling and visualizing this pattern by identifying a switchpoint with a growth rate before and a decline rate after the switchpoint.
+Description: Bumblebee colonies grow during worker production, then decline after switching to production of reproductive individuals (drones and gynes).  This package provides tools for modeling and visualizing this pattern by identifying a switchpoint with a growth rate before and a decline rate after the switchpoint.
 License: CC BY 4.0
 Encoding: UTF-8
 LazyData: true
