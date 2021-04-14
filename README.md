@@ -10,7 +10,7 @@ status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https:/
 [![Codecov test
 coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](https://codecov.io/gh/Aariq/bumbl?branch=master)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
 [![DOI](https://zenodo.org/badge/200284602.svg)](https://zenodo.org/badge/latestdoi/200284602)
