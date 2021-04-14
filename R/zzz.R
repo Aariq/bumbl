@@ -62,3 +62,8 @@ s3_register <- function(generic, class, method = NULL) {
 .onLoad <- function(libname, pkgname) {
   s3_register("ggplot2::autoplot", "bumbldf")
 }
+
+release_questions <- function() {
+  c("Have you updated the version number on the citation?",
+    "Have you checked that the text of the vignette is up to date?")
+}
