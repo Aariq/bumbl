@@ -13,24 +13,22 @@ coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](http
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
-[![DOI](https://zenodo.org/badge/200284602.svg)](https://zenodo.org/badge/latestdoi/200284602)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4545782.svg)](https://doi.org/10.5281/zenodo.4545782)
 
 <!-- badges: end -->
 
 `bumbl` implements a model for bumblebee colony growth described in
 Crone and Williams 2016<sup>1</sup>. It models colony growth as having a
-change point at some time, *tau*, where the colony switches from growth
+switchpoint at some time, *tau*, where the colony switches from growth
 and worker production to gyne production and decline. Currently
-`bumbl()` works by fitting a separate changepoint model to each colony,
+`bumbl()` works by fitting a separate switchpoint model to each colony,
 optimizing the switchpoint, *tau*. It returns the optimal switchpoint,
-growth, and decline rates for each colony. Becuase the current version
+growth, and decline rates for each colony. Because the current version
 of `bumbl()` works by fitting a separate GLM to each colony, if
 covariates are included, their estimates could vary significantly among
 colonies. Stay tuned for future developments that may allow estimating a
 single value of a covariate but different values of growth and decline
 rates and *tau* for each colony.
-
-This is still in early development, so use at your own risk.
 
 ## Collaboration
 
@@ -61,11 +59,13 @@ bumblebee ecology and demography from anyone!
 -   [ ] Polish user interface in regards to specifying formula and
     covariates.
 -   [ ] Submit v2.0.0 of package to CRAN
--   [ ] Write a manuscript
+-   [ ] Write a manuscript for JOSS or other journal
 
-Possible areas of improvement that I don’t personally have time for:
+Other possible areas of improvement:
 
 -   Extend `bumbl()` to work with GLMMs
+-   Test significance of switchpoint (see
+    [\#62](https://github.com/Aariq/bumbl/issues/62))
 
 ## Installation
 
