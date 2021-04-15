@@ -27,56 +27,63 @@ citation_author: Scott et. al.
 date: 15 April 2021
 year: 2021
 bibliography: paper.bib
-output: rticles::joss_article
+output: 
+  pdf_document: default
+  rticles::joss_article: default
 csl: apa.csl
 journal: JOSS
 ---
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational fields lead to the dynamical evolution of structures in the universe.
-The orbits of these bodies are therefore key to understanding the formation, history, and future state of galaxies.
-The field of "galactic dynamics," which aims to model the gravitating components of galaxies to study their structure and evolution, is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require efficient numerical tools, many of which require the same base code (e.g., for performing numerical orbit integration).
+<!--# statement of need from Sylvie -->
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics.
-Python enables wrapping low-level languages (e.g., C) for speed without losing flexibility or ease-of-use in the user-interface.
-The API for `Gala` was designed to provide a class-based and user-friendly interface to fast (C or Cython-optimized) implementations of common operations such as gravitational potential and force evaluation, orbit integration, dynamical transformations, and chaos indicators for nonlinear dynamics.
-`Gala` also relies heavily on and interfaces well with the implementations of physical units and astronomical coordinate systems in the `Astropy` package (`astropy.units` and `astropy.coordinates`).
-
-`Gala` was designed to be used by both astronomical researchers and by students in courses on gravitational dynamics or astronomy.
-It has already been used in a number of scientific publications and has also been used in graduate courses on Galactic dynamics to, e.g., provide interactive visualizations of textbook material.
-The combination of speed, design, and support for Astropy functionality in `Gala` will enable exciting scientific explorations of forthcoming data releases from the *Gaia* mission by students and experts alike.
-
-# Mathematics
-
-Single dollars (\$) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
+@croneBumbleBeeColony2016 describe a mathematical model for bumblebee colony growth, switch to reproduction, and decline.
 
 $$
-\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.
+W_t = 
+  \begin{cases}
+  \lambda^tW_0 & t\leq\tau \\
+  \lambda^{\tau}W_{0}\delta^{t-\tau} & t > \tau
+  \end{cases}
 $$
 
-# In-text citations
+It defines the expected colony weight (or other proxies for size such as counts of workers) over time as having an initial size ($W_0$), a growth rate ($\lambda$), a switch from growth to decline at time $t = \tau$, and a rate of decline ($\delta$) after the switch to reproduction.
+This can be then be log-linearized and fit as a single model by creating a variable $x$ that is 0 when $t \leq \tau$ and equal to $t - \tau$ when $t > \tau$
 
-Citations to entries in paper.bib should be in [rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html) format.
+$$
+\ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + x\ln(\delta)
+$$
 
-For a quick reference, the following citation commands can be used: - `@author:2001` -\> "Author et al. (2001)" - `[@author:2001]` -\> "(Author et al., 2001)" - `[@author1:2001; @author2:2001]` -\> "(Author1 et al., 2001; Author2 et al., 2002)"
+The `bumbl()` function finds a value for $\tau$ that maximizes the likelihood of this model, then returns the maximum likelihood estimate for $\tau$ (`tau`), the estimated initial colony weight on a log scale ($\ln({W_0})$, `logN0`) , the average colony growth rate on a log scale ($\ln(\lambda)$, `logLam`) , the rate of decline after $\tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
 
-# Rendered R Figures
+The object created by `bumbl()` has methods for both `plot()` and the `autoplot()` function from the `ggplot2` package [@wickhamGgplot2ElegantGraphics2016] to plot the fitted models.
 
-Figures can be plotted like so:
-
-```{r}
-plot(1:10)
+```{r include=FALSE}
+cap <- "Example output from plotting a `bumbl()` data frame. Each panel represents a different colony in the dataset."
 ```
 
-# Acknowledgements
+```{r include=FALSE}
+library(bumbl)
+library(tidyverse)
+library(latex2exp)
+bombus_sub <- 
+  bombus %>% 
+  dplyr::filter(colony %in% c("17", "104", "20", "24"))
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong Oh, and support from Kathryn Johnston during the genesis of this project.
+out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)
+p <- autoplot(out)
+```
+
+```{r plot, echo=FALSE, fig.cap=cap}
+p + labs(y = TeX("$\\Delta$mass(g)"))
+```
+
+<!--# something about the dataset included? -->
+
+# Acknowledgments
+
+We thank the rOpenSci reviewers Rebecca Killick and Mark Padgham for helpful suggestions and contributions.
+We thank Jeremy Hemberger and Genevieve Pugesek for beta testing and feedback on early versions of the package.
 
 # References
