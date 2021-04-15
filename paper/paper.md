@@ -71,9 +71,12 @@ For a quick reference, the following citation commands can be used: - `@author:2
 
 Figures can be plotted like so:
 
-```{r}
+
+```r
 plot(1:10)
 ```
+
+![](paper_files/figure-latex/unnamed-chunk-1-1.pdf)<!-- --> 
 
 # Acknowledgements
 
