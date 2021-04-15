@@ -9,4 +9,5 @@
 
 0 errors \| 0 warnings \| 0 notes
 
--   This is a new release.
+-   Updated link to CODE_OF_CONDUCT.md to a fully specified URL
+-   Added a reference to the description
