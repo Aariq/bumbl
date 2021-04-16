@@ -10,4 +10,12 @@
 0 errors \| 0 warnings \| 0 notes
 
 -   Updated link to CODE_OF_CONDUCT.md to a fully specified URL
+
 -   Added a reference to the description
+
+-   Added ggplot2 to Imports so that autoplot.bumbl() could be exported and therefore include documentation.
+
+-   Removed example from brkpt() as it should not be exported
+
+-   Removed dontrun from bumbl() example
+

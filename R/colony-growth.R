@@ -19,15 +19,6 @@
 #' @importFrom stats update logLik terms glm poisson as.formula gaussian
 #' @importFrom MASS glm.nb
 #' @keywords internal
-#'
-#' @examples
-#' testbees <- bombus[bombus$colony == 9, ]
-#' # Using dates
-#' \dontrun{
-#' brkpt(testbees, t = date, formula = mass ~ date)
-#' # Using weeks
-#' brkpt(testbees, t = week, formula = mass ~ week)
-#' }
 brkpt <-
   function(data,
            t,
@@ -195,9 +186,7 @@ brkpt <-
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
-#' }
 bumbl <-
   function(data,
            t,

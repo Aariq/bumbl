@@ -104,9 +104,7 @@ without the switchpoint by AIC or a likelihood ratio test to test the
 significance of the switchpoint.
 }
 \examples{
-\dontrun{
 bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
-}
 }
 \references{
 Crone EE, Williams NM (2016) Bumble bee colony dynamics:
