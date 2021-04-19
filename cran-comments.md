@@ -17,5 +17,4 @@
 
 -   Removed example from brkpt() as it should not be exported
 
--   Removed dontrun from bumbl() example
-
+-   Changed dontrun to donttest in bumbl() example (example takes \>10s to run and is tested in tests)

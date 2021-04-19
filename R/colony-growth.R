@@ -186,7 +186,9 @@ brkpt <-
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
+#' }
 bumbl <-
   function(data,
            t,
