@@ -30,7 +30,7 @@ colonies. Stay tuned for future developments that may allow estimating a
 single value of a covariate but different values of growth and decline
 rates and *tau* for each colony.
 
-## Collaboration
+## Contributing
 
 I’m looking for collaborators who know (or are willing to let me teach
 them) how to use git and GitHub and who have an interest in helping to
@@ -53,23 +53,30 @@ bumblebee ecology and demography from anyone!
     `bumbl()`
 -   [x] Release v0.1.0 and archive on Zenodo
 -   [x] Bug fixes
--   [ ] Submit v1.0.0 of package to CRAN
+-   [x] Submit v1.0.0 of package to CRAN
+-   [ ] Write a manuscript for JOSS
+-   [ ] Release minor version to CRAN to update citation
 -   [ ] Possibly re-work internals of `bumbl()`? (see
     [\#58](https://github.com/Aariq/bumbl/issues/58))
--   [ ] Polish user interface in regards to specifying formula and
-    covariates.
 -   [ ] Submit v2.0.0 of package to CRAN
--   [ ] Write a manuscript for JOSS or other journal
 
 Other possible areas of improvement:
 
 -   Extend `bumbl()` to work with GLMMs
 -   Test significance of switchpoint (see
     [\#62](https://github.com/Aariq/bumbl/issues/62))
+-   Extend `bumbl()` to work with dates, datetimes, or other timeseries
+    classes (see [\#46](https://github.com/Aariq/bumbl/issues/46))
 
 ## Installation
 
-You can install this development version of `bumbl` with:
+You can install `bumbl` with:
+
+``` r
+install.packages("bumbl")
+```
+
+Or install the development version with:
 
 ``` r
 devtools::install_github("Aariq/bumbl", build_vignettes = TRUE)
