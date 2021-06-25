@@ -28,15 +28,23 @@ date: 15 April 2021
 year: 2021
 bibliography: paper.bib
 output: 
-  pdf_document: default
+  bookdown::word_document2:
+    number_sections: no
+    linenumbers: yes
+    fig_caption: yes
   rticles::joss_article: default
+  pdf_document: default
 csl: apa.csl
 journal: JOSS
 ---
 
 # Summary
 
+# Statement of Need
+
 <!--# statement of need from Sylvie -->
+
+# Background
 
 @croneBumbleBeeColony2016 describe a mathematical model for bumblebee colony growth, switch to reproduction, and decline.
 
@@ -55,13 +63,15 @@ $$
 \ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + x\ln(\delta)
 $$
 
-The `bumbl()` function finds a value for $\tau$ that maximizes the likelihood of this model, then returns the maximum likelihood estimate for $\tau$ (`tau`), the estimated initial colony weight on a log scale ($\ln({W_0})$, `logN0`) , the average colony growth rate on a log scale ($\ln(\lambda)$, `logLam`) , the rate of decline after $\tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
+The `bumbl()` function finds a value for $\tau$ that maximizes the likelihood of this model, then returns the maximum likelihood estimate for $\tau$ (`tau`), the estimated initial colony weight on a log scale ($\ln({W_0})$, `logN0`), the average colony growth rate on a log scale ($\ln(\lambda)$, `logLam`), the rate of decline after $\tau$ ($ln(\delta - \lambda)$, `decay`), and the estimated maximum weight of each colony, on a log scale (`logNmax`).
 
 The object created by `bumbl()` has methods for both `plot()` and the `autoplot()` function from the `ggplot2` package [@wickhamGgplot2ElegantGraphics2016] to plot the fitted models.
 
-```{r include=FALSE}
-cap <- "Example output from plotting a `bumbl()` data frame. Each panel represents a different colony in the dataset."
-```
+# Examples
+
+The package includes a built-in dataset, `bombus`, that contains weekly weights of bumblebee colonies originally published in @croneBumbleBeeColony2016.
+Here is an example analysis using just four colonies from this dataset.
+
 
 ```{r include=FALSE}
 library(bumbl)
@@ -75,11 +85,27 @@ out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)
 p <- autoplot(out)
 ```
 
-```{r plot, echo=FALSE, fig.cap=cap}
+
+```{r include=FALSE}
+table_cap <- "Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)"
+```
+
+
+```{r table, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(out, format.args = c(digits = 3), caption = table_cap)
+# out
+```
+
+
+```{r include=FALSE}
+fig_cap <- "Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points."
+```
+
+
+```{r plot, echo=FALSE, fig.cap=fig_cap}
 p + labs(y = TeX("$\\Delta$mass(g)"))
 ```
 
-<!--# something about the dataset included? -->
 
 # Acknowledgments
 
