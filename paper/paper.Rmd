@@ -38,11 +38,16 @@ csl: apa.csl
 journal: JOSS
 ---
 
-# Summary
-
 # Statement of Need
 
-<!--# statement of need from Sylvie -->
+<!--# add sentence(s) about bumblebees being important pollinators, many species in decline. -->
+
+Bumble bees (*Bombus* spp*.*) are social bees which produce annual colonies.
+In early spring, queens emerge and establish nests.
+The colony then begins to increase exponentially with workers until at some point, the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees]. After this, the colony size declines as workers die and new queens and males disperse. This switch point is critical for the reproduction and viability of the colony and is therefore important for ecologists to examine. Standard generalized linear models (GLMs) are commonly used to estimate and forecast population-level growth, but these methods are not suited to analyze colony-level growth and decline because they cannot capture the sharp switchpoint from growth to reproduction. [@croneBumbleBeeColony2016] developed a method to estimate the switch from growth to reproduction by fitting a modified GLM with a switchpoint included.
+Their method required repeated creation of dummy variables in the data for many values of the switchpoint in order to choose the value of the switchpoint that maximized the likelihood of the modified GLM.
+This package automates the model fitting process and uses optimization for a more precise estimate of the switchpoint.
+`bumbl` aims to make this method broadly accessible to bumble bee biologists, and others who are interested in similar growth-switchpoint-decline phenomena.
 
 # Background
 
@@ -72,7 +77,6 @@ The object created by `bumbl()` has methods for both `plot()` and the `autoplot(
 The package includes a built-in dataset, `bombus`, that contains weekly weights of bumblebee colonies originally published in @croneBumbleBeeColony2016.
 Here is an example analysis using just four colonies from this dataset.
 
-
 ```{r include=FALSE}
 library(bumbl)
 library(tidyverse)
@@ -85,27 +89,22 @@ out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)
 p <- autoplot(out)
 ```
 
-
 ```{r include=FALSE}
 table_cap <- "Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)"
 ```
-
 
 ```{r table, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(out, format.args = c(digits = 3), caption = table_cap)
 # out
 ```
 
-
 ```{r include=FALSE}
 fig_cap <- "Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points."
 ```
 
-
 ```{r plot, echo=FALSE, fig.cap=fig_cap}
 p + labs(y = TeX("$\\Delta$mass(g)"))
 ```
-
 
 # Acknowledgments
 
