@@ -81,34 +81,23 @@ The object created by `bumbl()` has methods for both `plot()` and the `autoplot(
 The package includes a built-in dataset, `bombus`, that contains weekly weights of bumblebee colonies originally published in @croneBumbleBeeColony2016.
 Here is an example analysis using just four colonies from this dataset.
 
-```{r include=FALSE}
-library(bumbl)
-library(tidyverse)
-library(latex2exp)
-bombus_sub <- 
-  bombus %>% 
-  dplyr::filter(colony %in% c("17", "104", "20", "24"))
 
-out <- bumbl(bombus_sub, colonyID = colony, t = week, formula = d.mass ~ week)
-p <- autoplot(out)
-```
 
-```{r include=FALSE}
-table_cap <- "Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)"
-```
 
-```{r table, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(out, format.args = c(digits = 3), caption = table_cap)
-# out
-```
 
-```{r include=FALSE}
-fig_cap <- "Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points."
-```
 
-```{r plot, echo=FALSE, fig.cap=fig_cap}
-p + labs(y = TeX("$\\Delta$mass(g)"))
-```
+Table: Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)
+
+|colony |converged |  tau| logN0| logLam|  decay| logNmax|
+|:------|:---------|----:|-----:|------:|------:|-------:|
+|104    |TRUE      | 6.42|  3.44|  0.380| -0.541|    5.78|
+|17     |TRUE      | 6.36|  3.39|  0.407| -0.662|    5.83|
+|20     |TRUE      | 7.27|  2.79|  0.194| -0.345|    4.14|
+|24     |TRUE      | 6.23|  4.06|  0.167| -0.391|    5.06|
+
+
+
+![Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points.](paper_files/figure-latex/plot-1.pdf) 
 
 # Acknowledgments
 
