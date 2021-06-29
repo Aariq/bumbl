@@ -15,9 +15,6 @@ authors:
   - name: Sylvana Finn
     # orcid: 0000-0000-0000-0000
     affiliation: 2
-  - name: Elizabeth E. Crone
-    orcid: 0000-0002-5287-221X
-    affiliation: 2
 affiliations:
  - name: Department of Wildlife Ecology and Conservation, University of Florida
    index: 1
@@ -105,6 +102,7 @@ Using the `autoplot()` function from the `ggplot2` package on the output object 
 
 # Acknowledgments
 
+We thank Elizabeth E. Crone for supplying example analysis code and data, and for guidance in developing the package. 
 We thank the rOpenSci reviewers Rebecca Killick and Mark Padgham for helpful suggestions and contributions.
 We thank Jeremy Hemberger and Genevieve Pugesek for beta testing and feedback on early versions of the package.
 
