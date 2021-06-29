@@ -40,6 +40,9 @@ output:
 csl: apa.csl
 journal: JOSS
 ---
+```{r include=FALSE}
+knitr::opts_chunk$set(fig.path = "paper/")
+```
 
 # Statement of Need
 
