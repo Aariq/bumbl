@@ -1,5 +1,7 @@
-on: [push]
-if: github.ref == 'refs/heads/joss-paper'
+on:
+  push:
+    branches:
+      - 'joss-paper'
 jobs:
   paper:
     runs-on: ubuntu-latest
