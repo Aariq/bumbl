@@ -77,13 +77,13 @@ The object created by `bumbl()` has methods for both `plot()` and the `autoplot(
 
 The package includes a built-in dataset, `bombus`, that contains weekly weights of *Bombus vosnesenskii* colonies originally published in @croneBumbleBeeColony2016.
 Here is an example analysis using just four colonies from this dataset.
-The output from the `bumbl()` function is a `tibble` with one row for each colony and columns for parameters calculated from the models (Table \@ref(tab:table)).
+The output from the `bumbl()` function is a `tibble` with one row for each colony and columns for parameters calculated from the models (\autoref{tab:output}).
 
 
 
 \begin{table}
 
-\caption{(\#tab:table)Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)}
+\caption{(\#tab:output)Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)}
 \centering
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline
@@ -100,7 +100,7 @@ colony & converged & tau & logN0 & logLam & decay & logNmax\\
 \end{tabular}
 \end{table}
 
-Using the `autoplot()` function from the `ggplot2` package on the output object generates a faceted plot with raw data and best fit lines (Figure \@ref(fig:plot)).
+Using the `autoplot()` function from the `ggplot2` package on the output object generates a faceted plot with raw data and best fit lines (\autoref{fig:plot}).
 
 ![Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points.\label{fig:plot}](plot-1.png)
 
