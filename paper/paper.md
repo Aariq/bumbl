@@ -41,10 +41,9 @@ csl: apa.csl
 journal: JOSS
 ---
 
-
 # Statement of Need
 
-Bumble bees (*Bombus* spp*.*) are important pollinators of wild plants and agricultural systems, and many species of bumble bees are in decline [@goulson2008]. Bumble bees are social bees which produce annual colonies. In early spring, queens emerge and establish nests. The colony then begins to increase exponentially with workers until at some point, the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees]. After this, the colony size declines as workers die and new queens and males disperse. This switch point is critical for the reproduction and viability of the colony and is therefore important for ecologists to examine. Standard generalized linear models (GLMs) are commonly used to estimate and forecast population-level growth, but these methods are not suited to analyze colony-level growth and decline because they cannot capture the sharp switchpoint from growth to reproduction. [@croneBumbleBeeColony2016] developed a method to estimate the switch from growth to reproduction by fitting a modified GLM with a switchpoint included.
+Bumble bees (*Bombus* spp.) are important pollinators of wild plants and agricultural systems, and many species of bumble bees are in decline [@goulson2008]. Bumble bees are social bees which produce annual colonies. In early spring, queens emerge and establish nests. The colony then begins to increase exponentially with workers until at some point, the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees]. After this, the colony size declines as workers die and new queens and males disperse. This switch point is critical for the reproduction and viability of the colony and is therefore important for ecologists to examine. Standard generalized linear models (GLMs) are commonly used to estimate and forecast population-level growth, but these methods are not suited to analyze colony-level growth and decline because they cannot capture the sharp switchpoint from growth to reproduction. [@croneBumbleBeeColony2016] developed a method to estimate the switch from growth to reproduction by fitting a modified GLM with a switchpoint included.
 Their method required repeated creation of dummy variables in the data for many values of the switchpoint in order to choose the value of the switchpoint that maximized the likelihood of the modified GLM.
 This package automates the model fitting process and uses optimization for a more precise estimate of the switchpoint.
 `bumbl` aims to make this method broadly accessible to bumble bee biologists, and others who are interested in similar growth-switchpoint-decline phenomena.
@@ -103,11 +102,7 @@ colony & converged & tau & logN0 & logLam & decay & logNmax\\
 
 Using the `autoplot()` function from the `ggplot2` package on the output object generates a faceted plot with raw data and best fit lines (Figure \@ref(fig:plot)).
 
-
-
-![(\#fig:plot)Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points.](paper/plot-1.pdf) 
-
-
+![Results of analysis by the `bumbl()` function as visualized by `ggplot2::autoplot()`.  Each facet represents one of the four colonies. Raw data are plotted as points with the red line representing the fitted values for those points.\label{fig:plot}](plot-1.png)
 
 # Acknowledgments
 
