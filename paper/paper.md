@@ -28,15 +28,15 @@ date: 15 April 2021
 year: 2021
 bibliography: paper.bib
 output: 
-  bookdown::pdf_document2:
-    keep_md: yes
-    fig_caption: yes
+  rticles::joss_article: default
   bookdown::word_document2:
     number_sections: no
     linenumbers: yes
     fig_caption: yes
     keep_md: yes
-  rticles::joss_article: default
+  bookdown::pdf_document2:
+    keep_md: yes
+    fig_caption: yes
 csl: apa.csl
 journal: JOSS
 ---
@@ -83,7 +83,7 @@ The output from the `bumbl()` function is a `tibble` with one row for each colon
 
 \begin{table}
 
-\caption{(\#tab:output)Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)}
+\caption{\label{tab:output}Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)}
 \centering
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline

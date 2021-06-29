@@ -28,15 +28,15 @@ date: 15 April 2021
 year: 2021
 bibliography: paper.bib
 output: 
-  bookdown::pdf_document2:
-    keep_md: yes
-    fig_caption: yes
+  rticles::joss_article: default
   bookdown::word_document2:
     number_sections: no
     linenumbers: yes
     fig_caption: yes
     keep_md: yes
-  rticles::joss_article: default
+  bookdown::pdf_document2:
+    keep_md: yes
+    fig_caption: yes
 csl: apa.csl
 journal: JOSS
 ---
@@ -95,7 +95,7 @@ table_cap <- "Data frame output by the `bumbl()` function showing estimates of s
 ```
 
 ```{r output, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(out, format.args = c(digits = 3), caption = table_cap)
+kableExtra::kbl(out, format = "latex", format.args = c(digits = 3), caption = table_cap, label = "output")
 ```
 
 Using the `autoplot()` function from the `ggplot2` package on the output object generates a faceted plot with raw data and best fit lines (\autoref{fig:plot}).
