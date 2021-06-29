@@ -83,7 +83,7 @@ The output from the `bumbl()` function is a `tibble` with one row for each colon
 
 \begin{table}
 
-\caption{\label{tab:output}Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)}
+\caption{\label{tab:output}Data frame output by the \texttt{bumbl()} function showing estimates of switchpoint (tau, in weeks), estimated initial size (logN0), growth rate (logLam), decay rate (decay), and maximum size (logNmax)}
 \centering
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline

@@ -91,11 +91,11 @@ Here is an example analysis using just four colonies from this dataset.
 The output from the `bumbl()` function is a `tibble` with one row for each colony and columns for parameters calculated from the models (\autoref{tab:output}).
 
 ```{r include=FALSE}
-table_cap <- "Data frame output by the `bumbl()` function showing estimates of switchpoint (`tau`, in weeks), estimated initial size (`logN0`), growth rate (`logLam`), decay rate (`decay`), and maximum size (`logNmax`)"
+table_cap <- 'Data frame output by the \\texttt{bumbl()} function showing estimates of switchpoint (tau, in weeks), estimated initial size (logN0), growth rate (logLam), decay rate (decay), and maximum size (logNmax)'
 ```
 
 ```{r output, echo=FALSE, message=FALSE, warning=FALSE}
-kableExtra::kbl(out, format = "latex", format.args = c(digits = 3), caption = table_cap, label = "output")
+knitr::kable(out, format = "latex", format.args = c(digits = 3), caption = table_cap, label = "output")
 ```
 
 Using the `autoplot()` function from the `ggplot2` package on the output object generates a faceted plot with raw data and best fit lines (\autoref{fig:plot}).
