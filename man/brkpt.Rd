@@ -28,15 +28,6 @@ winning model
 Fits models using a range of taus and picks the best one using maximum
 likelihood. Typically only used internally by \code{\link[=bumbl]{bumbl()}}.
 }
-\examples{
-testbees <- bombus[bombus$colony == 9, ]
-# Using dates
-\dontrun{
-brkpt(testbees, t = date, formula = mass ~ date)
-# Using weeks
-brkpt(testbees, t = week, formula = mass ~ week)
-}
-}
 \seealso{
 \code{\link[=bumbl]{bumbl()}}
 }

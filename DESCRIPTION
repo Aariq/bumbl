@@ -22,8 +22,7 @@ Suggests:
     rmarkdown,
     covr,
     car,
-    rsq,
-    ggplot2
+    rsq
 Imports: 
     dplyr,
     rlang,
@@ -31,7 +30,8 @@ Imports:
     purrr,
     broom,
     glue,
-    MASS
+    MASS,
+    ggplot2
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

@@ -104,7 +104,7 @@ without the switchpoint by AIC or a likelihood ratio test to test the
 significance of the switchpoint.
 }
 \examples{
-\dontrun{
+\donttest{
 bumbl(bombus, colonyID = colony, t = week, formula = d.mass ~ week)
 }
 }
