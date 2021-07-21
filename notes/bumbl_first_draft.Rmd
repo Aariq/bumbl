@@ -1,0 +1,419 @@
+---
+title: "Colony Growth Model"
+author: "Eric R. Scott"
+date: "2019-07-31"
+output: 
+  html_notebook: 
+    highlight: kate
+    theme: yeti
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Last compiled: `r Sys.Date()`*
+
+```{r packages, include=FALSE}
+library(tidyverse)
+library(here)
+library(bumbl)
+```
+
+# Purpose
+
+Try to get Elizabeth Crone's breakpoint bumble bee colony growth model working on my machine
+
+# Load Data
+
+```{r data, echo=TRUE}
+bombus
+```
+
+
+## Data Dictionary
+
+
+
+
+# Notes
+
+The idea is to fit a model that allows for different growth rates before and after a switch point, $\tau$, and an added decay rate after $\tau$.
+
+Before the switch point, growth (colony weight, $W_t$) is defined as:
+
+$$
+W_t = \lambda^tW_0
+$$
+After the switchpoint ($t > \tau$), it's defined as:
+
+$$
+W_t = \lambda^{\tau}W_{0}\delta^{t-\tau}
+$$
+Where $\delta$ is a rate of decline
+
+$$
+W_t = 
+  \begin{cases}
+  \lambda^tW_0 & t\leq\tau \\
+  \lambda^{\tau}W_{0}\delta^{t-\tau} & t > \tau
+  \end{cases}
+$$
+
+
+After log-linearizing it it looks like this:
+
+For $t<=\tau$:
+
+$$
+\ln(W_t) = \ln(W_0) + t\ln(\lambda)
+$$
+
+For $t>\tau$
+
+$$
+\ln(W_t) = \ln(W_0) + \tau\ln(\lambda) + (t-\tau)\ln(\delta)
+$$
+Turning that into a simple linter regression looks like:
+$$
+ln(W_t) = \beta_0 + \beta_1*t + \beta_2*post
+$$
+Where *post* is $0$ before $\tau$ and $t-\tau$ after $\tau$
+
+To clarify:
+
+- $\beta_0 = \ln(W_0)$
+- $\beta_1 = \ln(\lambda)$
+- $\beta_2 = \ln(\delta-\lambda) = \frac{\ln(\delta)}{\ln(\lambda)}$
+
+# Original code dissection
+
+Elizabeth's code contained an additional co-variate, "supp" which was whether hives were supplemented or not.  But for the sake of writing a working function, I'll ignore covariates for now.
+
+What the function needs to do is for each colony:
+
+1. calculate *post*
+2. Fit a linear model, `lm(log(TrueColonyWt_g) ~ Round + post, data = dat)`, using a range of $\tau$s
+3. Find the best $\tau$ using maximum liklihood
+4. Export coefficients from the model
+
+
+```{r}
+taos = (seq(2,8,0.1)) #possible values for breakpoint
+taoML = array() 
+sites = unique(wts$ColonyID) 
+for(j in 1:length(sites)){
+  dat = wts[wts$ColonyID == sites[j],] #subset data by colony?
+  LLs = array(NA, dim = c(length(taos),1)) #creates array with slot for each tau?
+  
+  for(i in 1:length(taos)){
+    usetao = taos[i]
+    dat$post = dat$Round - usetao
+    dat$post[(dat$post < 0) == T] = 0 #post is 0 if before tao, numeric if after tao
+    
+    m0 = try(lm(log(TrueColonyWt_g) ~ Round + post, data = dat))
+    if(class(m0) != "try-error") LLs[i] = logLik(m0)
+    LLs
+  }
+  taoML[j] = taos[which(LLs == max(LLs))]
+  
+}
+taoML # show the list of maximum-likelihood breakpoints for each colony
+```
+I think the warning is because sometimes there are multiple quivalent taus with the same maximum liklihood.  That is, `taos[which(LLs == max(LLs))]` is sometimes a vector.
+
+
+Next, loop below extracts the colony-dynamic coefficients for each colony, given the ML value of tao.  It **re-fits** the model using the best $\tau$, which is probably not the best way.
+
+```{r}
+
+params = array(NA, dim = c(length(sites), 6)) #<-had to change this because I got rid of "supp"
+for(k in 1:length(sites)){
+  dat = wts[wts$ColonyID == sites[k],]
+  usetao = taoML[k] #isn't this going to be a vector sometimes?
+  dat$post = dat$Round - usetao
+  dat$post[(dat$post < 0) == T] = 0
+  m1 = lm(log(TrueColonyWt_g) ~ Round + post, data = dat) 
+  print(sites[k])
+  print(summary(m1))
+  params[k,] = (c(sites[k],usetao, coef(m1), max(predict(m1), na.rm = T)))
+  # plots of each colony's trajectory and fitted curve, for visual inspection
+  # these lines of code can be turned off without loss of function
+  # but I like to look at them to be sure nothing went wrong
+  plot(dat$Round, dat$TrueColonyWt_g, main = sites[k])
+  points(dat$Round[1:length(predict(m1))], exp(predict(m1)), type = "l", col = "red")
+}# this loop returns `params` and prints models and plots as side-effect
+
+
+```
+First problem: This doesn't allow for variable numbers of parameters.  It fails because it was expecting 7 parameters I think.
+
+
+Next, this code converts the matrix of model parameters to a data frame
+```{r}
+params = data.frame(params)
+params
+colnames(params) = c("ColonyID", "tao", "logNo", "loglam", "decay", "logNmax") #can't just assign these manually like this.
+toc()
+head(params)
+```
+
+- `tao` is the switchpoint, in weeks.  The colony grows for tao weeks, then begins to decline in week tao + 1
+- `logNo` is the intercept of the growth function.  It reflects actual initial colony size, if the colony initially grows exponentiallyl.  It would also be lower if there were a few weeks lag before growth started in the field
+- `loglam` is the average 10-day (log-scale) colony growth rate (i.e., rate of weight gain) during the growth period
+- other coefs for covariates
+- `decay` reflects the rate of decline during the decline period.  In fact, the way this model is set up, the actual  rate of decline per 10 days is calculated as decay - loglam.
+- `logNmax` is the maximum weight reached by each colony.  It is a function of tao, logNo and loglam
+
+And this appends it back to the original data, but summarized by colony and all the co-variates in the model
+```{r}
+param.dat = merge(params, wts[wts$Round == 0,c(2,4,5)], all.y = F) #full_join()
+param.dat = param.dat[1:length(sites), ] #not sure why necessary
+param.dat
+#maximum-likelihood breakpoints for each colony
+```
+
+
+# Functionalizing
+
+## Find Tau for a single colony
+First, let's write a function that picks the best tau for *one* colony
+
+```{r}
+library(bumbl)
+testbees <- bombus %>% filter(colony == 68)
+brkpt(testbees, t = week, formula = log(mass) ~ week)
+```
+
+## Map brkpt to all colonies
+
+Using possibly() with nested data works great at getting error mesages with readable compact code.
+BUT I'll have to use something more complicated like quietly
+
+```{r}
+# safe_brkpt <- safely(brkpt)
+safe_brkpt <- possibly(brkpt, NULL)
+
+test <- 
+  bombus %>% 
+  group_by(colony) %>% 
+  nest() %>% 
+  mutate(safe_model = map(data,
+                     ~safe_brkpt(.,
+                            t = week,
+                            # taus = seq(1:30, 0.5),
+                            formula = log(mass) ~ week))) %>% 
+  unnest(safe_model, keep_empty = TRUE) 
+
+```
+
+```{r}
+errs <- test %>% filter(is.null(model[[1]]))
+if(nrow(errs) > 0){
+  abort(paste0("More than 1 equivalent tau for colony ID ", str_flatten(errs$colony, ", ")))
+}
+colonyID <- quo(colony)
+t <- quo(week)
+test %>% 
+  mutate(coefs = map(.data$model, broom::tidy)) %>%
+    unnest(.data$coefs) %>%
+    select(!!colonyID, "tau", "model", "term", "estimate") %>%
+    spread(key = "term", value = "estimate") %>%
+    mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%
+    select(-"model") %>%
+    select(!!colonyID, "tau", logNo = '(Intercept)', loglam = !!t, decay = '.post', everything())
+```
+```{r}
+library(forcats)
+library(purrr)
+
+mydata <- colony_weights %>% 
+  dplyr::filter(!ColonyID %in% c("68", "97")) 
+
+dflist <-
+  mydata %>% 
+  group_by(ColonyID) %>%
+  group_split(keep = TRUE) %>%  #experimental
+  set_names(pull(group_keys(mydata, ColonyID)))
+```
+```{r}
+#for loop style
+model_list <- vector("list", length(dflist))
+
+
+for(i in 1:length(dflist)){
+
+  model_list[[i]] <- 
+    tryCatch(brkpt(dflist[[i]], taus = mytaus,t = Round,formula = log(TrueColonyWt_g) ~ Round),
+             error = function(c){
+               c$message <- glue::glue("For Colony ID '{names(dflist)[i]}': {c$message}")
+               stop(c)
+             })
+  names(model_list) <- names(dflist)
+}
+bind_rows(model_list, .id = "Colony ID")
+
+```
+ 
+```{r}
+dflist %>% #experimental
+  map_dfr(~brkpt(.x,
+                taus = mytaus,
+                t = Round,
+                formula = log(TrueColonyWt_g) ~ Round), .id = "ColonyID") %>% 
+  mutate(coefs = map(model, broom::tidy)) %>%
+  unnest(coefs, .preserve = "model") %>% 
+  select(ColonyID, tau, model, term, estimate) %>% 
+  spread(key = term, value = estimate) %>%
+  mutate(logNmax = map_dbl(model, ~max(predict(.), na.rm = TRUE))) %>% 
+  select(-model) %>%
+  select(ColonyID, tau, logNo = `(Intercept)`, loglam = Round, decay = .post, everything())
+full_join(mydata, summarydata)
+```
+
+## How to catch errors correctly
+What I want is for errors generated by `brkpt()` to be passed on to bumbl, but with info about which colonyID caused the error.
+
+One possibility is to switch `bumbl` to a for-loop, but that seems silly just to get the errors right
+
+Another possibility is to capture errors with `safely()` or `try()` or something in the dataframe and then construct meaningful errors inside `bumbl`
+
+Another possibility is I'm just doing something wrong in how I pass variables from `bumbl` to `brkpt`
+
+Code for aggregating warnings:
+```{r}
+at_least_one_warning <- function(code) {
+  warnings <- character()
+  wHandler <- function(w) {
+    warnings <<- c(warnings, w$message)
+    invokeRestart("muffleWarning")
+  }
+  
+  result <- withCallingHandlers(
+    expr = code,
+    warning = wHandler
+  )
+  
+  if (length(warnings) > 0) {
+    message("at least one warning")
+  }
+  
+  result
+}
+
+at_least_one_warning(purrr::map_dbl(c(10, 12, -1, -12), log))
+```
+
+from https://community.rstudio.com/t/quickly-scanning-purrr-side-effects-and-using-pillar-to-style-the-report/17075
+```{r}
+quietly_status = function(x, .prefix_err = 'Error:', .prefix_warn = 'Warning:',
+  .prefix_msg = 'Message:', .text_ok = 'OK') {
+  map(x,
+      ~ if (is.null(.$warning) | is_empty(.$warning)) {
+        if (is.null(.$message) | is_empty(.$message)) {
+          .text_ok
+        } else { paste(.prefix_msg, .$message) }
+      } else { paste(.prefix_warn, .$warning) }) %>%
+  as_vector()
+}
+
+
+# safe_log = safely(log)
+quiet_log = quietly(log)
+
+test = 
+  # tidy up and trim down for the example
+  mtcars %>%
+  rownames_to_column(var = "car") %>%
+  as_data_frame() %>%
+  select(car, cyl, disp, wt) %>%
+  # spike some rows in cyl == 4 to make them fail
+  mutate(wt = case_when(
+    wt < 2 ~ -wt,
+    TRUE ~ wt)) %>%
+  # nest and do some operations quietly()
+  nest(-cyl) %>%
+  mutate(
+    qlog = map(data, ~ quiet_log(.$wt)),
+    qlog_status = quietly_status(qlog),
+    # optional: overwrite the "quiet" output with just successful results
+    qlog = map(qlog, "result"))
+
+test
+```
+
+THIS WORKS AND DOES WHAT I WANT.  Captures errors **AND** warnings, in a tidy format, and allows filtering and passing on of error messages.  I don't know if it's the best way, but I should do it like this for now.
+
+```{r}
+
+quietly_status = function(x, .prefix_err = 'Error:', .prefix_warn = 'Warning:',
+  .prefix_msg = 'Message:', .text_ok = 'OK') {
+  map(x,
+      ~ if (is.null(.$error) | is_empty(.$error))   {
+        if (is.null(.$warning) | is_empty(.$warning)) {
+          if (is.null(.$message) | is_empty(.$message)) {
+            
+            .text_ok
+            
+          } else { paste(.prefix_msg, .$message) }
+        } else { paste(.prefix_warn, .$warning) }
+      } else { paste(.prefix_err, .$error) }) %>%
+    as_vector()
+}
+
+
+safely_n_quietly <- function(.f, otherwise = NULL) {
+  retfun <- quietly(safely(.f, otherwise = otherwise, quiet = FALSE))
+  function(...) {
+    ret <- retfun(...)
+    list(result = ret$result$result,
+         output = ret$output,
+         messages = ret$messages,
+         warnings = ret$warnings,
+         error = ret$result$error)
+  }
+}
+
+weirdlog <- function(x) {
+  out <- vector(length = length(x))
+  for(i in 1:length(x)) {
+    if(x[i] == 0) {
+      stop("I hate zero")
+    } else {
+      out[i] <- log(x[i])
+    }
+  }
+  return(out)
+}
+weirdlog(c(1,2,3, 0))
+safe_n_quiet_log <- safely_n_quietly(weirdlog)
+
+safe_n_quiet_log(0)
+quiet_log <- quietly(weirdlog)
+safely_log <- safely(weirdlog)
+
+test = 
+  # tidy up and trim down for the example
+  mtcars %>%
+  rownames_to_column(var = "car") %>%
+  as_data_frame() %>%
+  select(car, cyl, disp, wt) %>%
+  # spike some rows in cyl == 4 to make them fail
+  mutate(wt = case_when(wt < 1.3 ~ -wt,
+                        wt > 3.5 ~ 0,
+                        TRUE ~ wt)) %>%
+  # nest and do some operations quietly()
+  nest(-cyl) %>%
+  mutate(qlog = map(data, ~ safe_n_quiet_log(.$wt)),
+         qlog_status = quietly_status(qlog),
+         # optional: overwrite the "quiet" output with just successful results
+         qlog = map(qlog, "result"))
+
+test
+
+log(c(1,2,3))
+
+```
+

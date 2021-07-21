@@ -1,0 +1,292 @@
+---
+title: "Single-model rework of bumbl(), to handle covariates better"
+author: "Eric R. Scott"
+date: "2021-02-17"
+output: 
+  html_notebook: 
+    highlight: kate
+    theme: yeti
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(conflicted)
+library(bumbl)
+
+conflict_prefer("lag", "dplyr")
+conflict_prefer("filter", "dplyr")
+```
+
+```{css}
+.alert {
+  position: relative;
+  padding: .75rem 1.25rem;
+  margin-bottom: 1rem;
+  background: #f6fbfe;
+  color: #12537e;
+  border: 1px solid transparent;
+  border-color: #1976d2;
+  border-radius: .25rem;
+  font-size: inherit;
+}
+.center {
+  text-align: center;
+}
+```
+
+*Last compiled: `r Sys.Date()`*
+
+# Purpose
+
+Analysis code demonstrating the proposed changes to how `bumbl()` works.
+
+# Load Data
+
+```{r data, echo=TRUE}
+bombus_sub <-
+  bombus %>% 
+  filter(colony %in% c(9, 17, 20))
+```
+
+# Status quo
+
+The way bumbl currently works is on one colony at a time.
+The data and formula for a GLM are modified like so:
+
+```{r}
+#formula supplied by user
+f_user <- d.mass ~ week
+
+#a guess for tau, will discuss optimizing later
+tau <- 5
+
+#just a single colony's data
+bombus_9 <- bombus_sub %>% filter(colony == 9)
+
+#mutate data
+df_new <-
+  bombus_9 %>% 
+  mutate(.post = ifelse(week <= tau, 0, week - tau))
+
+#alter formula
+f_internal <- update(f_user, .~. + .post)
+f_internal
+```
+
+Then we fit the GLM
+
+```{r}
+glm(formula = f_internal, data = df_new, family = gaussian(link = "log"))
+```
+
+To find the correct value for `tau`, we need to find the value that maximizes likelihood for this model.
+This is all done by `brkpt()`, a lower-level function that `bumbl()` calls for each colony in a dataset.
+
+```{r}
+bumbl:::brkpt(bombus_9, t = week, formula = d.mass ~ week, family = gaussian(link = "log"))
+```
+
+Then `bumbl` extracts some things from the model for each colony
+
+```{r}
+bumbl(
+  bombus_sub,
+  colonyID = colony,
+  t = week,
+  formula = d.mass ~ week,
+  family = gaussian(link = "log")
+)
+```
+
+## Covariates
+
+In the current version of `bumbl`, covariates *can* be added to the model formula, but they are estimated for each colony separately.
+
+```{r}
+bumbl(
+  bombus_sub,
+  colonyID = colony,
+  t = week,
+  formula = d.mass ~ week + cum_floral
+)
+```
+
+If you wanted to estimate a single coefficient for a covariate, the current workaround is to first use `bumbl` to find the optimal value for `tau` without the covariate, then re-fit the model "manually".
+
+```{r}
+out_df <-
+  bumbl(
+  bombus_sub,
+  colonyID = colony,
+  t = week,
+  formula = d.mass ~ week,
+  family = gaussian(link = "log"),
+  augment = TRUE
+)
+out_df <-
+  out_df %>% 
+  mutate(.post = ifelse(week <= tau, 0, week - tau))
+
+glm(d.mass ~ week + .post + cum_floral, data = out_df, family = gaussian(link = "log"))
+```
+
+This workaround could easily be formalized into `bumbl()` by allowing the user to override the optimization step and supply their own values of `tau`.
+
+# New Behavior
+
+If covariates should be taken into account **during optimization of tau**, but only one coefficient is to be estimated (not one per colony), then this requires a change in the way `bumbl()` works.
+
+I think the new base model it needs to fit is:
+
+    d.mass ~ week*colony + .post*colony
+
+So that a different growth and decay rate can be fit for each colony.
+`tau` then needs to be optimized for all colonies simultaneously, since `tau` determines the value of `.post`.
+Then the user has more flexibility in specifying covariates.
+Take a simple categorical covariate like `habitat`.
+One can add `+ habitat` to estimate different intercepts for different habitats, `+ habitat*week` to have different growth rates in different habitats, or `+ habitat*.post` to have different decay rates in different habitats (how the API will work is up for discussion, but maybe `bumbl()` will accept a right-sided formula for covariates).
+Importantly, these covariates are estimated across all colonies, not for each colony independently.
+
+## Analysis code
+
+Here's an analysis with 3 colonies and a covariate (no interactions with the covariate).
+
+```{r}
+taus <- c(5, 6, 7) #example guesses for tau
+colonies <- unique(bombus_sub$colony)
+bombus_sub <- 
+  bombus_sub %>% 
+  mutate(tau = case_when(
+    colony == colonies[1] ~ taus[1],
+    colony == colonies[2] ~ taus[2],
+    colony == colonies[3] ~ taus[3]
+  )) %>% 
+  mutate(.post = ifelse(week <= tau, 0, week - tau))
+m <-
+  glm(
+    d.mass ~ week * colony + .post * colony + habitat,
+    family = gaussian(link = "log"),
+    data = bombus_sub
+  )
+coef(m)
+```
+
+```{r results="asis"}
+library(equatiomatic)
+extract_eq(m, wrap = TRUE)
+```
+
+There is a different intercept (e.g. $\beta_2$), growth rate slope (e.g. $\beta_6$), and decline rate slope (e.g. $\beta_8$) for each colony as well as an overall different intercept for the two `habitat` types ($\beta_5$).
+
+## Optimizing multiple taus
+
+This is still a long way off from being implemented into `bumbl()`, but it's a proof of concept.
+
+First, create a function.
+
+```{r}
+foo <- function(taus) {
+  colonies <- unique(bombus_sub$colony)
+  bombus_sub <- 
+    bombus_sub %>% 
+    # This mutate just adds a column of taus giving each colony a different tau.
+    # There is probably a more efficient way of doing this for any number of
+    # colonies, but doing this programmatically is key to this whole thing
+    # working.
+    mutate(tau = case_when(
+      colony == colonies[1] ~ taus[1],
+      colony == colonies[2] ~ taus[2],
+      colony == colonies[3] ~ taus[3]
+    )) %>% 
+    # Create .post column, as before
+    mutate(.post = ifelse(week <= tau, 0, week - tau))
+  # Fit the model
+  m <-
+    glm(
+      d.mass ~ week * colony + .post * colony + habitat,
+      family = gaussian(link = "log"),
+      data = bombus_sub
+    )
+  return(m)
+}
+
+foo(taus = c(5, 6, 7))
+```
+
+The `foo()` function only works with three colonies, so you'd need to edit it to work with a variable number of colonies.
+Now, for `optim()` to work on the `foo()` function, it needs to be wrapped such that the parameters (`taus`) are the first argument and it returns the model log-likelihood (or whatever you want to minimize/maximize).
+
+```{r}
+foo_wrap <- function(taus) {
+  m <- foo(taus = taus)
+  return(logLik(m))
+}
+foo_wrap(taus = c(5, 6, 7))
+```
+
+Ok, now I can try to `optim()`
+
+::: {.alert}
+::: {.center}
+**NOTE**
+:::
+
+There are different methods for optimization that can be supplied with the `method` argument to `optim()`.
+This is just the default for demonstration, but it is probably worth while reading more about the options.
+Some, like `"L-BFGS-B"` take a lower and upper bound, which might be appropriate for `tau`.
+:::
+
+```{r}
+out <- 
+  optim(
+    par = c(5,5,5), #must supply initial values.  Could be mean(week)?
+    fn = foo_wrap,
+    control = list(fnscale = -1) #include to maximize instead of minimize logLik
+  )
+out$par
+```
+
+These are the optimal values of tau for the three colonies.
+
+Now we can run the model with the optimal taus by feeding them back into `foo()`
+
+```{r}
+foo(out$par)
+```
+
+The values are very similar to what we get from `bumbl()`, but now habitat is included as a covariate.
+
+For example, the `logN0` for colony 17 is 3.388 (the intercept), for colony 20 its 3.388-0.599 = 2.739.
+The corresponding values from `bumbl()` without habitat as a covariate are 3.35 and 2.8.
+
+```{r}
+bumbl(
+  bombus_sub,
+  colonyID = colony,
+  t = week,
+  formula = d.mass ~ week,
+  family = gaussian(link = "log")
+)
+```
+
+If I'm thinking about this correctly, it seems promising.
+The big hurdles are in the programming and designing the user interface.
+How should the user supply the glm formula?
+Something like this?
+
+``` {.r}
+bumbl(
+  response = d.mass,
+  time = week,
+  colonyID = colony,
+  covariates  = ~ habitat + cum_floral*week
+)
+```
+
+But then what does `cum_floral*week` do?
+Does it *actually* do `~cum_floral*week + cum_floral*.post`?
