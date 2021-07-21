@@ -4,3 +4,5 @@
 inst/doc
 *.pdf
 Meta
+*.nb.html
+*.html

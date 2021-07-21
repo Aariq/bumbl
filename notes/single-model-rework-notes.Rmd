@@ -3,7 +3,7 @@ title: "Single-model rework of bumbl(), to handle covariates better"
 author: "Eric R. Scott"
 date: "2021-02-17"
 output: 
-  html_notebook: 
+  html_document: 
     highlight: kate
     theme: yeti
     toc: yes

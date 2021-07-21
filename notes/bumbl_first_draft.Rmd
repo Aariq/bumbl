@@ -3,7 +3,7 @@ title: "Colony Growth Model"
 author: "Eric R. Scott"
 date: "2019-07-31"
 output: 
-  html_notebook: 
+  html_document: 
     highlight: kate
     theme: yeti
     toc: yes
