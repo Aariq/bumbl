@@ -1,7 +1,5 @@
-on:
-  push:
-    branches:
-      - 'joss-paper'
+on: [push]
+
 jobs:
   paper:
     runs-on: ubuntu-latest
