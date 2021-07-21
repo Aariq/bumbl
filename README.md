@@ -55,9 +55,10 @@ bumblebee ecology and demography from anyone!
     `bumbl()`
 -   [x] Release v0.1.0 and archive on Zenodo
 -   [x] Bug fixes
--   [ ] Submit v1.0.0 of package to CRAN
+-   [x] Submit v1.0.0 of package to CRAN
 -   [ ] Possibly re-work internals of `bumbl()`? (see
-    [\#58](https://github.com/Aariq/bumbl/issues/58))
+    [\#58](https://github.com/Aariq/bumbl/issues/58) and
+    [notes](https://github.com/Aariq/bumbl/blob/master/notes/single-model-rework-notes.Rmd))
 -   [ ] Polish user interface in regards to specifying formula and
     covariates.
 -   [ ] Submit v2.0.0 of package to CRAN

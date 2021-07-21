@@ -45,8 +45,8 @@ I also welcome contributions including bug-fixes, improvement of documentation, 
 -   [x] Regroup with Elizabeth Crone to discuss current behavior of `bumbl()`
 -   [x] Release v0.1.0 and archive on Zenodo
 -   [x] Bug fixes
--   [ ] Submit v1.0.0 of package to CRAN
--   [ ] Possibly re-work internals of `bumbl()`? (see [\#58](https://github.com/Aariq/bumbl/issues/58))
+-   [x] Submit v1.0.0 of package to CRAN
+-   [ ] Possibly re-work internals of `bumbl()`? (see [\#58](https://github.com/Aariq/bumbl/issues/58) and [notes](https://github.com/Aariq/bumbl/blob/master/notes/single-model-rework-notes.Rmd))
 -   [ ] Polish user interface in regards to specifying formula and covariates.
 -   [ ] Submit v2.0.0 of package to CRAN
 -   [ ] Write a manuscript for JOSS or other journal
