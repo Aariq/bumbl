@@ -10,7 +10,7 @@
 ^\.Rhistory$
 .github
 ^\.github$
-^doc$
+^paper$
 ^Meta$
 ^CODE_OF_CONDUCT\.md$
 ^cran-comments\.md$

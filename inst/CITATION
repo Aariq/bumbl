@@ -5,11 +5,7 @@ citEntry(
   author       = c(person(given = c("Eric", "R."),
                           family = "Scott",
                           role = c("aut", "cre"),
-                          email = "scottericr@gmail.com"),
-                   person(given = c("Elizabeth", "E."),
-                          family = "Crone",
-                          role = c("aut"),
-                          email = "elizabeth.crone@tufts.edu")),
+                          email = "scottericr@gmail.com")),
   title        = "bumbl: Tools for modeling bumblebee colony growth and decline",
   month        = "feb",
   year         = "2021",
@@ -17,7 +13,7 @@ citEntry(
   version      = "v1.0.0",
   doi          = "10.5281/zenodo.4545782",
   url          = "https://doi.org/10.5281/zenodo.4545782",
-    textVersion = "Eric R. Scott, & Elizabeth E. Crone. (2021, February 17). bumbl: Tools for modeling bumblebee colony growth and decline (Version v1.0.0). Zenodo. http://doi.org/10.5281/zenodo.4545782"
+    textVersion = "Eric R. Scott. (2021, February 17). bumbl: Tools for modeling bumblebee colony growth and decline (Version v1.0.0). Zenodo. http://doi.org/10.5281/zenodo.4545782"
   )
 
 citEntry(

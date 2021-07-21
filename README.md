@@ -13,6 +13,8 @@ coverage](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg)](http
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
+[![metacran
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/bumbl)](https://cran.r-project.org/package=bumbl)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4545782.svg)](https://doi.org/10.5281/zenodo.4545782)
 
 <!-- badges: end -->
@@ -56,8 +58,7 @@ bumblebee ecology and demography from anyone!
 -   [x] Submit v1.0.0 of package to CRAN
 -   [ ] Write a manuscript for JOSS
 -   [ ] Release minor version to CRAN to update citation
--   [ ] Possibly re-work internals of `bumbl()`? (see
-    [\#58](https://github.com/Aariq/bumbl/issues/58))
+-   [ ] Possibly re-work internals of `bumbl()`? (see [\#58](https://github.com/Aariq/bumbl/issues/58) and [notes](https://github.com/Aariq/bumbl/blob/master/notes/single-model-rework-notes.Rmd))
 -   [ ] Submit v2.0.0 of package to CRAN
 
 Other possible areas of improvement:
