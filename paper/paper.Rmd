@@ -30,13 +30,10 @@ journal: JOSS
 
 # Statement of Need
 
-Bumble bees (*Bombus* spp.) are important pollinators of wild plants and agricultural systems, and many species of bumble bees are in decline [@goulson2008].
-Bumble bees are social bees which produce annual colonies.
-In early spring, queens emerge and establish nests.
-The colony then begins to increase exponentially with workers until at some point, the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees].
+Bumble bees (*Bombus* spp.) are important pollinators of wild plants and agricultural systems, and many species of bumble bees are in decline [@goulson2008]. Bumble bees are social bees, but unlike honeybees their colonies are annual. In early spring, queens emerge, establish nests, and produce offspring that function as workers. Colony size (e.g. number of workers) increases exponentially until the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees].
 After this, the colony size declines as workers die and new queens and males disperse.
-This switch point is critical for the reproduction and viability of the colony and is therefore important for ecologists to examine.
-Standard generalized linear models (GLMs) are commonly used to estimate and forecast population-level growth, but these methods are not suited to analyze colony-level growth and decline because they cannot capture the sharp switchpoint from growth to reproduction.
+At the population level, standard generalized linear models (GLMs) are commonly used to estimate and forecast population growth, but these methods are unable to capture the sharp switch point from growth to reproduction of individual colonies.
+However, the timing of this switch point for individual colonies, as well as growth and decline rates before and after it, has important consequences for population dynamics.
 @croneBumbleBeeColony2016 developed a method to estimate the switch from growth to reproduction by fitting a modified GLM with a switchpoint included.
 Their method required repeated creation of dummy variables in the data for many values of the switchpoint in order to choose the value of the switchpoint that maximized the likelihood of the modified GLM.
 This package automates the model fitting process and uses optimization for a more precise estimate of the switchpoint.
