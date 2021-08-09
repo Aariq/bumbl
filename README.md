@@ -16,7 +16,6 @@ status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/
 [![metacran
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/bumbl)](https://cran.r-project.org/package=bumbl)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4545782.svg)](https://doi.org/10.5281/zenodo.4545782)
-[![status](https://joss.theoj.org/papers/7a652c8b3ef4356bfd675f1ebb7375a4/status.svg)](https://joss.theoj.org/papers/7a652c8b3ef4356bfd675f1ebb7375a4)
 
 <!-- badges: end -->
 
