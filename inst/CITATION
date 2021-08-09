@@ -9,10 +9,10 @@ citEntry(
   title        = "bumbl: Tools for modeling bumblebee colony growth and decline",
   year         = "2021",
   publisher    = "Zenodo",
-  version      = packageVersion("bumbl"),
+  version      = package_version("1.0.1"),
   doi          = "10.5281/zenodo.4545782",
   url          = "https://doi.org/10.5281/zenodo.4545782",
-  textVersion  = paste0("Eric R. Scott. (2021). bumbl: Tools for modeling bumblebee colony growth and decline (Version v", packageVersion("bumbl"), "). Zenodo. http://doi.org/10.5281/zenodo.4545782")
+  textVersion  = "Eric R. Scott. (2021). bumbl: Tools for modeling bumblebee colony growth and decline (Version 1.0.1). Zenodo. http://doi.org/10.5281/zenodo.4545782"
   )
 
 citEntry(
