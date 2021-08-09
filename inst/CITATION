@@ -7,13 +7,12 @@ citEntry(
                           role = c("aut", "cre"),
                           email = "scottericr@gmail.com")),
   title        = "bumbl: Tools for modeling bumblebee colony growth and decline",
-  month        = "feb",
   year         = "2021",
   publisher    = "Zenodo",
-  version      = "v1.0.0",
+  version      = packageVersion("bumbl"),
   doi          = "10.5281/zenodo.4545782",
   url          = "https://doi.org/10.5281/zenodo.4545782",
-    textVersion = "Eric R. Scott. (2021, February 17). bumbl: Tools for modeling bumblebee colony growth and decline (Version v1.0.0). Zenodo. http://doi.org/10.5281/zenodo.4545782"
+  textVersion  = paste0("Eric R. Scott. (2021). bumbl: Tools for modeling bumblebee colony growth and decline (Version v", packageVersion("bumbl"), "). Zenodo. http://doi.org/10.5281/zenodo.4545782")
   )
 
 citEntry(
@@ -30,6 +29,6 @@ citEntry(
   number   = "4",
   pages    = "460-468",
   doi      = "10.1111/ele.12581",
-  textVersion = "Crone EE, Williams NM (2016) Bumble bee colony dynamics: quantifying the importance of land use and floral resources for colony growth and queen production. Ecology Letters 19:460–468 . https://doi.org/10.1111/ele.12581
+  textVersion = "Crone EE, Williams NM (2016). Bumble bee colony dynamics: quantifying the importance of land use and floral resources for colony growth and queen production. Ecology Letters 19:460–468. https://doi.org/10.1111/ele.12581
 "
 )
