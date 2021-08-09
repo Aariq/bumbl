@@ -57,7 +57,9 @@ bumblebee ecology and demography from anyone!
 -   [x] Release v0.1.0 and archive on Zenodo
 -   [x] Bug fixes
 -   [x] Submit v1.0.0 of package to CRAN
--   [ ] Write a manuscript for JOSS
+-   [x] Write a manuscript for JOSS
+    ([desk-reject](https://github.com/openjournals/joss-reviews/issues/3532),
+    out of scope)
 -   [ ] Release minor version to CRAN to update citation
 -   [ ] Possibly re-work internals of `bumbl()`? (see
     [\#58](https://github.com/Aariq/bumbl/issues/58) and
@@ -99,7 +101,7 @@ View the `bomubs` dataset
 
 ``` r
 head(bombus)
-#> # A tibble: 6 x 10
+#> # A tibble: 6 × 10
 #>   site  colony  wild habitat date        week  mass d.mass floral_resources
 #>   <fct> <fct>  <dbl> <fct>   <date>     <int> <dbl>  <dbl>            <dbl>
 #> 1 PUT2  9       0.98 W       2003-04-03     0 1910.    0.1            27.8 
@@ -120,7 +122,7 @@ colonies switch to reproduction
 bombus2 <- bombus[bombus$colony %in% c(9, 82, 98, 35), ]
 results <- bumbl(bombus2, colonyID = colony, t = week, formula = d.mass ~ week)
 results
-#> # A tibble: 4 x 7
+#> # A tibble: 4 × 7
 #>   colony converged   tau logN0 logLam  decay logNmax
 #>   <chr>  <lgl>     <dbl> <dbl>  <dbl>  <dbl>   <dbl>
 #> 1 35     TRUE       9.37  3.65  0.214 -0.296    5.60

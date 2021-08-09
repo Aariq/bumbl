@@ -30,7 +30,10 @@ journal: JOSS
 
 # Statement of Need
 
-Bumble bees (*Bombus* spp.) are important pollinators of wild plants and agricultural systems, and many species of bumble bees are in decline [@goulson2008]. Bumble bees are social bees, but unlike honeybees their colonies are annual. In early spring, queens emerge, establish nests, and produce offspring that function as workers. Colony size (e.g. number of workers) increases exponentially until the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees].
+Bumble bees (*Bombus* spp.) are important pollinators of wild plants and agricultural systems, and many species of bumble bees are in decline [@goulson2008].
+Bumble bees are social bees, but unlike honeybees their colonies are annual.
+In early spring, queens emerge, establish nests, and produce offspring that function as workers.
+Colony size (e.g. number of workers) increases exponentially until the colony switches from growth to reproduction, when males and new queens are produced [@goulson2010bumblebees].
 After this, the colony size declines as workers die and new queens and males disperse.
 At the population level, standard generalized linear models (GLMs) are commonly used to estimate and forecast population growth, but these methods are unable to capture the sharp switch point from growth to reproduction of individual colonies.
 However, the timing of this switch point for individual colonies, as well as growth and decline rates before and after it, has important consequences for population dynamics.
@@ -105,5 +108,6 @@ I thank Elizabeth E. Crone for supplying example analysis code and data, and for
 I thank Sylvana Finn for comments on an early draft of the manuscript.
 I thank the rOpenSci reviewers Rebecca Killick and Mark Padgham for helpful suggestions and contributions.
 I thank Jeremy Hemberger, Genevieve Pugesek, and Sylvana Finn for beta testing and feedback on early versions of the package.
+The initial development of this package was partly supported by National Science Foundation grant DEB 1354224 to Elizabeth Crone.
 
 # References
