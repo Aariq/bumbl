@@ -45,6 +45,7 @@ test_that("brkpt errors when tau optimization does not converge", {
 # })
 
 test_that("brkpt works with poisson dist", {
+  skip_on_cran()
   count.model <- brkpt(testcount, t = week, formula = count ~ week, family = "poisson")
   expect_s3_class(count.model, "data.frame")
   expect_s3_class(count.model$model[[1]], "glm")
