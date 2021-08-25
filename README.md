@@ -59,7 +59,7 @@ bumblebee ecology and demography from anyone!
 -   [x] Write a manuscript for JOSS
     ([desk-reject](https://github.com/openjournals/joss-reviews/issues/3532),
     out of scope)
--   [ ] Release minor version to CRAN to update citation
+-   [x] Release minor version to CRAN to update citation
 -   [ ] Possibly re-work internals of `bumbl()`? (see
     [\#58](https://github.com/Aariq/bumbl/issues/58) and
     [notes](https://github.com/Aariq/bumbl/blob/master/notes/single-model-rework-notes.Rmd))
