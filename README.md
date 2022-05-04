@@ -153,7 +153,7 @@ for colony growth and queen production. Ecol. Lett. 19, 460–468.
 
 ------------------------------------------------------------------------
 
-Please note that the bumbl project is released with a [Contributor Code
-of
+Please note that the `bumbl` project is released with a [Contributor
+Code of
 Conduct](https://github.com/Aariq/bumbl/blob/master/CODE_OF_CONDUCT.md).
 By contributing to this project you agree to abide by its terms.
