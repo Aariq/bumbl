@@ -17,3 +17,4 @@
 ^CRAN-RELEASE$
 
 create_test_df.R
+^CRAN-SUBMISSION$
