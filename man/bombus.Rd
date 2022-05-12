@@ -10,12 +10,14 @@ A data frame with 178 rows and 10 columns
 \item{site}{The site ID}
 \item{colony}{The colony ID}
 \item{wild}{The proportion of the habitat for that site classified as wild using GIS}
-\item{habitat}{The habitat type. Either wild (W), organic agriculture (O), or conventional agriculture (C)}
+\item{habitat}{The habitat type. Either wild (W), organic agriculture (O),
+or conventional agriculture (C)}
 \item{date}{The calendar date the measurements were taken on}
 \item{week}{Number of weeks since the initial mass was taken}
 \item{mass}{Colony mass, in grams}
 \item{d.mass}{Difference in mass from the smallest mass for each colony, in grams}
-\item{floral_resources}{Floral density in millions of flowers within a 2km radius around the colony, weighted as a function of distance from colony}
+\item{floral_resources}{Floral density in millions of flowers within a 2km
+radius around the colony, weighted as a function of distance from colony}
 \item{cum_floral}{Cumulative floral resources from the start of the study}
 }
 }
@@ -23,14 +25,23 @@ A data frame with 178 rows and 10 columns
 bombus
 }
 \description{
-This is a subset of the data from Crone and Williams, 2016.  \emph{Bombus vosnesenskii} colonies were placed in sites in a mixed agricultural--natural area in California, USA and weighed weekly.
+This is a subset of the data from Crone and Williams, 2016.  \emph{Bombus
+vosnesenskii} colonies were placed in sites in a mixed agricultural--natural
+area in California, USA and weighed weekly.
 }
 \details{
-Floral resources (\emph{e}) are weighted using the equation \emph{w} = \emph{e}^(\emph{-D/a}) where \emph{D} is the distance in meters between the resources and the colony and \emph{a} is the typical flight distance for the species. This is described in further detail in Williams et al. 2012.
+Floral resources (\emph{e}) are weighted using the equation \emph{w} =
+\emph{e}^(\emph{-D/a}) where \emph{D} is the distance in meters between the resources and
+the colony and \emph{a} is the typical flight distance for the species. This is
+described in further detail in Williams et al. 2012.
 }
 \references{
-Crone, E. E., and Williams, N. M. (2016). Bumble bee colony dynamics: quantifying the importance of land use and floral resources for colony growth and queen production. Ecol. Lett. 19, 460–468. doi:10.1111/ele.12581.
+Crone, E. E., and Williams, N. M. (2016). Bumble bee colony dynamics:
+quantifying the importance of land use and floral resources for colony growth
+and queen production. Ecol. Lett. 19, 460–468. doi:10.1111/ele.12581.
 
-Williams, N. M., Regetz, J., and Kremen, C. (2012). Landscape-scale resources promote colony growth but not reproductive performance of bumble bees. Ecology 93, 1049–1058. doi:10.1890/11-1006.1.
+Williams, N. M., Regetz, J., and Kremen, C. (2012). Landscape-scale resources
+promote colony growth but not reproductive performance of bumble bees.
+Ecology 93, 1049–1058. doi:10.1890/11-1006.1.
 }
 \keyword{datasets}

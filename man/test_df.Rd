@@ -5,19 +5,25 @@
 \alias{test_df}
 \title{Simulated colony growth data for internal tests}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 140 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 140 rows and 4 columns.
 }
 \usage{
 test_df
 }
 \description{
-Colonies 1-5 are generated with \code{sim_colony()} using the following parameters:
-\describe{
-\item{tau} \code{c(11, 11.5, 9, 12, 10.6)}
-\item{n0} \code{c(30, 24, 49, 37, 29)}
-\item{lambda} \code{c(1.42, 1.35, 1.4, 1.34, 1.37)}
-\item{delta} \code{c(0.3, 0.31, 0.29, 0.48, 0.32)}
+Simulated data including two colonies (6 and 7) that should always cause errors for \code{bumbl()}
 }
+\details{
+Colonies 1-5 are generated with \code{sim_colony()} using the following parameters:\tabular{rrrrr}{
+   colony \tab tau \tab n0 \tab lambda \tab delta \cr
+   1 \tab 11.0 \tab 30 \tab 1.42 \tab 0.30 \cr
+   2 \tab 11.5 \tab 24 \tab 1.35 \tab 0.31 \cr
+   3 \tab 9.0 \tab 49 \tab 1.40 \tab 0.29 \cr
+   4 \tab 12.0 \tab 37 \tab 1.34 \tab 0.48 \cr
+   5 \tab 10.6 \tab 29 \tab 1.37 \tab 0.32 \cr
+}
+
+
 Colonies 6 and 7 are generated manually.  Colony 6 contains negative numbers
 and should result in the warning "Warning, cannot find valid starting values:
 please specify some for colonyID '6' Omitting from results."  Colony 7 has a
