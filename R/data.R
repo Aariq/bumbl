@@ -53,9 +53,10 @@
 #'
 #' Colonies 6 and 7 are generated manually.  Colony 6 contains negative numbers
 #' and should result in the warning "Warning, cannot find valid starting values:
-#' please specify some for colonyID '6' Omitting from results."  Colony 7 has a
-#' switchpoint at week 20 and therefore should restult in a convergence error
-#' and the warning, "Warning: search for optimal switchpoint did not converge
-#' for colonyID '6'. Omitting from results."
+#' please specify some for colonyID '6' Omitting from results."  Colony 7 has
+#' all the data pushed up to week 25 and therefore should result in a
+#' convergence error when searching for the optimal switchpoint and the warning,
+#' "Warning: search for optimal switchpoint did not converge for colonyID '6'.
+#' Omitting from results."
 #'
 "test_df"
