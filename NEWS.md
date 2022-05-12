@@ -1,3 +1,5 @@
+# bumbl 1.0.2
+
 # bumbl 1.0.1
 
 -   Updated package citation and author list
