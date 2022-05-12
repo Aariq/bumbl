@@ -4,7 +4,14 @@
 \alias{brkpt}
 \title{Fit breakpoint model to individual colony}
 \usage{
-brkpt(data, t, formula, family = gaussian(link = "log"), ...)
+brkpt(
+  data,
+  t,
+  formula,
+  family = gaussian(link = "log"),
+  tau_optim_maxit = 100,
+  ...
+)
 }
 \arguments{
 \item{data}{a dataframe or tibble}
@@ -17,6 +24,10 @@ include the time variable supplied to \code{t}}
 \item{family}{a description of the error distribution and link function.
 This is passed to \code{\link[=glm]{glm()}} except in the case of \code{family = "negbin"}, which
 causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative binomial GLM.}
+
+\item{tau_optim_maxit}{passed to \code{optim()} which is used to find the optimal
+change point, tau.  Mostly used for testing purposes (to force convergence
+errors), but could be increased if optimal switchpoint doesn't converge.}
 
 \item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[=glm.nb]{glm.nb()}}}
 }

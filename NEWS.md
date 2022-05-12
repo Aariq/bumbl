@@ -1,6 +1,7 @@
 # bumbl 1.0.2
 
 -   Added a new dataset, `test_df`, containing simulated data used for package testing.
+-   Added a `tau_optim_maxit` argument to `bumbl()` that is passed to `optim()`.  Mostly for getting consistent convergence failures in tests, but possibly useful to end user.
 
 # bumbl 1.0.1
 

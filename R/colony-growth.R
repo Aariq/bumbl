@@ -10,6 +10,9 @@
 #' @param family a description of the error distribution and link function.
 #'   This is passed to [glm()] except in the case of `family = "negbin"`, which
 #'   causes [MASS::glm.nb()] to be used to fit a negative binomial GLM.
+#' @param tau_optim_maxit passed to `optim()` which is used to find the optimal
+#'   change point, tau.  Mostly used for testing purposes (to force convergence
+#'   errors), but could be increased if optimal switchpoint doesn't converge.
 #' @param ... additional arguments passed to [glm()] or [glm.nb()]
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
@@ -24,6 +27,7 @@ brkpt <-
            t,
            formula,
            family = gaussian(link = "log"),
+           tau_optim_maxit = 100,
            ...) {
 
     #low-level function to modify data and formula and fit breakpoint model
@@ -75,7 +79,7 @@ brkpt <-
       method = "L-BFGS-B",
       lower = min(pull(data, {{t}})),
       upper = max(pull(data, {{t}})),
-      control = list(fnscale = -1)
+      control = list(fnscale = -1, maxit = tau_optim_maxit)
     )
     if (m_optim$convergence != 0) {
       abort(message = "Search for optimal switchpoint did not converge")
@@ -123,6 +127,9 @@ brkpt <-
 #'   the models for each colony. This may be useful for extracting statistics
 #'   and performing model diagnostics not provided by `bumbl()`. Learn more
 #'   about working with list columns with `vignette("nest", package = "tidyr")`.
+#' @param tau_optim_maxit passed to `optim()` which is used to find the optimal
+#'   change point, tau.  Mostly used for testing purposes (to force convergence
+#'   errors), but could be increased if optimal switchpoint doesn't converge.
 #' @param ... additional arguments passed to [glm()] or [MASS::glm.nb()].
 #'
 #' @details Colony growth is modeled as increasing exponentially until the
@@ -197,6 +204,7 @@ bumbl <-
            colonyID = NULL,
            augment = FALSE,
            keep.model = FALSE,
+           tau_optim_maxit = 100,
            ...) {
 
     if (!inherits(data, "data.frame")) {
@@ -269,6 +277,7 @@ bumbl <-
                                         t = !!t,
                                         formula = formula,
                                         family = family,
+                                        tau_optim_maxit = tau_optim_maxit,
                                         !!!more_args),
                                   .y),
                      .id = as_name(colonyID))

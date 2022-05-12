@@ -12,6 +12,7 @@ bumbl(
   colonyID = NULL,
   augment = FALSE,
   keep.model = FALSE,
+  tau_optim_maxit = 100,
   ...
 )
 }
@@ -44,6 +45,10 @@ columns containing model coefficients. Cannot be used in conjunction with
 the models for each colony. This may be useful for extracting statistics
 and performing model diagnostics not provided by \code{bumbl()}. Learn more
 about working with list columns with \code{vignette("nest", package = "tidyr")}.}
+
+\item{tau_optim_maxit}{passed to \code{optim()} which is used to find the optimal
+change point, tau.  Mostly used for testing purposes (to force convergence
+errors), but could be increased if optimal switchpoint doesn't converge.}
 
 \item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}.}
 }

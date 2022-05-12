@@ -23,7 +23,7 @@ test_that("brkpt works with more complicated formulas", {
 
 test_that("brkpt errors when tau optimization does not converge", {
   expect_error({
-    brkpt(test_bad, t = week, formula = mass ~ week)
+    brkpt(test_bad, t = week, formula = mass ~ week, tau_optim_maxit = 1)
     },
     "Search for optimal switchpoint did not converge"
   )

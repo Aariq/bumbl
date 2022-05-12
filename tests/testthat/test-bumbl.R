@@ -32,7 +32,6 @@ test_that("bumbl works", {
   )
 })
 
-#TODO: change to test_df
 test_that("bumbl drops colonies that produce errors", {
   expect_message({
     out <- bumbl(test_df %>% filter(colony %in% 1:6), colonyID = colony, t = week, formula = mass ~ week)
@@ -94,7 +93,7 @@ test_that("bumbl works with poisson count data", {
 
 
 test_that("error handling", {
-  expect_error(bumbl(test_df %>% filter(colony %in% 6:7), colonyID = colony, t = week, formula = mass ~ week), "Model fitting failed for all colonies.")
+  expect_error(bumbl(test_df %>% filter(colony %in% 6:7), colonyID = colony, t = week, formula = mass ~ week, tau_optim_maxit = 1), "Model fitting failed for all colonies.")
 })
 
 test_that("results are correct", {
