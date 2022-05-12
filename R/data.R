@@ -22,3 +22,20 @@
 #' Williams, N. M., Regetz, J., and Kremen, C. (2012). Landscape-scale resources promote colony growth but not reproductive performance of bumble bees. Ecology 93, 1049–1058. doi:10.1890/11-1006.1.
 #'
 "bombus"
+
+#' Simulated colony growth data for internal tests
+#'
+#' Colonies 1-5 are generated with `sim_colony()` using the following parameters:
+#' \describe{
+#'   \item{tau} `c(11, 11.5, 9, 12, 10.6)`
+#'   \item{n0} `c(30, 24, 49, 37, 29)`
+#'   \item{lambda} `c(1.42, 1.35, 1.4, 1.34, 1.37)`
+#'   \item{delta} `c(0.3, 0.31, 0.29, 0.48, 0.32)`
+#' }
+#' Colonies 6 and 7 are generated manually.  Colony 6 contains negative numbers
+#' and should result in the warning "Warning, cannot find valid starting values:
+#' please specify some for colonyID '6' Omitting from results."  Colony 7 has a
+#' switchpoint at week 20 and therefore should restult in a convergence error
+#' and the warning, "Warning: search for optimal switchpoint did not converge
+#' for colonyID '6'. Omitting from results."
+"test_df"
