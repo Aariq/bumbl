@@ -7,7 +7,7 @@
 
 [![R build
 status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https://github.com/Aariq/bumbl/actions)
-[![codecov](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg?token=SU9rm3O2cc)](https://codecov.io/gh/Aariq/bumbl)
+[![codecov](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg?token=SU9rm3O2cc)](https://app.codecov.io/gh/Aariq/bumbl)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
