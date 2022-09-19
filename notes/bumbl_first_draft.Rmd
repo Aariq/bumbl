@@ -218,7 +218,7 @@ colonyID <- quo(colony)
 t <- quo(week)
 test %>% 
   mutate(coefs = map(.data$model, broom::tidy)) %>%
-    unnest(.data$coefs) %>%
+    unnest("coefs") %>%
     select(!!colonyID, "tau", "model", "term", "estimate") %>%
     spread(key = "term", value = "estimate") %>%
     mutate(logNmax = map_dbl(.data$model, ~max(predict(.), na.rm = TRUE))) %>%

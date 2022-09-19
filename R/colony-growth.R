@@ -290,13 +290,13 @@ bumbl <-
       resultdf %>%
       dplyr::select(-"tau") %>%
       mutate(aug = purrr::map(.data$model, ~broom::augment(.x, se_fit = TRUE))) %>%
-      tidyr::unnest(.data$aug) %>%
+      tidyr::unnest("aug") %>%
       dplyr::select(!!colonyID, !!t, ".fitted", ".se.fit", ".resid")
 
     modeldf_long <-
       resultdf %>%
       mutate(coefs = purrr::map(.data$model, broom::tidy)) %>%
-      tidyr::unnest(.data$coefs) %>%
+      tidyr::unnest("coefs") %>%
       # prepend coefs with "beta_" so colnames aren't duplicated if joined to original data.
       mutate(term = ifelse(
         !.data$term %in% c("(Intercept)", ".post", tvar),
@@ -324,7 +324,7 @@ bumbl <-
       )
 
     if (keep.model == FALSE) {
-      modeldf <- select(modeldf, -.data$model)
+      modeldf <- select(modeldf, -"model")
     }
     augmented_df <-
       left_join(df, modeldf, by = as_name(colonyID))
