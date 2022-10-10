@@ -8,8 +8,10 @@
 [![R build
 status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https://github.com/Aariq/bumbl/actions)
 [![codecov](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg?token=SU9rm3O2cc)](https://app.codecov.io/gh/Aariq/bumbl)
-[![Lifecycle:
-stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![Project Status: Inactive – The project has reached a stable, usable
+state but is no longer being actively developed; support/maintenance
+will be provided as time
+allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bumbl)](https://CRAN.R-project.org/package=bumbl)
 [![metacran
@@ -46,31 +48,31 @@ bumblebee ecology and demography from anyone!
 
 ### Roadmap
 
--   [x] Write `bumbl()` function to model colony growth with switchpoint
--   [x] Finish documentation and vignette(s)
--   [x] [rOpenSci
-    review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
--   [x] Regroup with Elizabeth Crone to discuss current behavior of
-    `bumbl()`
--   [x] Release v0.1.0 and archive on Zenodo
--   [x] Bug fixes
--   [x] Submit v1.0.0 of package to CRAN
--   [x] Write a manuscript for JOSS
-    ([desk-reject](https://github.com/openjournals/joss-reviews/issues/3532),
-    out of scope)
--   [x] Release minor version to CRAN to update citation
--   [ ] Possibly re-work internals of `bumbl()`? (see
-    [\#58](https://github.com/Aariq/bumbl/issues/58) and
-    [notes](https://github.com/Aariq/bumbl/blob/master/notes/single-model-rework-notes.Rmd))
--   [ ] Submit v2.0.0 of package to CRAN
+- [x] Write `bumbl()` function to model colony growth with switchpoint
+- [x] Finish documentation and vignette(s)
+- [x] [rOpenSci
+  review](https://github.com/ropenscilabs/statistical-software-review/issues/2)
+- [x] Regroup with Elizabeth Crone to discuss current behavior of
+  `bumbl()`
+- [x] Release v0.1.0 and archive on Zenodo
+- [x] Bug fixes
+- [x] Submit v1.0.0 of package to CRAN
+- [x] Write a manuscript for JOSS
+  ([desk-reject](https://github.com/openjournals/joss-reviews/issues/3532),
+  out of scope)
+- [x] Release minor version to CRAN to update citation
+- [ ] Possibly re-work internals of `bumbl()`? (see
+  [\#58](https://github.com/Aariq/bumbl/issues/58) and
+  [notes](https://github.com/Aariq/bumbl/blob/master/notes/single-model-rework-notes.Rmd))
+- [ ] Submit v2.0.0 of package to CRAN
 
 Other possible areas of improvement:
 
--   Extend `bumbl()` to work with GLMMs
--   Test significance of switchpoint (see
-    [\#62](https://github.com/Aariq/bumbl/issues/62))
--   Extend `bumbl()` to work with dates, datetimes, or other timeseries
-    classes (see [\#46](https://github.com/Aariq/bumbl/issues/46))
+- Extend `bumbl()` to work with GLMMs
+- Test significance of switchpoint (see
+  [\#62](https://github.com/Aariq/bumbl/issues/62))
+- Extend `bumbl()` to work with dates, datetimes, or other timeseries
+  classes (see [\#46](https://github.com/Aariq/bumbl/issues/46))
 
 ## Installation
 
@@ -100,15 +102,15 @@ View the `bomubs` dataset
 ``` r
 head(bombus)
 #> # A tibble: 6 × 10
-#>   site  colony  wild habitat date        week  mass d.mass floral_resources
-#>   <fct> <fct>  <dbl> <fct>   <date>     <int> <dbl>  <dbl>            <dbl>
-#> 1 PUT2  9       0.98 W       2003-04-03     0 1910.    0.1            27.8 
-#> 2 PUT2  9       0.98 W       2003-04-09     1 1940    30.6            27.8 
-#> 3 PUT2  9       0.98 W       2003-04-15     2 1938    28.6            27.8 
-#> 4 PUT2  9       0.98 W       2003-04-22     3 1976.   67.1            27.8 
-#> 5 PUT2  9       0.98 W       2003-05-01     4 2010.  101.              7.96
-#> 6 PUT2  9       0.98 W       2003-05-07     5 2143   234.              7.96
-#> # … with 1 more variable: cum_floral <dbl>
+#>   site  colony  wild habitat date        week  mass d.mass floral_reso…¹ cum_f…²
+#>   <fct> <fct>  <dbl> <fct>   <date>     <int> <dbl>  <dbl>         <dbl>   <dbl>
+#> 1 PUT2  9       0.98 W       2003-04-03     0 1910.    0.1         27.8     27.8
+#> 2 PUT2  9       0.98 W       2003-04-09     1 1940    30.6         27.8     55.5
+#> 3 PUT2  9       0.98 W       2003-04-15     2 1938    28.6         27.8     83.3
+#> 4 PUT2  9       0.98 W       2003-04-22     3 1976.   67.1         27.8    111. 
+#> 5 PUT2  9       0.98 W       2003-05-01     4 2010.  101.           7.96   119. 
+#> 6 PUT2  9       0.98 W       2003-05-07     5 2143   234.           7.96   127. 
+#> # … with abbreviated variable names ¹​floral_resources, ²​cum_floral
 ```
 
 ### Example use
