@@ -1,3 +1,5 @@
+# bumbl 1.0.3
+
 # bumbl 1.0.2
 
 -   Added a new dataset, `test_df`, containing simulated data used for package testing.
