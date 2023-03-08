@@ -31,8 +31,9 @@ Imports:
     broom,
     glue,
     MASS,
-    ggplot2
-RoxygenNote: 7.1.2
+    ggplot2,
+    lifecycle
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
