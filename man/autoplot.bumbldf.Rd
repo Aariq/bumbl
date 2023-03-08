@@ -4,10 +4,12 @@
 \alias{autoplot.bumbldf}
 \title{Plot observed and fitted results from bumbl()}
 \usage{
-\method{autoplot}{bumbldf}(object, colony = NULL, x = deprecated())
+\method{autoplot}{bumbldf}(object, ..., colony = NULL, x = deprecated())
 }
 \arguments{
 \item{object}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}}
+
+\item{...}{other arguments passed to \code{autoplot()}}
 
 \item{colony}{a character vector of colony IDs to plot}
 

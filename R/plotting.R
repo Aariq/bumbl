@@ -50,6 +50,7 @@ plot.bumbldf <- function(x, ..., colony = NULL) {
 #' Plots observed (points) and fitted (red line) values from the model implemented by `bumbl()`, faceted by colony.
 #'
 #' @param object a dataframe produced by [bumbl()]
+#' @param ... other arguments passed to `autoplot()`
 #' @param colony a character vector of colony IDs to plot
 #' @param x `r lifecycle::badge("deprecated")` `x` has been re-named to `object`
 #'   for consistency with other `autoplot()` functions
@@ -63,7 +64,7 @@ plot.bumbldf <- function(x, ..., colony = NULL) {
 #'                  formula = mass ~ week)
 #' library(ggplot2)
 #' autoplot(results)
-autoplot.bumbldf <- function(object, colony = NULL, x = deprecated()) {
+autoplot.bumbldf <- function(object, ..., colony = NULL, x = deprecated()) {
   if(!requireNamespace("ggplot2", quietly = TRUE)) {
     abort("The ggplot2 package must be installed to use autoplot.bumbldf()")
   }
