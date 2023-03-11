@@ -1,6 +1,6 @@
 Package: bumbl
 Title: Tools for Modeling Bumblebee Colony Growth and Decline
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person(given = c("Eric", "R."),
            family = "Scott",
@@ -31,8 +31,9 @@ Imports:
     broom,
     glue,
     MASS,
-    ggplot2
-RoxygenNote: 7.1.2
+    ggplot2,
+    lifecycle
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

@@ -1,3 +1,8 @@
+# bumbl 1.0.3
+
+-   In `autoplot.bumbldf()` the first argument has been re-named from `x` to `object` for consistency with other `autoplot()` methods.
+-   `bumbl` now uses the `lifecycle` package to manage function lifecycle
+
 # bumbl 1.0.2
 
 -   Added a new dataset, `test_df`, containing simulated data used for package testing.

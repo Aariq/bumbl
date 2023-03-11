@@ -4,12 +4,17 @@
 \alias{autoplot.bumbldf}
 \title{Plot observed and fitted results from bumbl()}
 \usage{
-\method{autoplot}{bumbldf}(x, colony = NULL)
+\method{autoplot}{bumbldf}(object, ..., colony = NULL, x = deprecated())
 }
 \arguments{
-\item{x}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}}
+\item{object}{a dataframe produced by \code{\link[=bumbl]{bumbl()}}}
+
+\item{...}{other arguments passed to \code{autoplot()}}
 
 \item{colony}{a character vector of colony IDs to plot}
+
+\item{x}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} \code{x} has been re-named to \code{object}
+for consistency with other \code{autoplot()} functions}
 }
 \value{
 invisibly returns a ggplot object

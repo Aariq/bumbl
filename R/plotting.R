@@ -49,8 +49,11 @@ plot.bumbldf <- function(x, ..., colony = NULL) {
 #'
 #' Plots observed (points) and fitted (red line) values from the model implemented by `bumbl()`, faceted by colony.
 #'
-#' @param x a dataframe produced by [bumbl()]
+#' @param object a dataframe produced by [bumbl()]
+#' @param ... other arguments passed to `autoplot()`
 #' @param colony a character vector of colony IDs to plot
+#' @param x `r lifecycle::badge("deprecated")` `x` has been re-named to `object`
+#'   for consistency with other `autoplot()` functions
 #' @method autoplot bumbldf
 #' @importFrom ggplot2 autoplot
 #' @export
@@ -61,28 +64,32 @@ plot.bumbldf <- function(x, ..., colony = NULL) {
 #'                  formula = mass ~ week)
 #' library(ggplot2)
 #' autoplot(results)
-autoplot.bumbldf <- function(x, colony = NULL) {
+autoplot.bumbldf <- function(object, ..., colony = NULL, x = deprecated()) {
   if(!requireNamespace("ggplot2", quietly = TRUE)) {
     abort("The ggplot2 package must be installed to use autoplot.bumbldf()")
   }
-  colonyID <- attr(x, "colonyID", exact = TRUE)
-  t <- attr(x, "t", exact = TRUE)
-  formula <- attr(x, "formula", exact = TRUE)
-  predict <- attr(x, "predict", exact = TRUE)
+  if (lifecycle::is_present(x)) {
+    lifecycle::deprecate_warn("1.0.3", "autoplot.bumbldf(x)", "autoplot.bumbldf(object)")
+    object <- x
+  }
+  colonyID <- attr(object, "colonyID", exact = TRUE)
+  t <- attr(object, "t", exact = TRUE)
+  formula <- attr(object, "formula", exact = TRUE)
+  predict <- attr(object, "predict", exact = TRUE)
   yvar <- all.vars(formula)[1]
 
   if (is.null(predict)) {
-    x <- x
+    df <- object
   } else {
-    x <- predict
+    df <- predict
   }
 
   if (!is.null(colony)) {
-    x <- x[x[[colonyID]] %in% colony, ]
+    df <- df[df[[colonyID]] %in% colony, ]
   }
 
   p <-
-    ggplot2::ggplot(x, ggplot2::aes_string(x = t)) +
+    ggplot2::ggplot(df, ggplot2::aes_string(x = t)) +
     ggplot2::geom_point(ggplot2::aes_string(y = yvar)) +
     ggplot2::geom_line(ggplot2::aes(y = exp(.data$.fitted)), color = "red") +
     ggplot2::facet_wrap(colonyID)
