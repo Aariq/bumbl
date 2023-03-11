@@ -1,3 +1,5 @@
+# bumbl (development version)
+
 # bumbl 1.0.3
 
 -   In `autoplot.bumbldf()` the first argument has been re-named from `x` to `object` for consistency with other `autoplot()` methods.

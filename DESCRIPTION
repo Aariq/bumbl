@@ -1,6 +1,6 @@
 Package: bumbl
 Title: Tools for Modeling Bumblebee Colony Growth and Decline
-Version: 1.0.3
+Version: 1.0.3.9000
 Authors@R: c(
     person(given = c("Eric", "R."),
            family = "Scott",
