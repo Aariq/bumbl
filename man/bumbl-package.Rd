@@ -3,7 +3,6 @@
 \docType{package}
 \name{bumbl-package}
 \alias{bumbl-package}
-\alias{_PACKAGE}
 \title{bumbl: Tools for Modeling Bumblebee Colony Growth and Decline}
 \description{
 Bumblebee colonies grow during worker production, then decline after switching to production of reproductive individuals (drones and gynes). This package provides tools for modeling and visualizing this pattern by identifying a switchpoint with a growth rate before and a decline rate after the switchpoint. The mathematical models fit by bumbl are described in Crone and Williams (2016) \doi{10.1111/ele.12581}.

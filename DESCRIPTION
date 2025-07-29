@@ -1,39 +1,42 @@
 Package: bumbl
 Title: Tools for Modeling Bumblebee Colony Growth and Decline
 Version: 1.0.3.9000
-Authors@R: c(
-    person(given = c("Eric", "R."),
-           family = "Scott",
-           role = c("aut", "cre"),
-           email = "scottericr@gmail.com",
+Authors@R: 
+    person(c("Eric", "R."), "Scott", , "scottericr@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7430-7879"))
-           )
-Description: Bumblebee colonies grow during worker production, then decline after switching to production of reproductive individuals (drones and gynes).  This package provides tools for modeling and visualizing this pattern by identifying a switchpoint with a growth rate before and a decline rate after the switchpoint. The mathematical models fit by bumbl are described in Crone and Williams (2016) <doi:10.1111/ele.12581>.
+Description: Bumblebee colonies grow during worker production, then
+    decline after switching to production of reproductive individuals
+    (drones and gynes).  This package provides tools for modeling and
+    visualizing this pattern by identifying a switchpoint with a growth
+    rate before and a decline rate after the switchpoint. The mathematical
+    models fit by bumbl are described in Crone and Williams (2016)
+    <doi:10.1111/ele.12581>.
 License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
 URL: https://github.com/Aariq/bumbl
 BugReports: https://github.com/Aariq/bumbl/issues
 Depends:
     R (>= 3.0)
+Imports: 
+    broom,
+    dplyr,
+    ggplot2,
+    glue,
+    lifecycle,
+    MASS,
+    purrr,
+    rlang,
+    tidyr (>= 1.0.0)
 Suggests: 
-    testthat (>= 2.1.0),
+    car,
+    covr,
     knitr,
     rmarkdown,
-    covr,
-    car,
-    rsq
-Imports: 
-    dplyr,
-    rlang,
-    tidyr (>= 1.0.0),
-    purrr,
-    broom,
-    glue,
-    MASS,
-    ggplot2,
-    lifecycle
-RoxygenNote: 7.2.3
-Roxygen: list(markdown = TRUE)
-VignetteBuilder: knitr
+    rsq,
+    testthat (>= 2.1.0)
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

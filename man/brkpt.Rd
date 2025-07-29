@@ -29,7 +29,7 @@ causes \code{\link[MASS:glm.nb]{MASS::glm.nb()}} to be used to fit a negative bi
 change point, tau.  Mostly used for testing purposes (to force convergence
 errors), but could be increased if optimal switchpoint doesn't converge.}
 
-\item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[=glm.nb]{glm.nb()}}}
+\item{...}{additional arguments passed to \code{\link[=glm]{glm()}} or \code{\link[MASS:glm.nb]{MASS::glm.nb()}}}
 }
 \value{
 a tibble with a column for the winning tau and a column for the

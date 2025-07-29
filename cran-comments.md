@@ -1,22 +1,24 @@
 ## Test environments
-* local R installation, macOS 13.2.1, R 4.2.2
+* local R installation, macOS 15.5, R 4.5.0
 
 With GitHub Actions:
 
-* windows-latest, R 4.2.2
+* windows-latest, R 4.5.1
 * windows-devel, R development version
-* macOS-latest, R 4.2.2
-* ubuntu-20.04, R 4.2.2
-* ubuntu-20.04, R development version
+* macOS-latest, R 4.5.1
+* ubuntu-latest, R 4.5.1
+* ubuntu-latest, R development version
+* ubuntu-latest, R 4.4.3
 
 R-hub:
 
-* Windows Server 2022, R development version
+* Windows Server 2022 x64 (build 20348), R development version
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
 
-* This is a patch update to the `bumbl` package to address check warnings about S3 generic/method consistency
+* The only note is "unable to verify current time", which I belive is a known bug
 
-* A note on the R-hub windows build (detritus in temp directory lastMiKTeXException) is an rhub issue: https://github.com/r-hub/rhub/issues/503
+* This is a patch update to the `bumbl` package to address check warnings about cross-references in documentation
+

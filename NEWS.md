@@ -1,6 +1,7 @@
 # bumbl (development version)
 
 - bumbl is now licenced under an MIT license
+- fixed link in documentation for `brkpt()`
 
 # bumbl 1.0.3
 

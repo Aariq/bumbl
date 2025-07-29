@@ -5,9 +5,9 @@
 
 <!-- badges: start -->
 
-[![R build
-status](https://github.com/Aariq/bumbl/workflows/R-CMD-check/badge.svg)](https://github.com/Aariq/bumbl/actions)
-[![codecov](https://codecov.io/gh/Aariq/bumbl/branch/master/graph/badge.svg?token=SU9rm3O2cc)](https://app.codecov.io/gh/Aariq/bumbl)
+[![R-CMD-check](https://github.com/Aariq/bumbl/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Aariq/bumbl/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/Aariq/bumbl/graph/badge.svg)](https://app.codecov.io/gh/Aariq/bumbl)
 [![Project Status: Inactive – The project has reached a stable, usable
 state but is no longer being actively developed; support/maintenance
 will be provided as time
@@ -36,11 +36,10 @@ rates and *tau* for each colony.
 ## Contributing
 
 I’m looking for collaborators who know (or are willing to let me teach
-them) how to use git and GitHub and who have an interest in helping to
-develop and maintain this package long-term. I’m not a bumblebee
-biologist, so I would especially love a collaborator who works on
-bumblebees or other organisms with a similar growth, switch, decline
-lifecycle.
+them) how to use git and GitHub and who have an interest in taking over
+as maintainer of this package. I’m not a bumblebee biologist, so I would
+especially love a collaborator who works on bumblebees or other
+organisms with a similar growth, switch, decline lifecycle.
 
 I also welcome contributions including bug-fixes, improvement of
 documentation, additional features, or new functions relating to
@@ -102,15 +101,15 @@ View the `bomubs` dataset
 ``` r
 head(bombus)
 #> # A tibble: 6 × 10
-#>   site  colony  wild habitat date        week  mass d.mass floral_reso…¹ cum_f…²
-#>   <fct> <fct>  <dbl> <fct>   <date>     <int> <dbl>  <dbl>         <dbl>   <dbl>
-#> 1 PUT2  9       0.98 W       2003-04-03     0 1910.    0.1         27.8     27.8
-#> 2 PUT2  9       0.98 W       2003-04-09     1 1940    30.6         27.8     55.5
-#> 3 PUT2  9       0.98 W       2003-04-15     2 1938    28.6         27.8     83.3
-#> 4 PUT2  9       0.98 W       2003-04-22     3 1976.   67.1         27.8    111. 
-#> 5 PUT2  9       0.98 W       2003-05-01     4 2010.  101.           7.96   119. 
-#> 6 PUT2  9       0.98 W       2003-05-07     5 2143   234.           7.96   127. 
-#> # … with abbreviated variable names ¹​floral_resources, ²​cum_floral
+#>   site  colony  wild habitat date        week  mass d.mass floral_resources
+#>   <fct> <fct>  <dbl> <fct>   <date>     <int> <dbl>  <dbl>            <dbl>
+#> 1 PUT2  9       0.98 W       2003-04-03     0 1910.    0.1            27.8 
+#> 2 PUT2  9       0.98 W       2003-04-09     1 1940    30.6            27.8 
+#> 3 PUT2  9       0.98 W       2003-04-15     2 1938    28.6            27.8 
+#> 4 PUT2  9       0.98 W       2003-04-22     3 1976.   67.1            27.8 
+#> 5 PUT2  9       0.98 W       2003-05-01     4 2010.  101.              7.96
+#> 6 PUT2  9       0.98 W       2003-05-07     5 2143   234.              7.96
+#> # ℹ 1 more variable: cum_floral <dbl>
 ```
 
 ### Example use
