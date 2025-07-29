@@ -13,7 +13,7 @@
 #' @param tau_optim_maxit passed to `optim()` which is used to find the optimal
 #'   change point, tau.  Mostly used for testing purposes (to force convergence
 #'   errors), but could be increased if optimal switchpoint doesn't converge.
-#' @param ... additional arguments passed to [glm()] or [glm.nb()]
+#' @param ... additional arguments passed to [glm()] or [MASS::glm.nb()]
 #' @return a tibble with a column for the winning tau and a column for the
 #'   winning model
 #' @seealso [bumbl()]
