@@ -8,7 +8,7 @@ message: 'To cite package "bumbl" in publications use:'
 type: software
 license: CC-BY-4.0
 title: 'bumbl: Tools for Modeling Bumblebee Colony Growth and Decline'
-version: 1.0.3
+version: 1.0.4
 doi: 10.5281/zenodo.4545782
 abstract: Bumblebee colonies grow during worker production, then decline after switching
   to production of reproductive individuals (drones and gynes). This package provides
@@ -31,7 +31,7 @@ preferred-citation:
   year: '2021'
   publisher:
     name: Zenodo
-  version: 1.0.3
+  version: 1.0.4
   doi: 10.5281/zenodo.4545782
   url: https://doi.org/10.5281/zenodo.4545782
 repository: https://CRAN.R-project.org/package=bumbl
